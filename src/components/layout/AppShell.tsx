@@ -8,7 +8,7 @@ export function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-brand-50/20">
+    <div className="min-h-screen bg-[#EEF2FF]">
       <Navbar onMenuClick={() => setSidebarOpen(p => !p)} />
       <div className="flex pt-16">
         <Sidebar open={sidebarOpen} />

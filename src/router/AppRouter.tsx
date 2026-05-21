@@ -1,6 +1,5 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import { useLocation } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import LandingPage from '../pages/LandingPage';
 import DashboardPage from '../pages/dashboard/DashboardPage';
@@ -13,6 +12,7 @@ import PublicQuizSessionPage from '../pages/public/PublicQuizSessionPage';
 import PublicQuizResultPage from '../pages/public/PublicQuizResultPage';
 import NotFoundPage from '../pages/NotFoundPage';
 import { AppShell } from '../components/layout/AppShell';
+import { PageTransition } from '../components/common/PageTransition';
 
 export default function AppRouter() {
   const location = useLocation();
@@ -21,19 +21,19 @@ export default function AppRouter() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         {/* Public routes */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/quiz/:quizCode" element={<PublicQuizLandingPage />} />
-        <Route path="/quiz/:quizCode/session" element={<PublicQuizSessionPage />} />
-        <Route path="/quiz/:quizCode/result" element={<PublicQuizResultPage />} />
+        <Route path="/" element={<PageTransition><LandingPage /></PageTransition>} />
+        <Route path="/quiz/:quizCode" element={<PageTransition><PublicQuizLandingPage /></PageTransition>} />
+        <Route path="/quiz/:quizCode/session" element={<PageTransition><PublicQuizSessionPage /></PageTransition>} />
+        <Route path="/quiz/:quizCode/result" element={<PageTransition><PublicQuizResultPage /></PageTransition>} />
 
         {/* Protected routes — wrapped in AppShell */}
         <Route element={<ProtectedRoute />}>
           <Route element={<AppShell />}>
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/quizzes" element={<QuizzesPage />} />
-            <Route path="/quizzes/:id" element={<QuizDetailPage />} />
-            <Route path="/quizzes/:id/analytics" element={<QuizAnalyticsPage />} />
-            <Route path="/generate" element={<GeneratePage />} />
+            <Route path="/dashboard" element={<PageTransition><DashboardPage /></PageTransition>} />
+            <Route path="/quizzes" element={<PageTransition><QuizzesPage /></PageTransition>} />
+            <Route path="/quizzes/:id" element={<PageTransition><QuizDetailPage /></PageTransition>} />
+            <Route path="/quizzes/:id/analytics" element={<PageTransition><QuizAnalyticsPage /></PageTransition>} />
+            <Route path="/generate" element={<PageTransition><GeneratePage /></PageTransition>} />
           </Route>
         </Route>
 

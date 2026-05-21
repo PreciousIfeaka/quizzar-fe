@@ -68,12 +68,16 @@ export default function PublicQuizSessionPage() {
   const timerSeconds = session.timerValueSeconds;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-brand-50/30">
+    <div className="min-h-screen bg-[#0d0414] text-slate-100 selection:bg-[#c97dff]/30 relative overflow-hidden">
+      {/* Decorative starry glowing gradients */}
+      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-[#c97dff]/5 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-[#6366f1]/5 blur-[150px] pointer-events-none" />
+
       {/* Progress Header */}
-      <div className="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-slate-100 px-4 py-3">
+      <div className="sticky top-0 z-10 bg-[#12061c]/80 backdrop-blur-lg border-b border-[#c97dff]/15 px-4 py-3">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-semibold text-slate-600">
+            <span className="text-sm font-bold text-[#e5baff]/80">
               Question {currentIndex + 1} of {quiz.questions?.length || 0}
             </span>
             {timerMode === 'OVERALL' && timerSeconds && (
@@ -83,13 +87,18 @@ export default function PublicQuizSessionPage() {
                 size="sm"
               />
             )}
-            <span className="text-sm font-semibold text-brand-600">{studentName}</span>
+            <span 
+              className="text-sm font-extrabold text-[#c97dff] tracking-wide"
+              style={{ textShadow: '0 0 8px rgba(201,125,255,0.5)' }}
+            >
+              {studentName}
+            </span>
           </div>
           <ProgressBar value={progress} />
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-8">
+      <div className="max-w-2xl mx-auto px-4 py-8 relative z-10">
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={currentIndex}

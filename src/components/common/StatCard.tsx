@@ -11,10 +11,10 @@ interface StatCardProps {
 }
 
 const colors = {
-  brand: { bg: 'bg-brand-100', icon: 'text-brand-600', ring: 'ring-brand-200' },
-  accent: { bg: 'bg-purple-100', icon: 'text-purple-600', ring: 'ring-purple-200' },
-  energy: { bg: 'bg-orange-100', icon: 'text-orange-600', ring: 'ring-orange-200' },
-  success: { bg: 'bg-green-100', icon: 'text-green-600', ring: 'ring-green-200' },
+  brand: { bg: 'bg-brand-50', icon: 'text-brand-600', ring: 'ring-brand-100/50' },
+  accent: { bg: 'bg-blue-50', icon: 'text-blue-600', ring: 'ring-blue-100/50' },
+  energy: { bg: 'bg-red-50', icon: 'text-red-600', ring: 'ring-red-100/50' },
+  success: { bg: 'bg-emerald-50', icon: 'text-emerald-600', ring: 'ring-emerald-100/50' },
 };
 
 export function StatCard({ label, value, icon: Icon, trend, color = 'brand' }: StatCardProps) {
@@ -23,19 +23,20 @@ export function StatCard({ label, value, icon: Icon, trend, color = 'brand' }: S
     <motion.div
       whileHover={{ y: -2 }}
       transition={{ duration: 0.2 }}
-      className="bg-white rounded-2xl border border-slate-100 shadow-card p-5"
+      className="bg-white rounded-2xl border border-slate-100/60 shadow-md p-5"
     >
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm text-muted-foreground font-medium">{label}</p>
-          <p className="text-3xl font-bold text-slate-800 mt-1">{value}</p>
+          <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider">{label}</p>
+          <p className="text-3xl font-black text-slate-900 mt-1 tracking-tight">{value}</p>
           {trend && (
-            <p className={cn('text-xs font-medium mt-1', trend.positive ? 'text-green-600' : 'text-red-500')}>
-              {trend.positive ? '↑' : '↓'} {Math.abs(trend.value)}% from last week
+            <p className={cn('text-xs font-semibold mt-2 flex items-center gap-1', trend.positive ? 'text-emerald-500' : 'text-red-500')}>
+              <span className="text-sm">{trend.positive ? '↑' : '↓'}</span>
+              <span>{Math.abs(trend.value)}% from last week</span>
             </p>
           )}
         </div>
-        <div className={cn('p-3 rounded-xl ring-1', c.bg, c.ring)}>
+        <div className={cn('p-3 rounded-xl border border-transparent transition-colors duration-200', c.bg, c.ring)}>
           <Icon className={cn('w-5 h-5', c.icon)} />
         </div>
       </div>

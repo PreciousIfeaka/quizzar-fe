@@ -53,7 +53,7 @@ export function SpecsForm({ onGenerating }: { onGenerating: (v: boolean) => void
   const [showSyllabus, setShowSyllabus] = useState(false);
 
   const {
-    register, handleSubmit, watch, setValue, control,
+    register, handleSubmit, watch, setValue,
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),

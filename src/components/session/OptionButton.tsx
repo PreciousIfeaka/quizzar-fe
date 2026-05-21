@@ -10,47 +10,48 @@ interface OptionButtonProps {
   correct?: boolean | null;   // Only shown on result screen
   disabled?: boolean;
 }
-
 export function OptionButton({
-  label, text, selected, onClick, correct, disabled
+  label: _label, text, selected, onClick, correct, disabled
 }: OptionButtonProps) {
   const isResult = correct !== undefined && correct !== null;
 
+  // Strips prefixes like "A. ", "B) ", "c. ", etc.
+  const cleanedText = text.replace(/^[A-Da-d][.)\-\s]+\s*/, '').trim();
+
   return (
     <motion.button
-      whileHover={!disabled ? { x: 4 } : undefined}
-      whileTap={!disabled ? { scale: 0.99 } : undefined}
+      whileHover={!disabled ? { scale: 1.03, y: -3, rotate: 0.5 } : undefined}
+      whileTap={!disabled ? { scale: 0.97 } : undefined}
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'w-full flex items-center gap-4 p-4 rounded-2xl border-2 text-left transition-all duration-200',
-        !isResult && !selected && 'border-slate-100 bg-white hover:border-brand-300 hover:bg-brand-50/40',
-        !isResult && selected && 'border-brand-500 bg-brand-50 shadow-brand-sm',
-        isResult && correct  && selected && 'border-green-500 bg-green-50',
-        isResult && !correct && selected && 'border-red-400 bg-red-50',
-        isResult && correct  && !selected && 'border-green-200 bg-green-50/50',
+        'w-full flex items-center justify-center p-5 rounded-2xl border-2 text-center transition-all duration-300 font-extrabold text-base relative overflow-hidden group',
+        !isResult && !selected && 'border-[#c97dff]/15 bg-[#1a0926]/40 text-slate-200 hover:border-[#c97dff]/70 hover:bg-[#c97dff]/12 hover:text-white hover:shadow-[0_8px_30px_rgba(201,125,255,0.15)]',
+        !isResult && selected && 'border-[#c97dff] bg-[#c97dff]/25 text-[#e5baff] shadow-[0_0_30px_rgba(201,125,255,0.45)]',
+        isResult && correct  && selected && 'border-[#00d68f] bg-[#00d68f]/25 text-[#a8ffd4] shadow-[0_0_30px_rgba(0,214,143,0.45)]',
+        isResult && !correct && selected && 'border-red-500 bg-red-500/20 text-red-300 shadow-[0_0_30px_rgba(239,68,68,0.35)]',
+        isResult && correct  && !selected && 'border-[#00d68f]/40 bg-[#00d68f]/8 text-emerald-400',
         disabled && 'cursor-not-allowed'
       )}
     >
-      <span className={cn(
-        'w-9 h-9 rounded-xl flex items-center justify-center text-sm font-black flex-shrink-0 transition-all',
-        !isResult && !selected && 'bg-slate-100 text-slate-500',
-        !isResult && selected  && 'bg-brand-500 text-white',
-        isResult && correct  && selected  && 'bg-green-500 text-white',
-        isResult && !correct && selected  && 'bg-red-400 text-white',
-        isResult && correct  && !selected && 'bg-green-100 text-green-700',
-      )}>
-        {isResult && correct && selected
-          ? <Check className="w-4 h-4" />
-          : label
-        }
+      {/* Decorative spotlight glare overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out pointer-events-none" />
+
+      <span className="relative z-10 tracking-tight leading-snug">
+        {cleanedText}
       </span>
-      <span className={cn(
-        'text-sm font-medium leading-snug flex-1',
-        selected && !isResult ? 'text-brand-700' : 'text-slate-700'
-      )}>
-        {text}
-      </span>
+
+      {/* Result indicators at the right corner if needed */}
+      {isResult && correct && (
+        <span className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#00d68f] flex items-center justify-center text-white shadow-md">
+          <Check className="w-3.5 h-3.5 stroke-[3]" />
+        </span>
+      )}
+      {isResult && !correct && selected && (
+        <span className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-red-500 flex items-center justify-center text-white text-xs font-black shadow-md">
+          ✕
+        </span>
+      )}
     </motion.button>
   );
 }

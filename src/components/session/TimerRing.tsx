@@ -26,7 +26,7 @@ export function TimerRing({ seconds, onExpire, size = 'lg' }: TimerRingProps) {
           cx={dim / 2} cy={dim / 2} r={r}
           fill="none" stroke="currentColor"
           strokeWidth={stroke}
-          className="text-slate-100"
+          className="text-[#1a0926]"
         />
         {/* Progress ring */}
         <motion.circle
@@ -38,7 +38,7 @@ export function TimerRing({ seconds, onExpire, size = 'lg' }: TimerRingProps) {
           strokeDashoffset={offset}
           className={cn(
             'transition-all duration-1000',
-            isUrgent ? 'stroke-red-500' : 'stroke-brand-500'
+            isUrgent ? 'stroke-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'stroke-[#c97dff] shadow-[0_0_8px_rgba(201,125,255,0.5)]'
           )}
         />
       </svg>
@@ -46,8 +46,7 @@ export function TimerRing({ seconds, onExpire, size = 'lg' }: TimerRingProps) {
         <span className={cn(
           'font-black tabular-nums',
           size === 'lg' ? 'text-2xl' : 'text-sm',
-          isUrgent ? 'text-red-500' : 'text-slate-800',
-          isUrgent && 'animate-pulse'
+          isUrgent ? 'text-red-500 animate-pulse' : 'text-slate-200',
         )}>
           {remaining}
         </span>

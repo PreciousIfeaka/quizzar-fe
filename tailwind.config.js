@@ -31,13 +31,18 @@ export default {
           foreground: "hsl(var(--muted-foreground))",
         },
 
-        // MERGED ACCENT OBJECT (Fixes the duplicate key overwrite error)
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
-          400: '#c084fc',
-          500: '#a855f7',
-          600: '#9333ea',
+          400: '#60a5fa',
+          500: '#2563eb',
+          600: '#1d4ed8',
+        },
+
+        success: {
+          400: '#34d399',
+          500: '#10b981',
+          600: '#059669',
         },
 
         popover: {
@@ -49,27 +54,27 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         brand: {
-          50: '#eef2ff',
-          100: '#e0e7ff',
-          200: '#c7d2fe',
-          300: '#a5b4fc',
-          400: '#818cf8',
-          500: '#6366f1',
-          600: '#4f46e5',
-          700: '#4338ca',
-          800: '#3730a3',
-          900: '#312e81',
+          50: '#f5f3ff',
+          100: '#ede9fe',
+          200: '#ddd6fe',
+          300: '#c4b5fd',
+          400: '#a78bfa',
+          500: '#5B21B6',
+          600: '#4c1d95',
+          700: '#3b0764',
+          800: '#2e0854',
+          900: '#1e003b',
         },
         energy: {
-          400: '#fb923c',
-          500: '#f97316',
-          600: '#ea580c',
+          400: '#f87171',
+          500: '#ef4444',
+          600: '#dc2626',
         },
       },
       backgroundImage: {
-        'gradient-brand': 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
-        'gradient-energy': 'linear-gradient(135deg, #f97316 0%, #ef4444 100%)',
-        'gradient-success': 'linear-gradient(135deg, #22c55e 0%, #10b981 100%)',
+        'gradient-brand': 'linear-gradient(135deg, #5B21B6 0%, #7c3aed 100%)',
+        'gradient-energy': 'linear-gradient(135deg, #fb923c 0%, #ef4444 100%)',
+        'gradient-success': 'linear-gradient(135deg, #10B981 0%, #059669 100%)',
         'gradient-card': 'linear-gradient(145deg, #ffffff 0%, #f8f7ff 100%)',
       },
       boxShadow: {

@@ -15,10 +15,10 @@ import { quizApi } from '../../api/quiz.api';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 
 const timingLabels = {
-  NONE: { label: 'No Timer', color: 'bg-slate-100 text-slate-600' },
-  PER_QUESTION: { label: 'Per Question', color: 'bg-blue-100 text-blue-700' },
-  OVERALL: { label: 'Overall Timer', color: 'bg-purple-100 text-purple-700' },
-  AI_SUGGESTED: { label: 'AI Suggested', color: 'bg-brand-100 text-brand-700' },
+  NONE: { label: 'No Timer', color: 'bg-slate-50 text-slate-600 border border-slate-100/50' },
+  PER_QUESTION: { label: 'Per Question', color: 'bg-blue-50 text-blue-600 border border-blue-100/50' },
+  OVERALL: { label: 'Overall Timer', color: 'bg-purple-50 text-brand-600 border border-brand-100/50' },
+  AI_SUGGESTED: { label: 'AI Suggested', color: 'bg-indigo-50 text-indigo-600 border border-indigo-100/50' },
 };
 
 export function QuizCard({ quiz }: { quiz: QuizSummary }) {
@@ -52,15 +52,15 @@ export function QuizCard({ quiz }: { quiz: QuizSummary }) {
         whileHover="hover"
         animate="rest"
         onClick={() => navigate(`/quizzes/${quiz.id}`)}
-        className="bg-white rounded-2xl border border-slate-100 shadow-card cursor-pointer overflow-hidden group"
+        className="bg-white rounded-2xl border border-slate-100/60 shadow-md hover:shadow-lg cursor-pointer overflow-hidden group transition-all duration-300"
       >
         {/* Color accent bar */}
-        <div className="h-1 bg-gradient-brand" />
+        <div className="h-1 bg-brand-500" />
 
         <div className="p-5">
           <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-slate-800 text-base leading-snug truncate group-hover:text-brand-600 transition-colors">
+              <h3 className="font-extrabold text-slate-900 text-base leading-snug truncate group-hover:text-brand-500 transition-colors">
                 {quiz.title}
               </h3>
               {quiz.description && (
@@ -99,25 +99,25 @@ export function QuizCard({ quiz }: { quiz: QuizSummary }) {
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground bg-slate-50 px-2.5 py-1 rounded-lg">
-              <BookOpen className="w-3 h-3" />
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 bg-slate-50 border border-slate-100/50 px-3 py-1 rounded-full">
+              <BookOpen className="w-3 h-3 text-slate-400" />
               {quiz.questionCount} questions
             </span>
             {quiz.timingMode && (
-              <span className={`inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-lg font-medium ${timing.color}`}>
+              <span className={`inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full font-semibold ${timing.color}`}>
                 <Clock className="w-3 h-3" />
                 {timing.label}
               </span>
             )}
           </div>
 
-          <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-50">
+          <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100/60">
             <p className="text-xs text-muted-foreground">{formatDate(quiz.createdAt)}</p>
             <button
               onClick={handleCopyLink}
-              className="text-xs text-brand-600 font-semibold flex items-center gap-1 hover:text-brand-700"
+              className="text-xs text-brand-600 font-bold flex items-center gap-1 hover:text-brand-700"
             >
-              <Link2 className="w-3 h-3" />
+              <Link2 className="w-3.5 h-3.5" />
               Copy link
             </button>
           </div>
