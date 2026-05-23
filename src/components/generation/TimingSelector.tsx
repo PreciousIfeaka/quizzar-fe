@@ -47,18 +47,18 @@ export function TimingSelector({
               className={cn(
                 'flex items-center gap-2.5 p-3 rounded-xl border-2 text-left transition-all duration-200',
                 active
-                  ? 'border-brand-500 bg-brand-50 shadow-brand-sm'
-                  : 'border-slate-100 hover:border-brand-200 hover:bg-slate-50'
+                  ? 'border-[#00bcd4] bg-[#00bcd4]/5 shadow-brand-sm'
+                  : 'border-slate-100 hover:border-[#00bcd4]/30 hover:bg-slate-50'
               )}
             >
               <div className={cn(
-                'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0',
-                active ? 'bg-brand-500' : 'bg-slate-100'
+                'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-200',
+                active ? 'bg-[#00bcd4] shadow-brand-md' : 'bg-slate-100'
               )}>
-                <Icon className={cn('w-4 h-4', active ? 'text-white' : 'text-slate-400')} />
+                <Icon className={cn('w-4 h-4 transition-colors duration-200', active ? 'text-white' : 'text-slate-400')} />
               </div>
               <div className="min-w-0">
-                <p className={cn('text-xs font-bold truncate', active ? 'text-brand-700' : 'text-slate-700')}>
+                <p className={cn('text-xs font-bold truncate transition-colors duration-200', active ? 'text-[#00bcd4]' : 'text-slate-700')}>
                   {label}
                 </p>
                 <p className="text-[10px] text-muted-foreground leading-tight truncate">{desc}</p>

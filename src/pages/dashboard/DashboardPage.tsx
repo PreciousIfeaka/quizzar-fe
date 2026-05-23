@@ -30,7 +30,7 @@ export default function DashboardPage() {
   return (
     <AnimatedPage>
       {/* Welcome Banner */}
-      <div className="relative bg-[#5B21B6] rounded-3xl p-8 mb-8 overflow-hidden shadow-md">
+      <div className="relative bg-[#0b192c] rounded-3xl p-8 mb-8 overflow-hidden shadow-md">
         {/* Subtle grid pattern of VoyageMath */}
         <div className="absolute inset-0 opacity-[0.05] pointer-events-none">
           <svg width="100%" height="100%">
@@ -48,7 +48,7 @@ export default function DashboardPage() {
             <circle cx="50" cy="50" r="20" />
           </svg>
         </div>
-
+ 
         <div className="relative z-10 max-w-xl">
           <motion.p
             initial={{ opacity: 0, y: -10 }}
@@ -81,9 +81,9 @@ export default function DashboardPage() {
           >
             <button
               onClick={() => navigate('/generate')}
-              className="inline-flex items-center gap-2 bg-white text-[#5B21B6] hover:bg-brand-50 transition-all duration-200 font-extrabold text-xs uppercase tracking-wider px-6 py-3.5 rounded-xl shadow-md hover:shadow-lg active:scale-95"
+              className="inline-flex items-center gap-2 bg-white text-[#0b192c] hover:bg-brand-50 transition-all duration-200 font-extrabold text-xs uppercase tracking-wider px-6 py-3.5 rounded-xl shadow-md hover:shadow-lg active:scale-95"
             >
-              <Sparkles className="w-4 h-4" />
+              <Sparkles className="w-4 h-4 text-[#00bcd4]" />
               CREATE NEW QUIZ ↗
             </button>
           </motion.div>

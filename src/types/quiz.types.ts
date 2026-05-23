@@ -1,4 +1,5 @@
 export type TimingMode = 'NONE' | 'PER_QUESTION' | 'OVERALL' | 'AI_SUGGESTED';
+export type QuizMode = 'OVERALL' | 'PER_QUESTION';
 export type QuestionType = 'MCQ' | 'TRUE_FALSE' | 'SHORT_ANSWER';
 export type Difficulty = 'EASY' | 'MEDIUM' | 'HARD' | 'MIXED';
 
@@ -24,6 +25,7 @@ export interface Quiz {
   description?: string;
   quizCode: string;
   timingMode: TimingMode;
+  quizMode: QuizMode;
   timerValueSeconds?: number;
   aiSuggestedTimeSeconds?: number;
   aiSuggestedTimingMode?: string;
@@ -39,6 +41,7 @@ export interface QuizSummary {
   quizCode: string;
   questionCount: number;
   timingMode?: TimingMode;
+  quizMode?: QuizMode;
   createdAt: string;
 }
 
@@ -54,5 +57,6 @@ export interface UpdateQuizRequest {
   title?: string;
   description?: string;
   timingMode?: TimingMode;
+  quizMode?: QuizMode;
   timerValueSeconds?: number;
 }

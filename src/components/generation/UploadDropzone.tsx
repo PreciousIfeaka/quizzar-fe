@@ -21,6 +21,7 @@ const schema = z.object({
   quizDescription: z.string().optional(),
   timingPreference: z.enum(['NONE', 'PER_QUESTION', 'OVERALL', 'AI_SUGGESTED']),
   manualTimerSeconds: z.number().optional(),
+  quizMode: z.enum(['OVERALL', 'PER_QUESTION']),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -31,7 +32,7 @@ export function UploadDropzone({ onGenerating }: { onGenerating: (v: boolean) =>
   const queryClient = useQueryClient();
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { timingPreference: 'AI_SUGGESTED' },
+    defaultValues: { timingPreference: 'AI_SUGGESTED', quizMode: 'OVERALL' },
   });
 
   const onDrop = useCallback((accepted: File[]) => {
@@ -59,6 +60,7 @@ export function UploadDropzone({ onGenerating }: { onGenerating: (v: boolean) =>
         quizDescription: fd.quizDescription,
         timingPreference: fd.timingPreference,
         manualTimerSeconds: fd.manualTimerSeconds,
+        quizMode: fd.quizMode,
       };
 
       formData.append(
@@ -71,11 +73,11 @@ export function UploadDropzone({ onGenerating }: { onGenerating: (v: boolean) =>
       return generationApi.fromUpload(formData);
     },
     onMutate: () => onGenerating(true),
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       onGenerating(false);
       queryClient.invalidateQueries({ queryKey: ['quizzes'] });
-      toast({ title: '✨ Quiz generated!', description: `"${data.quiz.title}" is ready.` });
-      navigate('/quizzes');
+      toast({ title: '✨ Quiz generated!', description: `"${variables.quizTitle}" is ready.` });
+      navigate(`/quizzes/${data.quizId}`);
     },
     onError: () => {
       onGenerating(false);
@@ -92,10 +94,10 @@ export function UploadDropzone({ onGenerating }: { onGenerating: (v: boolean) =>
           className={cn(
             'relative border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all duration-200',
             isDragActive
-              ? 'border-brand-500 bg-brand-50 scale-[1.01]'
+              ? 'border-[#00bcd4] bg-[#00bcd4]/5 scale-[1.01]'
               : file
                 ? 'border-green-400 bg-green-50'
-                : 'border-slate-200 hover:border-brand-300 hover:bg-brand-50/30'
+                : 'border-slate-200 hover:border-[#00bcd4]/30 hover:bg-[#00bcd4]/5'
           )}
         >
           <input {...getInputProps()} />
@@ -132,7 +134,7 @@ export function UploadDropzone({ onGenerating }: { onGenerating: (v: boolean) =>
               >
                 <div className={cn(
                   'w-14 h-14 rounded-2xl flex items-center justify-center transition-all',
-                  isDragActive ? 'bg-brand-500 animate-pulse-brand' : 'bg-slate-100'
+                  isDragActive ? 'bg-[#00bcd4] animate-pulse' : 'bg-slate-100'
                 )}>
                   <Upload className={cn('w-7 h-7', isDragActive ? 'text-white' : 'text-slate-400')} />
                 </div>
@@ -180,6 +182,38 @@ export function UploadDropzone({ onGenerating }: { onGenerating: (v: boolean) =>
             className="rounded-xl resize-none"
             {...register('quizDescription')}
           />
+        </div>
+
+        {/* Quiz Mode */}
+        <div className="space-y-2">
+          <Label className="text-sm font-semibold">Quiz Mode</Label>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { id: 'OVERALL', label: 'Overall Scoring', desc: 'Results shown at end' },
+              { id: 'PER_QUESTION', label: 'Instant Feedback', desc: 'Feedback per question' },
+            ].map(({ id, label, desc }) => {
+              const active = watch('quizMode') === id;
+              return (
+                <motion.button
+                  key={id}
+                  type="button"
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => setValue('quizMode', id as any)}
+                  className={cn(
+                    'flex flex-col gap-1 p-3 rounded-xl border-2 text-left transition-all duration-200',
+                    active
+                      ? 'border-[#00bcd4] bg-[#00bcd4]/5 shadow-brand-sm'
+                      : 'border-slate-100 hover:border-[#00bcd4]/30 hover:bg-slate-50'
+                  )}
+                >
+                  <span className={cn('text-xs font-bold', active ? 'text-[#00bcd4]' : 'text-slate-700')}>
+                    {label}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground leading-tight">{desc}</span>
+                </motion.button>
+              );
+            })}
+          </div>
         </div>
 
         <TimingSelector

@@ -1,4 +1,4 @@
-import type { Difficulty, QuestionType, TimingMode } from "./quiz.types";
+import type { Difficulty, QuestionType, TimingMode, QuizMode } from "./quiz.types";
 
 export type GenerationMode = 'upload' | 'paste' | 'specs';
 export type TimingPreference = 'NONE' | 'PER_QUESTION' | 'OVERALL' | 'AI_SUGGESTED';
@@ -9,6 +9,7 @@ export interface GenerateFromPasteRequest {
   quizDescription?: string;
   timingPreference?: TimingPreference;
   manualTimerSeconds?: number;
+  quizMode?: QuizMode;
 }
 
 export interface GenerateFromSpecsRequest {
@@ -22,6 +23,7 @@ export interface GenerateFromSpecsRequest {
   syllabusText?: string;
   timingPreference?: TimingPreference;
   manualTimerSeconds?: number;
+  quizMode?: QuizMode;
 }
 
 export interface AiTimingSuggestion {
@@ -31,14 +33,8 @@ export interface AiTimingSuggestion {
 }
 
 export interface GenerationResponse {
-  quiz: {
-    id: string;
-    title: string;
-    quizCode: string;
-    questionCount: number;
-  };
-  aiSuggestedTimingMode: string;
-  aiSuggestedTimeSeconds: number;
-  aiTimingReasoning: string;
-  publicLink: string;
+  quizId: string;
+  quizCode: string;
+  shareUrl: string;
+  aiTimingSuggestion?: AiTimingSuggestion;
 }

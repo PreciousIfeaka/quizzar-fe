@@ -20,6 +20,7 @@ const schema = z.object({
     .max(50000, 'Content too long (max 50,000 characters)'),
   timingPreference: z.enum(['NONE', 'PER_QUESTION', 'OVERALL', 'AI_SUGGESTED']),
   manualTimerSeconds: z.number().min(5).max(3600).optional(),
+  quizMode: z.enum(['OVERALL', 'PER_QUESTION']),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -33,7 +34,7 @@ export function PasteEditor({ onGenerating }: { onGenerating: (v: boolean) => vo
     formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { timingPreference: 'AI_SUGGESTED' },
+    defaultValues: { timingPreference: 'AI_SUGGESTED', quizMode: 'OVERALL' },
   });
 
   const rawText = watch('rawText') ?? '';
@@ -48,13 +49,14 @@ export function PasteEditor({ onGenerating }: { onGenerating: (v: boolean) => vo
       quizDescription: data.quizDescription,
       timingPreference: data.timingPreference,
       manualTimerSeconds: data.manualTimerSeconds,
+      quizMode: data.quizMode,
     }),
     onMutate: () => onGenerating(true),
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       onGenerating(false);
       queryClient.invalidateQueries({ queryKey: ['quizzes'] });
-      toast({ title: '✨ Quiz generated!', description: `"${data.quiz.title}" is ready.` });
-      navigate('/quizzes');
+      toast({ title: '✨ Quiz generated!', description: `"${variables.quizTitle}" is ready.` });
+      navigate(`/quizzes/${data.quizId}`);
     },
     onError: () => {
       onGenerating(false);
@@ -72,7 +74,7 @@ export function PasteEditor({ onGenerating }: { onGenerating: (v: boolean) => vo
       <div className="lg:col-span-3 space-y-2">
         <div className="flex items-center justify-between">
           <Label className="flex items-center gap-1.5 text-sm font-semibold">
-            <FileText className="w-4 h-4 text-brand-500" />
+            <FileText className="w-4 h-4 text-[#00bcd4]" />
             Paste your questions and answers
           </Label>
           <span className={`text-xs font-medium tabular-nums ${isNearLimit ? 'text-energy-500' : 'text-muted-foreground'
@@ -95,7 +97,7 @@ Answer: A
 2. True or False: The Earth is flat.
 Answer: False`}
           rows={18}
-          className="rounded-xl resize-none font-mono text-sm leading-relaxed focus:ring-brand-400"
+          className="rounded-xl resize-none font-mono text-sm leading-relaxed focus:ring-[#00bcd4]/50"
         />
         {errors.rawText && (
           <p className="text-xs text-red-500">{errors.rawText.message}</p>
@@ -104,7 +106,7 @@ Answer: False`}
         {/* Character progress bar */}
         <div className="h-1 bg-slate-100 rounded-full overflow-hidden">
           <div
-            className={`h-full rounded-full transition-all duration-300 ${isNearLimit ? 'bg-energy-500' : 'bg-brand-500'
+            className={`h-full rounded-full transition-all duration-300 ${isNearLimit ? 'bg-[#f5a623]' : 'bg-[#00bcd4]'
               }`}
             style={{ width: `${Math.min((charCount / charLimit) * 100, 100)}%` }}
           />
@@ -138,6 +140,38 @@ Answer: False`}
             className="rounded-xl resize-none"
             {...register('quizDescription')}
           />
+        </div>
+
+        {/* Quiz Mode */}
+        <div className="space-y-2">
+          <Label className="text-sm font-semibold">Quiz Mode</Label>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { id: 'OVERALL', label: 'Overall Scoring', desc: 'Results shown at end' },
+              { id: 'PER_QUESTION', label: 'Instant Feedback', desc: 'Feedback per question' },
+            ].map(({ id, label, desc }) => {
+              const active = watch('quizMode') === id;
+              return (
+                <motion.button
+                  key={id}
+                  type="button"
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => setValue('quizMode', id as any)}
+                  className={cn(
+                    'flex flex-col gap-1 p-3 rounded-xl border-2 text-left transition-all duration-200',
+                    active
+                      ? 'border-[#00bcd4] bg-[#00bcd4]/5 shadow-brand-sm'
+                      : 'border-slate-100 hover:border-[#00bcd4]/30 hover:bg-slate-50'
+                  )}
+                >
+                  <span className={cn('text-xs font-bold', active ? 'text-[#00bcd4]' : 'text-slate-700')}>
+                    {label}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground leading-tight">{desc}</span>
+                </motion.button>
+              );
+            })}
+          </div>
         </div>
 
         <TimingSelector

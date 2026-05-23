@@ -58,7 +58,7 @@ export function QuizLinkPanel({ quizId, quizCode: initialCode }: QuizLinkPanelPr
             href={publicUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-slate-400 hover:text-brand-500 transition-colors flex-shrink-0"
+            className="text-slate-400 hover:text-[#00bcd4] transition-colors flex-shrink-0"
           >
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
@@ -68,7 +68,7 @@ export function QuizLinkPanel({ quizId, quizCode: initialCode }: QuizLinkPanelPr
         <motion.button
           whileTap={{ scale: 0.97 }}
           onClick={handleCopy}
-          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-brand-50 border border-brand-100 text-brand-700 text-sm font-semibold hover:bg-brand-100 transition-all"
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#00bcd4]/5 border border-[#00bcd4]/10 text-[#00bcd4] text-sm font-semibold hover:bg-[#00bcd4]/10 transition-all"
         >
           <AnimatePresence mode="wait">
             {copied ? (

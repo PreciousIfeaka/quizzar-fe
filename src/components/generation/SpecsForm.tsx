@@ -29,6 +29,7 @@ const schema = z.object({
   syllabusText: z.string().max(50000).optional(),
   timingPreference: z.enum(['NONE', 'PER_QUESTION', 'OVERALL', 'AI_SUGGESTED']),
   manualTimerSeconds: z.number().min(5).max(3600).optional(),
+  quizMode: z.enum(['OVERALL', 'PER_QUESTION']),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -43,7 +44,7 @@ const DIFFICULTIES: { value: Difficulty; label: string; color: string }[] = [
   { value: 'EASY', label: 'Easy', color: 'border-green-300 bg-green-50 text-green-700 data-[selected=true]:bg-green-500 data-[selected=true]:text-white data-[selected=true]:border-green-500' },
   { value: 'MEDIUM', label: 'Medium', color: 'border-yellow-300 bg-yellow-50 text-yellow-700 data-[selected=true]:bg-yellow-500 data-[selected=true]:text-white data-[selected=true]:border-yellow-500' },
   { value: 'HARD', label: 'Hard', color: 'border-red-300 bg-red-50 text-red-700 data-[selected=true]:bg-red-500 data-[selected=true]:text-white data-[selected=true]:border-red-500' },
-  { value: 'MIXED', label: 'Mixed', color: 'border-brand-300 bg-brand-50 text-brand-700 data-[selected=true]:bg-brand-500 data-[selected=true]:text-white data-[selected=true]:border-brand-500' },
+  { value: 'MIXED', label: 'Mixed', color: 'border-[#00bcd4]/30 bg-[#00bcd4]/5 text-[#00bcd4] data-[selected=true]:bg-[#00bcd4] data-[selected=true]:text-white data-[selected=true]:border-[#00bcd4]' },
 ];
 
 export function SpecsForm({ onGenerating }: { onGenerating: (v: boolean) => void }) {
@@ -62,6 +63,7 @@ export function SpecsForm({ onGenerating }: { onGenerating: (v: boolean) => void
       difficulty: 'MEDIUM',
       numberOfQuestions: 10,
       timingPreference: 'AI_SUGGESTED',
+      quizMode: 'OVERALL',
     },
   });
 
@@ -106,6 +108,7 @@ export function SpecsForm({ onGenerating }: { onGenerating: (v: boolean) => void
         syllabusText: data.syllabusText,
         timingPreference: data.timingPreference,
         manualTimerSeconds: data.manualTimerSeconds,
+        quizMode: data.quizMode,
       };
 
       formData.append(
@@ -120,11 +123,11 @@ export function SpecsForm({ onGenerating }: { onGenerating: (v: boolean) => void
       return generationApi.fromSpecs(formData);
     },
     onMutate: () => onGenerating(true),
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       onGenerating(false);
       queryClient.invalidateQueries({ queryKey: ['quizzes'] });
-      toast({ title: '✨ Quiz generated!', description: `"${data.quiz.title}" is ready.` });
-      navigate('/quizzes');
+      toast({ title: '✨ Quiz generated!', description: `"${variables.quizTitle}" is ready.` });
+      navigate(`/quizzes/${data.quizId}`);
     },
     onError: () => {
       onGenerating(false);
@@ -165,6 +168,40 @@ export function SpecsForm({ onGenerating }: { onGenerating: (v: boolean) => void
             </div>
           </div>
 
+          {/* Quiz Mode */}
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-card p-6 space-y-4">
+            <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wide text-muted-foreground">
+              Quiz Mode
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { id: 'OVERALL', label: 'Overall Scoring', desc: 'Results are shown at the end of the entire session' },
+                { id: 'PER_QUESTION', label: 'Instant Feedback', desc: 'Immediate correctness feedback after each question' },
+              ].map(({ id, label, desc }) => {
+                const active = watch('quizMode') === id;
+                return (
+                  <motion.button
+                    key={id}
+                    type="button"
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => setValue('quizMode', id as any)}
+                    className={cn(
+                      'flex flex-col gap-1.5 p-4 rounded-xl border-2 text-left transition-all duration-200',
+                      active
+                        ? 'border-[#00bcd4] bg-[#00bcd4]/5 shadow-brand-sm'
+                        : 'border-slate-100 hover:border-[#00bcd4]/30 hover:bg-[#00bcd4]/5'
+                    )}
+                  >
+                    <span className={cn('text-xs font-bold', active ? 'text-[#00bcd4]' : 'text-slate-700')}>
+                      {label}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground leading-tight">{desc}</span>
+                  </motion.button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Question types */}
           <div className="bg-white rounded-2xl border border-slate-100 shadow-card p-6 space-y-4">
             <h3 className="font-bold text-slate-800 text-sm uppercase tracking-wide text-muted-foreground">
@@ -182,11 +219,11 @@ export function SpecsForm({ onGenerating }: { onGenerating: (v: boolean) => void
                     className={cn(
                       'flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-center transition-all duration-200',
                       active
-                        ? 'border-brand-500 bg-brand-50 shadow-brand-sm'
-                        : 'border-slate-100 hover:border-brand-200 hover:bg-brand-50/30'
+                        ? 'border-[#00bcd4] bg-[#00bcd4]/5 shadow-brand-sm'
+                        : 'border-slate-100 hover:border-[#00bcd4]/30 hover:bg-[#00bcd4]/5'
                     )}
                   >
-                    <span className={cn('text-xs font-bold', active ? 'text-brand-700' : 'text-slate-700')}>
+                    <span className={cn('text-xs font-bold', active ? 'text-[#00bcd4]' : 'text-slate-700')}>
                       {label}
                     </span>
                     <span className="text-[10px] text-muted-foreground leading-tight">{desc}</span>
@@ -252,12 +289,12 @@ export function SpecsForm({ onGenerating }: { onGenerating: (v: boolean) => void
                 type="button"
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setValue('numberOfQuestions', Math.max(1, questionCount - 1))}
-                className="w-10 h-10 rounded-xl border-2 border-slate-100 flex items-center justify-center hover:border-brand-300 hover:bg-brand-50 transition-all"
+                className="w-10 h-10 rounded-xl border-2 border-slate-100 flex items-center justify-center hover:border-[#00bcd4]/30 hover:bg-[#00bcd4]/5 transition-all"
               >
                 <Minus className="w-4 h-4 text-slate-600" />
               </motion.button>
               <div className="flex-1 text-center">
-                <span className="text-5xl font-black text-brand-600 tabular-nums">
+                <span className="text-5xl font-black text-[#0b192c] tabular-nums">
                   {questionCount}
                 </span>
                 <p className="text-xs text-muted-foreground mt-1">questions</p>
@@ -266,7 +303,7 @@ export function SpecsForm({ onGenerating }: { onGenerating: (v: boolean) => void
                 type="button"
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setValue('numberOfQuestions', Math.min(100, questionCount + 1))}
-                className="w-10 h-10 rounded-xl border-2 border-slate-100 flex items-center justify-center hover:border-brand-300 hover:bg-brand-50 transition-all"
+                className="w-10 h-10 rounded-xl border-2 border-slate-100 flex items-center justify-center hover:border-[#00bcd4]/30 hover:bg-[#00bcd4]/5 transition-all"
               >
                 <Plus className="w-4 h-4 text-slate-600" />
               </motion.button>
@@ -276,7 +313,7 @@ export function SpecsForm({ onGenerating }: { onGenerating: (v: boolean) => void
               min={1} max={100} step={1}
               value={questionCount}
               onChange={e => setValue('numberOfQuestions', Number(e.target.value))}
-              className="w-full accent-brand-500"
+              className="w-full accent-[#00bcd4]"
             />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>1</span><span>25</span><span>50</span><span>75</span><span>100</span>
@@ -315,7 +352,7 @@ export function SpecsForm({ onGenerating }: { onGenerating: (v: boolean) => void
                 className={cn(
                   'flex-1 py-2 text-xs font-semibold rounded-xl border-2 transition-all',
                   !showSyllabus
-                    ? 'border-brand-400 bg-brand-50 text-brand-700'
+                    ? 'border-[#00bcd4] bg-[#00bcd4]/5 text-[#00bcd4]'
                     : 'border-slate-100 text-slate-500 hover:border-slate-200'
                 )}
               >
@@ -327,7 +364,7 @@ export function SpecsForm({ onGenerating }: { onGenerating: (v: boolean) => void
                 className={cn(
                   'flex-1 py-2 text-xs font-semibold rounded-xl border-2 transition-all',
                   showSyllabus
-                    ? 'border-brand-400 bg-brand-50 text-brand-700'
+                    ? 'border-[#00bcd4] bg-[#00bcd4]/5 text-[#00bcd4]'
                     : 'border-slate-100 text-slate-500 hover:border-slate-200'
                 )}
               >
@@ -365,8 +402,8 @@ export function SpecsForm({ onGenerating }: { onGenerating: (v: boolean) => void
                       className={cn(
                         'border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all duration-200',
                         isDragActive
-                          ? 'border-brand-400 bg-brand-50'
-                          : 'border-slate-200 hover:border-brand-300 hover:bg-slate-50'
+                          ? 'border-[#00bcd4] bg-[#00bcd4]/5'
+                          : 'border-slate-200 hover:border-[#00bcd4]/30 hover:bg-[#00bcd4]/5'
                       )}
                     >
                       <input {...getInputProps()} />

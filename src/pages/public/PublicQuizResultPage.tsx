@@ -37,7 +37,7 @@ export default function PublicQuizResultPage() {
     if (result?.passed && !showConfetti) {
       confetti({
         particleCount: 120, spread: 80, origin: { y: 0.6 },
-        colors: ['#6366f1', '#a855f7', '#f97316']
+        colors: ['#00e5ff', '#00bcd4', '#ff9100', '#0b192c']
       });
       setShowConfetti(true);
     }
@@ -54,7 +54,7 @@ export default function PublicQuizResultPage() {
   const pct = Math.round(result.percentageScore);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-brand-50/30 flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-[#f4f7fc] via-[#f4f7fc] to-[#00bcd4]/10 flex items-center justify-center px-4 py-12">
       <motion.div
         variants={staggerContainer}
         initial="hidden"

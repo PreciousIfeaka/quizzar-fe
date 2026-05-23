@@ -13,8 +13,8 @@ export function useGenerateFromUpload(onGenerating: (v: boolean) => void) {
     onMutate: () => onGenerating(true),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['quizzes'] });
-      toast({ title: '✨ Quiz generated!', description: `"${data.quiz.title}" is ready.` });
-      navigate(`/quizzes/${data.quiz.id}`);
+      toast({ title: '✨ Quiz generated!', description: 'Your quiz is ready.' });
+      navigate(`/quizzes/${data.quizId}`);
     },
     onError: () => {
       onGenerating(false);
@@ -30,10 +30,10 @@ export function useGenerateFromPaste(onGenerating: (v: boolean) => void) {
   return useMutation({
     mutationFn: (data: GenerateFromPasteRequest) => generationApi.fromPaste(data),
     onMutate: () => onGenerating(true),
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['quizzes'] });
-      toast({ title: '✨ Quiz generated!', description: `"${data.quiz.title}" is ready.` });
-      navigate(`/quizzes/${data.quiz.id}`);
+      toast({ title: '✨ Quiz generated!', description: `"${variables.quizTitle}" is ready.` });
+      navigate(`/quizzes/${data.quizId}`);
     },
     onError: () => {
       onGenerating(false);
@@ -51,8 +51,8 @@ export function useGenerateFromSpecs(onGenerating: (v: boolean) => void) {
     onMutate: () => onGenerating(true),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['quizzes'] });
-      toast({ title: '✨ Quiz generated!', description: `"${data.quiz.title}" is ready.` });
-      navigate(`/quizzes/${data.quiz.id}`);
+      toast({ title: '✨ Quiz generated!', description: 'Your quiz is ready.' });
+      navigate(`/quizzes/${data.quizId}`);
     },
     onError: () => {
       onGenerating(false);

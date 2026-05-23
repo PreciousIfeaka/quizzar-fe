@@ -8,12 +8,12 @@ interface PageTransitionProps {
 export function PageTransition({ children }: PageTransitionProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15 }}
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -15 }}
+      exit={{ opacity: 0, y: -8 }}
       transition={{
-        duration: 0.25,
-        ease: [0.22, 1, 0.36, 1] // Custom cubic-bezier for snappy, smooth transition
+        duration: 0.18,
+        ease: [0.22, 1, 0.36, 1] // Snappy ease-out curve
       }}
       className="w-full h-full"
     >

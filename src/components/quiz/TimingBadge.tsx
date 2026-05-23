@@ -13,8 +13,8 @@ const config: Record<TimingMode, {
 }> = {
   NONE: { label: 'No Timer', icon: Ban, color: 'bg-slate-100 text-slate-600' },
   PER_QUESTION: { label: 'Per Question', icon: Timer, color: 'bg-blue-100 text-blue-700' },
-  OVERALL: { label: 'Overall Timer', icon: Clock, color: 'bg-purple-100 text-purple-700' },
-  AI_SUGGESTED: { label: 'AI Suggested', icon: Zap, color: 'bg-brand-100 text-brand-700' },
+  OVERALL: { label: 'Overall Timer', icon: Clock, color: 'bg-[#ff9100]/10 text-[#ff9100]' },
+  AI_SUGGESTED: { label: 'AI Suggested', icon: Zap, color: 'bg-[#00bcd4]/10 text-[#00bcd4]' },
 };
 
 export function TimingBadge({ timingMode, timerSeconds }: TimingBadgeProps) {

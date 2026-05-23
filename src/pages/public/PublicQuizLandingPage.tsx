@@ -57,7 +57,7 @@ export default function PublicQuizLandingPage() {
       : 'Timed';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-50 via-white to-accent-50/30 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-[#f0f4f8] via-white to-[#00bcd4]/5 flex flex-col">
       {/* Header */}
       <header className="p-6">
         <QuizzarLogo />
@@ -86,11 +86,11 @@ export default function PublicQuizLandingPage() {
               )}
               <div className="flex items-center gap-4 text-sm">
                 <span className="flex items-center gap-1.5 text-slate-600 bg-slate-50 px-3 py-1.5 rounded-xl">
-                  <BookOpen className="w-4 h-4 text-brand-500" />
+                  <BookOpen className="w-4 h-4 text-[#00bcd4]" />
                   {quiz.questions.length} questions
                 </span>
                 <span className="flex items-center gap-1.5 text-slate-600 bg-slate-50 px-3 py-1.5 rounded-xl">
-                  <Clock className="w-4 h-4 text-brand-500" />
+                  <Clock className="w-4 h-4 text-[#00bcd4]" />
                   {timingLabel}
                 </span>
               </div>
@@ -105,7 +105,7 @@ export default function PublicQuizLandingPage() {
             <h2 className="font-bold text-slate-800 text-lg mb-5">Enter your name to begin</h2>
             <div className="space-y-1.5 mb-6">
               <Label htmlFor="studentName" className="flex items-center gap-1.5">
-                <User className="w-4 h-4 text-brand-500" />
+                <User className="w-4 h-4 text-[#00bcd4]" />
                 Your Name
               </Label>
               <Input

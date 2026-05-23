@@ -1,6 +1,6 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
-const COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#6366f1'];
+const COLORS = ['#ef4444', '#f5a623', '#00bcd4', '#10b981', '#0b192c'];
 
 export function ScoreDistributionChart({ data }: { data: Record<string, number> }) {
   const chartData = Object.entries(data).map(([range, count], i) => ({

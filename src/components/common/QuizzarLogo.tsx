@@ -10,7 +10,7 @@ export function QuizzarLogo({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
         <span className="text-white font-black">Q</span>
       </div>
       <span className={`${sizes[size]} font-black text-slate-800`}>
-        Quizz<span className="text-brand-500">ar</span>
+        Quizz<span className="text-[#00bcd4]">ar</span>
       </span>
     </Link>
   );

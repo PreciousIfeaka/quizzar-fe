@@ -6,11 +6,11 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 
 const features = [
-  { icon: Upload, title: 'Upload & Extract', desc: 'Upload PDFs, Word docs, or text files — AI extracts and formats questions instantly.', color: 'bg-brand-50 text-[#581c87]' },
-  { icon: FileText, title: 'Paste & Format', desc: 'Copy-paste any raw question content and AI structures it into a clean, consistent format.', color: 'bg-purple-50 text-[#581c87]' },
-  { icon: Sparkles, title: 'AI Generation', desc: 'Describe your quiz specs — level, difficulty, topic — and AI generates from scratch.', color: 'bg-orange-50 text-orange-600' },
+  { icon: Upload, title: 'Upload & Extract', desc: 'Upload PDFs, Word docs, or text files — AI extracts and formats questions instantly.', color: 'bg-brand-50 text-brand-500' },
+  { icon: FileText, title: 'Paste & Format', desc: 'Copy-paste any raw question content and AI structures it into a clean, consistent format.', color: 'bg-[#00bcd4]/5 text-[#00bcd4]' },
+  { icon: Sparkles, title: 'AI Generation', desc: 'Describe your quiz specs — level, difficulty, topic — and AI generates from scratch.', color: 'bg-amber-50 text-[#f5a623]' },
   { icon: BarChart2, title: 'Deep Analytics', desc: 'Track every quiz attempt, score distribution, and per-question difficulty in real time.', color: 'bg-green-50 text-green-600' },
-  { icon: Zap, title: 'Instant Sharing', desc: 'Generate a public link in one click. Takers need no account — just their name.', color: 'bg-yellow-50 text-yellow-600' },
+  { icon: Zap, title: 'Instant Sharing', desc: 'Generate a public link in one click. Takers need no account — just their name.', color: 'bg-cyan-50 text-[#00bcd4]' },
   { icon: Clock, title: 'Smart Timing', desc: 'Let AI suggest quiz timing or configure your own per-question or overall timers.', color: 'bg-red-50 text-red-600' },
 ];
 
@@ -92,8 +92,8 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
-            <span className="text-[#581c87] font-black text-2xl tracking-tight">
-              Quizz<span className="font-semibold text-[#8b5cf6]">ar</span>
+            <span className="text-[#0b192c] font-black text-2xl tracking-tight">
+              Quizz<span className="font-semibold text-[#00bcd4]">ar</span>
             </span>
           </div>
 
@@ -101,7 +101,7 @@ export default function LandingPage() {
           <div className="flex items-center">
             <button 
               onClick={login}
-              className="bg-[#581c87] hover:bg-[#4a1772] text-white font-extrabold px-6 py-2.5 rounded-xl text-xs tracking-wider transition-all duration-200 shadow-[0_4px_14px_rgba(88,28,135,0.25)] hover:shadow-[0_6px_20px_rgba(88,28,135,0.35)]"
+              className="bg-[#0b192c] hover:bg-[#081322] text-white font-extrabold px-6 py-2.5 rounded-xl text-xs tracking-wider transition-all duration-200 shadow-[0_4px_14px_rgba(11,25,44,0.25)] hover:shadow-[0_6px_20px_rgba(11,25,44,0.35)]"
             >
               LOGIN
             </button>
@@ -118,7 +118,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-1.5 bg-[#581c87]/5 text-[#581c87] text-xs font-black px-4 py-2 rounded-full border border-[#581c87]/10 mb-8 tracking-wider uppercase"
+            className="inline-flex items-center gap-1.5 bg-[#00bcd4]/5 text-[#00bcd4] text-xs font-black px-4 py-2 rounded-full border border-[#00bcd4]/10 mb-8 tracking-wider uppercase"
           >
             <Sparkles className="w-3.5 h-3.5" />
             AI-Powered Quiz Platform
@@ -134,10 +134,10 @@ export default function LandingPage() {
             <br />
             QUIZZES,
             <br />
-            <span className="text-[#2563eb] relative inline-block font-black mt-2">
+            <span className="text-[#00bcd4] relative inline-block font-black mt-2">
               STEP-BY-STEP
               {/* Curved sparkles next to text */}
-              <svg className="absolute -right-10 top-1/2 -translate-y-1/2 w-8 h-8 text-[#2563eb]/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round">
+              <svg className="absolute -right-10 top-1/2 -translate-y-1/2 w-8 h-8 text-[#00bcd4]/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round">
                 <path d="M4 6c2.5 1 4.5 3.5 5.5 6" />
                 <path d="M2 12c3.5 0 6.5 0 8 0" />
                 <path d="M4 18c2.5-1 4.5-3.5 5.5-6" />
@@ -162,7 +162,7 @@ export default function LandingPage() {
           >
             <button 
               onClick={login}
-              className="bg-[#581c87] hover:bg-[#43146b] text-white font-black px-10 py-5 rounded-2xl text-lg tracking-wider transition-all duration-200 shadow-[0_8px_30px_rgba(88,28,135,0.3)] hover:shadow-[0_12px_35px_rgba(88,28,135,0.4)] flex items-center justify-center gap-2.5 group hover:scale-[1.02] active:scale-[0.98]"
+              className="bg-gradient-brand text-white font-black px-10 py-5 rounded-2xl text-lg tracking-wider transition-all duration-200 shadow-[0_8px_30px_rgba(0,188,212,0.25)] hover:shadow-[0_12px_35px_rgba(0,188,212,0.35)] flex items-center justify-center gap-2.5 group hover:scale-[1.02] active:scale-[0.98]"
             >
               GET STARTED
               <span className="transition-transform duration-200 group-hover:translate-x-1 group-hover:-translate-y-0.5 text-xl">↗</span>
@@ -174,10 +174,10 @@ export default function LandingPage() {
         <div className="flex-1 relative w-full max-w-xl h-[480px] md:h-[520px] flex items-center justify-center mt-8 lg:mt-0">
           
           {/* Subtle concentric background arcs behind mockups */}
-          <div className="absolute w-[440px] h-[440px] border border-blue-500/10 rounded-full pointer-events-none" />
-          <div className="absolute w-[320px] h-[320px] border border-blue-500/5 rounded-full pointer-events-none" />
-          <div className="absolute -top-10 right-20 w-32 h-32 bg-purple-200/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-10 left-10 w-40 h-40 bg-blue-200/20 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute w-[440px] h-[440px] border border-brand-500/10 rounded-full pointer-events-none" />
+          <div className="absolute w-[320px] h-[320px] border border-brand-500/5 rounded-full pointer-events-none" />
+          <div className="absolute -top-10 right-20 w-32 h-32 bg-[#00bcd4]/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-10 left-10 w-40 h-40 bg-[#00bcd4]/10 rounded-full blur-3xl pointer-events-none" />
 
           {/* Interactive Celebration Rain */}
           <AnimatePresence>
@@ -267,24 +267,24 @@ export default function LandingPage() {
           >
             {/* QuizGuide Header */}
             <div className="flex items-center gap-1.5 mb-4">
-              <div className="w-4.5 h-4.5 rounded-md bg-[#2563eb] flex items-center justify-center text-[10px] font-black text-white shadow-sm">
+              <div className="w-4.5 h-4.5 rounded-md bg-[#00bcd4] flex items-center justify-center text-[10px] font-black text-white shadow-sm">
                 ▰
               </div>
-              <span className="text-[#1e3b8b] font-black text-xs tracking-tight">QuizGuide</span>
+              <span className="text-[#0b192c] font-black text-xs tracking-tight">QuizGuide</span>
             </div>
 
             {/* Astronomy Orbit Path Graphic */}
-            <div className="relative w-36 h-36 mx-auto my-3 border border-blue-500/20 bg-blue-50/15 flex items-center justify-center rounded-xl overflow-hidden">
+            <div className="relative w-36 h-36 mx-auto my-3 border border-[#00bcd4]/20 bg-[#00bcd4]/5 flex items-center justify-center rounded-xl overflow-hidden">
               {/* Sun at center */}
               <div className="w-6 h-6 rounded-full bg-amber-400 border border-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)] z-10" />
               {/* Orbit paths */}
-              <div className="absolute w-24 h-24 border border-dashed border-blue-400/30 rounded-full" />
+              <div className="absolute w-24 h-24 border border-dashed border-[#00bcd4]/30 rounded-full" />
               {/* Mars planet on the path */}
               <div className="absolute w-3 h-3 rounded-full bg-red-500 border border-red-600 shadow-[0_0_6px_rgba(239,68,68,0.5)] z-20" style={{ transform: 'rotate(45deg) translate(48px) rotate(-45deg)' }} />
               
               {/* Measurements Tag */}
               <div className="absolute top-2 right-4 flex flex-col items-center">
-                <span className="text-[8px] font-bold text-[#2563eb] bg-white px-1 leading-none shadow-sm z-10 border border-[#2563eb]/10 rounded">
+                <span className="text-[8px] font-bold text-[#00bcd4] bg-white px-1 leading-none shadow-sm z-10 border border-[#00bcd4]/20 rounded">
                   4th Planet
                 </span>
               </div>
@@ -298,7 +298,7 @@ export default function LandingPage() {
               {/* Progress step */}
               <div className="flex items-center gap-1.5 text-slate-800 font-bold text-xs mt-2 bg-slate-50 p-2 rounded-lg border border-slate-100 w-fit">
                 <span className="text-[10px] text-slate-600">Mercury, Venus, Earth,</span>
-                <div className="w-10 h-6 border border-[#2563eb]/30 bg-white rounded-md flex items-center justify-center text-[#2563eb] text-[10px] font-black shadow-sm">
+                <div className="w-10 h-6 border border-[#00bcd4]/30 bg-white rounded-md flex items-center justify-center text-[#00bcd4] text-[10px] font-black shadow-sm">
                   Mars
                 </div>
               </div>
@@ -315,7 +315,7 @@ export default function LandingPage() {
           >
             {/* Step Label */}
             <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-full bg-[#2563eb] text-white flex items-center justify-center text-[10px] font-black shadow-sm">
+              <div className="w-5 h-5 rounded-full bg-[#0b192c] text-white flex items-center justify-center text-[10px] font-black shadow-sm">
                 2
               </div>
               <span className="text-slate-800 font-extrabold text-[11px] tracking-wide uppercase">
@@ -368,10 +368,10 @@ export default function LandingPage() {
               <motion.div
                 key={title}
                 whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                className="bg-[#fafbff] rounded-2xl p-7 border border-slate-100 hover:border-[#581c87]/30 hover:shadow-[0_12px_30px_rgba(88,28,135,0.06)] transition-all duration-300 flex flex-col text-left group"
+                className="bg-[#fafbff] rounded-2xl p-7 border border-slate-100 hover:border-[#00bcd4]/30 hover:shadow-[0_12px_30px_rgba(0,188,212,0.08)] transition-all duration-300 flex flex-col text-left group"
               >
                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-5 ${color} shadow-sm group-hover:scale-110 transition-transform duration-300`}>
-                  <Icon className="w-5 h-5 text-[#581c87]" />
+                  <Icon className="w-5 h-5 text-brand-500" />
                 </div>
                 <h3 className="font-extrabold text-slate-800 mb-2.5 text-base tracking-tight">{title}</h3>
                 <p className="text-sm text-slate-500 leading-relaxed font-medium">{desc}</p>
@@ -404,7 +404,7 @@ export default function LandingPage() {
           </p>
           <button 
             onClick={login}
-            className="bg-[#581c87] hover:bg-[#43146b] hover:scale-[1.02] active:scale-[0.98] text-white font-black px-14 py-5 rounded-2xl text-lg md:text-xl tracking-wider transition-all duration-200 shadow-[0_10px_35px_rgba(88,28,135,0.35)] flex items-center gap-2.5 mx-auto group"
+            className="bg-gradient-brand hover:scale-[1.02] active:scale-[0.98] text-white font-black px-14 py-5 rounded-2xl text-lg md:text-xl tracking-wider transition-all duration-200 shadow-[0_10px_35px_rgba(0,188,212,0.25)] flex items-center gap-2.5 mx-auto group"
           >
             GET STARTED NOW
             <span className="transition-transform duration-200 group-hover:translate-x-1 group-hover:-translate-y-0.5 text-xl">↗</span>

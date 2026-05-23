@@ -17,8 +17,8 @@ import { ConfirmDialog } from '../common/ConfirmDialog';
 const timingLabels = {
   NONE: { label: 'No Timer', color: 'bg-slate-50 text-slate-600 border border-slate-100/50' },
   PER_QUESTION: { label: 'Per Question', color: 'bg-blue-50 text-blue-600 border border-blue-100/50' },
-  OVERALL: { label: 'Overall Timer', color: 'bg-purple-50 text-brand-600 border border-brand-100/50' },
-  AI_SUGGESTED: { label: 'AI Suggested', color: 'bg-indigo-50 text-indigo-600 border border-indigo-100/50' },
+  OVERALL: { label: 'Overall Timer', color: 'bg-[#ff9100]/5 text-[#ff9100] border-[#ff9100]/20' },
+  AI_SUGGESTED: { label: 'AI Suggested', color: 'bg-[#00bcd4]/5 text-[#00bcd4] border-[#00bcd4]/20' },
 };
 
 export function QuizCard({ quiz }: { quiz: QuizSummary }) {

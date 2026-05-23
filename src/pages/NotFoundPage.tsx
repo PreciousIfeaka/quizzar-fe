@@ -8,7 +8,7 @@ export default function NotFoundPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-50 via-white to-accent-50/20 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#f0f4f8] via-white to-[#00bcd4]/5 flex items-center justify-center px-4">
       <motion.div
         variants={staggerContainer}
         initial="hidden"
@@ -30,7 +30,7 @@ export default function NotFoundPage() {
             className="absolute inset-0 flex items-center justify-center"
           >
             <div className="w-20 h-20 rounded-3xl bg-white shadow-brand-lg flex items-center justify-center">
-              <SearchX className="w-10 h-10 text-brand-400" />
+              <SearchX className="w-10 h-10 text-[#00bcd4]" />
             </div>
           </motion.div>
         </motion.div>

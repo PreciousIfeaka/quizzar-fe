@@ -30,18 +30,18 @@ export function GenerationModeSelector({
             className={cn(
               'relative flex flex-col items-center gap-3 p-6 rounded-2xl border-2 transition-all duration-200 text-center',
               active
-                ? 'border-brand-500 bg-brand-50 shadow-brand-sm'
-                : 'border-slate-100 bg-white hover:border-brand-200 hover:bg-brand-50/30'
+                ? 'border-[#00bcd4] bg-[#00bcd4]/5 shadow-brand-sm'
+                : 'border-slate-100 bg-white hover:border-[#00bcd4]/30 hover:bg-[#00bcd4]/5'
             )}
           >
             <div className={cn(
-              'w-12 h-12 rounded-xl flex items-center justify-center',
-              active ? 'bg-brand-500 shadow-brand-md' : 'bg-slate-100'
+              'w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200',
+              active ? 'bg-[#00bcd4] shadow-brand-md' : 'bg-slate-100'
             )}>
-              <Icon className={cn('w-6 h-6', active ? 'text-white' : 'text-slate-500')} />
+              <Icon className={cn('w-6 h-6 transition-colors duration-200', active ? 'text-white' : 'text-slate-500')} />
             </div>
             <div>
-              <p className={cn('font-bold text-sm', active ? 'text-brand-700' : 'text-slate-700')}>
+              <p className={cn('font-bold text-sm transition-colors duration-200', active ? 'text-[#00bcd4]' : 'text-slate-700')}>
                 {label}
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
@@ -49,7 +49,7 @@ export function GenerationModeSelector({
             {active && (
               <motion.div
                 layoutId="mode-indicator"
-                className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-brand-500"
+                className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-[#00bcd4]"
               />
             )}
           </motion.button>

@@ -4,27 +4,27 @@
 
 @layer base {
   :root {
-    /* Brand - Deep Purple (#5B21B6) */
-    --brand-50:  #f5f3ff;
-    --brand-100: #ede9fe;
-    --brand-200: #ddd6fe;
-    --brand-300: #c4b5fd;
-    --brand-400: #a78bfa;
-    --brand-500: #5B21B6;   /* Primary Brand Purple */
-    --brand-600: #4c1d95;   /* Primary Brand Purple Darker */
-    --brand-700: #3b0764;
-    --brand-800: #2e0854;
-    --brand-900: #1e003b;
+    /* Brand - Midnight Navy (#0B192C) */
+    --brand-50:  #f0f4f8;
+    --brand-100: #d6e4f0;
+    --brand-200: #b9cfe3;
+    --brand-300: #90b4d2;
+    --brand-400: #5d90ba;
+    --brand-500: #0b192c;   /* Primary Brand Midnight Navy */
+    --brand-600: #081322;
+    --brand-700: #060e18;
+    --brand-800: #040910;
+    --brand-900: #020508;
 
-    /* Accent — royal blue (#2563EB) */
-    --accent-400: #60a5fa;
-    --accent-500: #2563eb;
-    --accent-600: #1d4ed8;
+    /* Accent — Electric Cyan (#00BCD4) */
+    --accent-400: #26c6da;
+    --accent-500: #00bcd4;
+    --accent-600: #0097a7;
 
-    /* Energy — timers and alerts */
-    --energy-400: #fb923c;
-    --energy-500: #f97316;
-    --energy-600: #ea580c;
+    /* Energy — Warm Amber (#F5A623) */
+    --energy-400: #feba74;
+    --energy-500: #f5a623;
+    --energy-600: #d97706;
 
     /* Success - Emerald Green (#10B981) */
     --success-400: #34d399;
@@ -36,26 +36,26 @@
     --danger-500: #ef4444;
     --danger-600: #dc2626;
 
-    /* Neutral surface */
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
+    /* Neutral surface - light icy blue-white background */
+    --background: 216 50% 97%;
+    --foreground: 222 47% 11%;
     --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 263 69% 42%;
+    --card-foreground: 222 47% 11%;
+    --muted: 214 32% 91%;
+    --muted-foreground: 215 16% 47%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 188 100% 42%;
 
-    /* shadcn required mapping to #5B21B6 */
-    --primary: 263 69% 42%;
+    /* shadcn required mapping to #0B192C */
+    --primary: 215 60% 11%;
     --primary-foreground: 210 20% 98%;
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
+    --secondary: 214 32% 91%;
+    --secondary-foreground: 222 47% 11%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 20% 98%;
     --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
+    --popover-foreground: 222 47% 11%;
     --radius: 0.75rem;
   }
 }

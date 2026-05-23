@@ -22,9 +22,9 @@ const typeLabels: Record<QuestionType, string> = {
 };
 
 const typeColors: Record<QuestionType, string> = {
-  MCQ: 'bg-brand-100 text-brand-700',
-  TRUE_FALSE: 'bg-purple-100 text-purple-700',
-  SHORT_ANSWER: 'bg-orange-100 text-orange-700',
+  MCQ: 'bg-[#00bcd4]/10 text-[#00bcd4]',
+  TRUE_FALSE: 'bg-[#00bcd4]/10 text-[#00bcd4]',
+  SHORT_ANSWER: 'bg-[#f5a623]/10 text-[#f5a623]',
 };
 
 export default function QuizDetailPage() {
@@ -65,7 +65,7 @@ export default function QuizDetailPage() {
           <div className="flex items-center gap-2 mb-1">
             <button
               onClick={() => navigate('/quizzes')}
-              className="text-sm text-muted-foreground hover:text-brand-600 transition-colors"
+              className="text-sm text-muted-foreground hover:text-[#00bcd4] transition-colors"
             >
               My Quizzes
             </button>
@@ -91,7 +91,7 @@ export default function QuizDetailPage() {
         <div className="flex items-center gap-2 flex-shrink-0">
           <button
             onClick={() => navigate(`/quizzes/${id}/analytics`)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-100 text-sm font-medium text-slate-600 hover:border-brand-200 hover:bg-brand-50 transition-all"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-100 text-sm font-medium text-slate-600 hover:border-[#00bcd4]/30 hover:bg-[#00bcd4]/5 hover:text-[#00bcd4] transition-all"
           >
             <BarChart2 className="w-4 h-4" />
             Analytics

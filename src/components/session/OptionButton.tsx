@@ -26,8 +26,8 @@ export function OptionButton({
       disabled={disabled}
       className={cn(
         'w-full flex items-center justify-center p-5 rounded-2xl border-2 text-center transition-all duration-300 font-extrabold text-base relative overflow-hidden group',
-        !isResult && !selected && 'border-[#c97dff]/15 bg-[#1a0926]/40 text-slate-200 hover:border-[#c97dff]/70 hover:bg-[#c97dff]/12 hover:text-white hover:shadow-[0_8px_30px_rgba(201,125,255,0.15)]',
-        !isResult && selected && 'border-[#c97dff] bg-[#c97dff]/25 text-[#e5baff] shadow-[0_0_30px_rgba(201,125,255,0.45)]',
+        !isResult && !selected && 'border-[#00bcd4]/15 bg-[#0b192c]/40 text-slate-200 hover:border-[#00bcd4]/70 hover:bg-[#00bcd4]/12 hover:text-white hover:shadow-[0_8px_30px_rgba(0,188,212,0.15)]',
+        !isResult && selected && 'border-[#00bcd4] bg-[#00bcd4]/25 text-[#a8ffd4] shadow-[0_0_30px_rgba(0,188,212,0.45)]',
         isResult && correct  && selected && 'border-[#00d68f] bg-[#00d68f]/25 text-[#a8ffd4] shadow-[0_0_30px_rgba(0,214,143,0.45)]',
         isResult && !correct && selected && 'border-red-500 bg-red-500/20 text-red-300 shadow-[0_0_30px_rgba(239,68,68,0.35)]',
         isResult && correct  && !selected && 'border-[#00d68f]/40 bg-[#00d68f]/8 text-emerald-400',

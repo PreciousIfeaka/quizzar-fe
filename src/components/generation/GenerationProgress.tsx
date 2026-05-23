@@ -34,7 +34,7 @@ export function GenerationProgress() {
         {[0, 1, 2].map(i => (
           <motion.div
             key={i}
-            className="absolute inset-0 rounded-full border-2 border-brand-400/40"
+            className="absolute inset-0 rounded-full border-2 border-[#00bcd4]/30"
             animate={{ scale: [1, 1.5 + i * 0.3], opacity: [0.6, 0] }}
             transition={{ duration: 2, delay: i * 0.4, repeat: Infinity, ease: 'easeOut' }}
           />
@@ -60,7 +60,7 @@ export function GenerationProgress() {
             className="flex items-center gap-3 text-sm"
           >
             <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
-              i < stepIndex ? 'bg-green-500' : i === stepIndex ? 'bg-brand-500 animate-pulse' : 'bg-slate-200'
+              i < stepIndex ? 'bg-green-500' : i === stepIndex ? 'bg-[#00bcd4] animate-pulse' : 'bg-slate-200'
             }`} />
             <span className={i <= stepIndex ? 'text-slate-700 font-medium' : 'text-muted-foreground'}>
               {step}

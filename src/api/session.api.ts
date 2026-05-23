@@ -1,5 +1,5 @@
 import { publicApi } from '../lib/axios';
-import type { PublicQuiz, QuizResult, StartSessionRequest, StartSessionResponse, SubmitAnswersRequest } from '../types/session.types';
+import type { PublicQuiz, QuizResult, StartSessionRequest, StartSessionResponse, SubmitAnswersRequest, SubmitAnswerRequest, QuestionResultResponse } from '../types/session.types';
 
 export const sessionApi = {
   getPublicQuiz: (quizCode: string): Promise<PublicQuiz> =>
@@ -10,6 +10,14 @@ export const sessionApi = {
 
   submitAnswers: (quizCode: string, sessionId: string, data: SubmitAnswersRequest): Promise<QuizResult> =>
     publicApi.post(`/public/quiz/${quizCode}/sessions/${sessionId}/submit`, data)
+      .then(r => r.data.data),
+
+  submitSingleAnswer: (quizCode: string, sessionId: string, data: SubmitAnswerRequest): Promise<QuestionResultResponse> =>
+    publicApi.post(`/public/quiz/${quizCode}/sessions/${sessionId}/submit-answer`, data)
+      .then(r => r.data.data),
+
+  completeSession: (quizCode: string, sessionId: string): Promise<QuizResult> =>
+    publicApi.post(`/public/quiz/${quizCode}/sessions/${sessionId}/complete`)
       .then(r => r.data.data),
 
   getSessionResults: (quizCode: string, sessionId: string): Promise<QuizResult> =>

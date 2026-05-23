@@ -9,7 +9,7 @@ import { QuestionCard } from '../../components/session/QuestionCard';
 import { TimerRing } from '../../components/session/TimerRing';
 import { BrandButton } from '../../components/common/BrandButton';
 import { ProgressBar } from '../../components/session/ProgressBar';
-import type { AnswerSubmission } from '../../types/session.types';
+import type { AnswerSubmission, SubmitAnswerRequest, QuestionResultResponse } from '../../types/session.types';
 
 export default function PublicQuizSessionPage() {
   const { quizCode } = useParams<{ quizCode: string }>();
@@ -17,6 +17,8 @@ export default function PublicQuizSessionPage() {
   const { quiz, session, studentName, currentIndex, answers, recordAnswer, nextQuestion } =
     useQuizStore();
   const [direction, setDirection] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState<QuestionResultResponse | null>(null);
   const questionStartTime = useRef(Date.now());
 
   // Guard: redirect if no active session
@@ -26,7 +28,6 @@ export default function PublicQuizSessionPage() {
 
   const submitMutation = useMutation({
     mutationFn: () => {
-      if (submitMutation.isPending) return Promise.reject('Already submitting');
       return sessionApi.submitAnswers(quizCode!, session!.sessionId, { answers });
     },
     onSuccess: (result) => {
@@ -37,6 +38,38 @@ export default function PublicQuizSessionPage() {
         } 
       });
     },
+    onError: () => {
+      setIsSubmitting(false);
+    },
+  });
+
+  const submitSingleAnswerMutation = useMutation({
+    mutationFn: (data: SubmitAnswerRequest) => {
+      return sessionApi.submitSingleAnswer(quizCode!, session!.sessionId, data);
+    },
+    onSuccess: (result) => {
+      setFeedback(result);
+    },
+    onError: () => {
+      setIsSubmitting(false);
+    }
+  });
+
+  const completeMutation = useMutation({
+    mutationFn: () => {
+      return sessionApi.completeSession(quizCode!, session!.sessionId);
+    },
+    onSuccess: (result) => {
+      navigate(`/quiz/${quizCode}/result`, { 
+        state: { 
+          result,
+          sessionId: session!.sessionId 
+        } 
+      });
+    },
+    onError: () => {
+      setIsSubmitting(false);
+    }
   });
 
   if (!quiz || !session) return null;
@@ -49,35 +82,98 @@ export default function PublicQuizSessionPage() {
   if (!currentQuestion) return null;
 
   const handleAnswer = (answer: Partial<AnswerSubmission>) => {
+    if (quiz.quizMode === 'PER_QUESTION' && feedback) return; // Prevent changing answer if already submitted
     const timeTaken = Math.round((Date.now() - questionStartTime.current) / 1000);
     recordAnswer({ questionId: currentQuestion.id, timeTakenSeconds: timeTaken, ...answer });
   };
 
+  const isPerQuestion = quiz.quizMode === 'PER_QUESTION';
+
+  const handleSubmitAnswer = () => {
+    if (submitSingleAnswerMutation.isPending || feedback) return;
+    
+    const timeTaken = Math.round((Date.now() - questionStartTime.current) / 1000);
+    // Record final selection state
+    recordAnswer({ 
+      questionId: currentQuestion.id, 
+      selectedOptionId: currentAnswer?.selectedOptionId, 
+      answerText: currentAnswer?.answerText, 
+      timeTakenSeconds: timeTaken 
+    });
+
+    submitSingleAnswerMutation.mutate({
+      questionId: currentQuestion.id,
+      selectedOptionId: currentAnswer?.selectedOptionId,
+      answerText: currentAnswer?.answerText,
+      timeTakenSeconds: timeTaken
+    });
+  };
+
   const handleNext = () => {
-    if (submitMutation.isPending) return;
-    setDirection(1);
-    if (isLast) {
-      submitMutation.mutate();
+    if (isPerQuestion) {
+      if (!feedback) {
+        handleSubmitAnswer();
+      } else {
+        if (isLast) {
+          setIsSubmitting(true);
+          completeMutation.mutate();
+        } else {
+          setDirection(1);
+          setFeedback(null);
+          nextQuestion();
+          questionStartTime.current = Date.now();
+        }
+      }
     } else {
-      nextQuestion();
-      questionStartTime.current = Date.now();
+      if (submitMutation.isPending || isSubmitting) return;
+      setDirection(1);
+      if (isLast) {
+        setIsSubmitting(true);
+        submitMutation.mutate();
+      } else {
+        nextQuestion();
+        questionStartTime.current = Date.now();
+      }
     }
   };
 
   const timerMode = session.timingMode;
   const timerSeconds = session.timerValueSeconds;
 
-  return (
-    <div className="min-h-screen bg-[#0d0414] text-slate-100 selection:bg-[#c97dff]/30 relative overflow-hidden">
-      {/* Decorative starry glowing gradients */}
-      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-[#c97dff]/5 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-[#6366f1]/5 blur-[150px] pointer-events-none" />
+  const getButtonText = () => {
+    if (isPerQuestion) {
+      if (!feedback) {
+        return submitSingleAnswerMutation.isPending ? 'Submitting...' : 'Submit Answer';
+      }
+      return isLast ? 'View Results' : 'Next Question';
+    }
+    if (isLast) {
+      return submitMutation.isPending || isSubmitting ? 'Submitting...' : 'Submit Quiz';
+    }
+    return 'Next Question';
+  };
 
+  const isButtonLoading = 
+    submitMutation.isPending || 
+    submitSingleAnswerMutation.isPending || 
+    completeMutation.isPending || 
+    isSubmitting;
+
+  const showIcon = isPerQuestion 
+    ? (!!feedback && !isLast) 
+    : !isLast;
+
+  return (
+    <div className="min-h-screen bg-[#060e17] text-slate-100 selection:bg-[#00bcd4]/30 relative overflow-hidden">
+      {/* Decorative starry glowing gradients */}
+      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-[#00bcd4]/5 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-[#00bcd4]/5 blur-[150px] pointer-events-none" />
+ 
       {/* Progress Header */}
-      <div className="sticky top-0 z-10 bg-[#12061c]/80 backdrop-blur-lg border-b border-[#c97dff]/15 px-4 py-3">
+      <div className="sticky top-0 z-10 bg-[#0b192c]/80 backdrop-blur-lg border-b border-[#00bcd4]/15 px-4 py-3">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-bold text-[#e5baff]/80">
+            <span className="text-sm font-bold text-slate-300">
               Question {currentIndex + 1} of {quiz.questions?.length || 0}
             </span>
             {timerMode === 'OVERALL' && timerSeconds && (
@@ -88,8 +184,8 @@ export default function PublicQuizSessionPage() {
               />
             )}
             <span 
-              className="text-sm font-extrabold text-[#c97dff] tracking-wide"
-              style={{ textShadow: '0 0 8px rgba(201,125,255,0.5)' }}
+              className="text-sm font-extrabold text-[#00bcd4] tracking-wide"
+              style={{ textShadow: '0 0 8px rgba(0,188,212,0.5)' }}
             >
               {studentName}
             </span>
@@ -112,11 +208,11 @@ export default function PublicQuizSessionPage() {
             animate="visible"
             exit="exit"
           >
-            {timerMode === 'PER_QUESTION' && timerSeconds && (
+            {timerMode === 'PER_QUESTION' && timerSeconds && !feedback && (
               <div className="flex justify-center mb-6">
                 <TimerRing
                   seconds={timerSeconds}
-                  onExpire={handleNext}
+                  onExpire={isPerQuestion ? handleSubmitAnswer : handleNext}
                   size="lg"
                   key={currentIndex}  // Reset timer on question change
                 />
@@ -129,6 +225,8 @@ export default function PublicQuizSessionPage() {
               answerText={currentAnswer?.answerText}
               onSelectOption={(id) => handleAnswer({ selectedOptionId: id })}
               onAnswerText={(text) => handleAnswer({ answerText: text })}
+              disabled={isPerQuestion ? !!feedback : false}
+              feedback={feedback}
             />
           </motion.div>
         </AnimatePresence>
@@ -136,11 +234,11 @@ export default function PublicQuizSessionPage() {
         <div className="flex justify-end mt-8">
           <BrandButton
             onClick={handleNext}
-            loading={submitMutation.isPending}
+            loading={isButtonLoading}
             size="lg"
-            icon={isLast ? undefined : <ChevronRight className="w-5 h-5" />}
+            icon={showIcon ? <ChevronRight className="w-5 h-5" /> : undefined}
           >
-            {isLast ? 'Submit Quiz' : 'Next Question'}
+            {getButtonText()}
           </BrandButton>
         </div>
       </div>

@@ -1,10 +1,11 @@
-import type { Question, TimingMode } from './quiz.types';
+import type { Question, TimingMode, QuizMode } from './quiz.types';
 
 export interface PublicQuiz {
   id: string;
   title: string;
   description?: string;
   timingMode: TimingMode;
+  quizMode: QuizMode;
   timerValueSeconds?: number;
   questions: Question[];  // no correct answers
 }
@@ -16,7 +17,23 @@ export interface StartSessionRequest {
 export interface StartSessionResponse {
   sessionId: string;
   timingMode: TimingMode;
+  quizMode: QuizMode;
   timerValueSeconds?: number;
+}
+
+export interface SubmitAnswerRequest {
+  questionId: string;
+  selectedOptionId?: string;
+  answerText?: string;
+  timeTakenSeconds: number;
+}
+
+export interface QuestionResultResponse {
+  correct: boolean;
+  pointsEarned: number;
+  correctOptionLabel?: string;
+  correctOptionText?: string;
+  correctShortAnswerKeys?: string[];
 }
 
 export interface AnswerSubmission {
