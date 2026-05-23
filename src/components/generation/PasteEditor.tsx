@@ -11,6 +11,8 @@ import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
 import { TimingSelector } from './TimingSelector';
 import { toast } from '../../hooks/use-toast';
+import { motion } from 'framer-motion';
+import { cn } from '../../lib/utils';
 
 const schema = z.object({
   quizTitle: z.string().min(1, 'Title is required').max(500, 'Title too long'),
