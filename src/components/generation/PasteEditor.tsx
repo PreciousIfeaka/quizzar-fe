@@ -158,7 +158,12 @@ Answer: False`}
                   key={id}
                   type="button"
                   whileTap={{ scale: 0.97 }}
-                  onClick={() => setValue('quizMode', id as any)}
+                  onClick={() => {
+                    setValue('quizMode', id as any);
+                    if (id === 'PER_QUESTION' && watch('timingPreference') === 'OVERALL') {
+                      setValue('timingPreference', 'PER_QUESTION');
+                    }
+                  }}
                   className={cn(
                     'flex flex-col gap-1 p-3 rounded-xl border-2 text-left transition-all duration-200',
                     active
@@ -181,6 +186,7 @@ Answer: False`}
           onChange={(v) => setValue('timingPreference', v)}
           manualSeconds={watch('manualTimerSeconds')}
           onManualSecondsChange={(v) => setValue('manualTimerSeconds', v)}
+          disabledTimingModes={watch('quizMode') === 'PER_QUESTION' ? ['OVERALL'] : []}
         />
 
         <BrandButton

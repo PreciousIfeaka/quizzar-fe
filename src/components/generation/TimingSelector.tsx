@@ -10,6 +10,7 @@ interface TimingSelectorProps {
   onChange: (v: TimingPreference) => void;
   manualSeconds?: number;
   onManualSecondsChange: (v: number | undefined) => void;
+  disabledTimingModes?: TimingPreference[];
 }
 
 const OPTIONS: {
@@ -22,7 +23,7 @@ const OPTIONS: {
   ];
 
 export function TimingSelector({
-  value, onChange, manualSeconds, onManualSecondsChange
+  value, onChange, manualSeconds, onManualSecondsChange, disabledTimingModes = []
 }: TimingSelectorProps) {
   const needsManual = value === 'PER_QUESTION' || value === 'OVERALL';
 
@@ -33,12 +34,15 @@ export function TimingSelector({
       <div className="grid grid-cols-2 gap-2">
         {OPTIONS.map(({ id, label, desc, icon: Icon }) => {
           const active = value === id;
+          const disabled = disabledTimingModes.includes(id);
           return (
             <motion.button
               key={id}
               type="button"
-              whileTap={{ scale: 0.97 }}
+              disabled={disabled}
+              whileTap={disabled ? undefined : { scale: 0.97 }}
               onClick={() => {
+                if (disabled) return;
                 onChange(id);
                 if (id !== 'PER_QUESTION' && id !== 'OVERALL') {
                   onManualSecondsChange(undefined);
@@ -48,17 +52,19 @@ export function TimingSelector({
                 'flex items-center gap-2.5 p-3 rounded-xl border-2 text-left transition-all duration-200',
                 active
                   ? 'border-[#00bcd4] bg-[#00bcd4]/5 shadow-brand-sm'
-                  : 'border-slate-100 hover:border-[#00bcd4]/30 hover:bg-slate-50'
+                  : 'border-slate-100 hover:border-[#00bcd4]/30 hover:bg-slate-50',
+                disabled && 'opacity-40 cursor-not-allowed pointer-events-none'
               )}
             >
               <div className={cn(
                 'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-200',
-                active ? 'bg-[#00bcd4] shadow-brand-md' : 'bg-slate-100'
+                active ? 'bg-[#00bcd4] shadow-brand-md' : 'bg-slate-100',
+                disabled && 'bg-slate-50'
               )}>
-                <Icon className={cn('w-4 h-4 transition-colors duration-200', active ? 'text-white' : 'text-slate-400')} />
+                <Icon className={cn('w-4 h-4 transition-colors duration-200', active ? 'text-white' : 'text-slate-300')} />
               </div>
               <div className="min-w-0">
-                <p className={cn('text-xs font-bold truncate transition-colors duration-200', active ? 'text-[#00bcd4]' : 'text-slate-700')}>
+                <p className={cn('text-xs font-bold truncate transition-colors duration-200', active ? 'text-[#00bcd4]' : 'text-slate-700', disabled && 'text-slate-400')}>
                   {label}
                 </p>
                 <p className="text-[10px] text-muted-foreground leading-tight truncate">{desc}</p>
@@ -67,6 +73,12 @@ export function TimingSelector({
           );
         })}
       </div>
+
+      {disabledTimingModes.includes('OVERALL') && (
+        <p className="text-[11px] text-amber-600 font-medium leading-relaxed mt-1.5 flex items-center gap-1">
+          ⚠️ Overall timing is unavailable in Instant Feedback mode.
+        </p>
+      )}
 
       {/* Manual timer input — shown only when PER_QUESTION or OVERALL */}
       <AnimatePresence>

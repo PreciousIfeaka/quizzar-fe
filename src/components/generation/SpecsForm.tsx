@@ -184,7 +184,12 @@ export function SpecsForm({ onGenerating }: { onGenerating: (v: boolean) => void
                     key={id}
                     type="button"
                     whileTap={{ scale: 0.97 }}
-                    onClick={() => setValue('quizMode', id as any)}
+                    onClick={() => {
+                      setValue('quizMode', id as any);
+                      if (id === 'PER_QUESTION' && watch('timingPreference') === 'OVERALL') {
+                        setValue('timingPreference', 'PER_QUESTION');
+                      }
+                    }}
                     className={cn(
                       'flex flex-col gap-1.5 p-4 rounded-xl border-2 text-left transition-all duration-200',
                       active
@@ -441,6 +446,7 @@ export function SpecsForm({ onGenerating }: { onGenerating: (v: boolean) => void
               onChange={(v) => setValue('timingPreference', v)}
               manualSeconds={watch('manualTimerSeconds')}
               onManualSecondsChange={(v) => setValue('manualTimerSeconds', v)}
+              disabledTimingModes={watch('quizMode') === 'PER_QUESTION' ? ['OVERALL'] : []}
             />
           </div>
 
