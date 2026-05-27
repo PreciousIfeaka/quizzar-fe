@@ -26,11 +26,11 @@ export function OptionButton({
       disabled={disabled}
       className={cn(
         'w-full flex items-center justify-center p-5 rounded-2xl border-2 text-center transition-all duration-300 font-extrabold text-base relative overflow-hidden group',
-        !isResult && !selected && 'border-[#00bcd4]/15 bg-[#0b192c]/40 text-slate-200 hover:border-[#00bcd4]/70 hover:bg-[#00bcd4]/12 hover:text-white hover:shadow-[0_8px_30px_rgba(0,188,212,0.15)]',
-        !isResult && selected && 'border-[#00bcd4] bg-[#00bcd4]/25 text-[#a8ffd4] shadow-[0_0_30px_rgba(0,188,212,0.45)]',
-        isResult && correct  && selected && 'border-[#00d68f] bg-[#00d68f]/25 text-[#a8ffd4] shadow-[0_0_30px_rgba(0,214,143,0.45)]',
-        isResult && !correct && selected && 'border-red-500 bg-red-500/20 text-red-300 shadow-[0_0_30px_rgba(239,68,68,0.35)]',
-        isResult && correct  && !selected && 'border-[#00d68f]/40 bg-[#00d68f]/8 text-emerald-400',
+        !isResult && !selected && 'border-slate-200 bg-slate-50 text-slate-700 hover:border-[#00bcd4]/80 hover:bg-[#00bcd4]/5 hover:text-[#00bcd4] hover:shadow-[0_8px_30px_rgba(0,188,212,0.1)]',
+        !isResult && selected && 'border-[#00bcd4] bg-[#00bcd4]/10 text-[#00bcd4] shadow-[0_0_30px_rgba(0,188,212,0.15)]',
+        isResult && correct  && selected && 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-[0_0_30px_rgba(16,185,129,0.15)]',
+        isResult && !correct && selected && 'border-red-500 bg-red-500/10 text-red-600 shadow-[0_0_30px_rgba(239,68,68,0.15)]',
+        isResult && correct  && !selected && 'border-emerald-300 bg-emerald-50/50 text-emerald-600',
         disabled && 'cursor-not-allowed'
       )}
     >

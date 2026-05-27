@@ -20,6 +20,7 @@ export default function PublicQuizSessionPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<QuestionResultResponse | null>(null);
   const questionStartTime = useRef(Date.now());
+  const submittingRef = useRef(false);
 
   // Guard: redirect if no active session
   useEffect(() => {
@@ -40,6 +41,7 @@ export default function PublicQuizSessionPage() {
     },
     onError: () => {
       setIsSubmitting(false);
+      submittingRef.current = false;
     },
   });
 
@@ -49,9 +51,12 @@ export default function PublicQuizSessionPage() {
     },
     onSuccess: (result) => {
       setFeedback(result);
+      setIsSubmitting(false);
+      submittingRef.current = false;
     },
     onError: () => {
       setIsSubmitting(false);
+      submittingRef.current = false;
     }
   });
 
@@ -69,6 +74,7 @@ export default function PublicQuizSessionPage() {
     },
     onError: () => {
       setIsSubmitting(false);
+      submittingRef.current = false;
     }
   });
 
@@ -90,7 +96,10 @@ export default function PublicQuizSessionPage() {
   const isPerQuestion = quiz.quizMode === 'PER_QUESTION';
 
   const handleSubmitAnswer = () => {
-    if (submitSingleAnswerMutation.isPending || feedback) return;
+    if (submitSingleAnswerMutation.isPending || feedback || isSubmitting || submittingRef.current) return;
+    
+    submittingRef.current = true;
+    setIsSubmitting(true);
     
     const timeTaken = Math.round((Date.now() - questionStartTime.current) / 1000);
     // Record final selection state
@@ -116,19 +125,22 @@ export default function PublicQuizSessionPage() {
       } else {
         if (isLast) {
           setIsSubmitting(true);
+          submittingRef.current = true;
           completeMutation.mutate();
         } else {
           setDirection(1);
           setFeedback(null);
+          submittingRef.current = false;
           nextQuestion();
           questionStartTime.current = Date.now();
         }
       }
     } else {
-      if (submitMutation.isPending || isSubmitting) return;
+      if (submitMutation.isPending || isSubmitting || submittingRef.current) return;
       setDirection(1);
       if (isLast) {
         setIsSubmitting(true);
+        submittingRef.current = true;
         submitMutation.mutate();
       } else {
         nextQuestion();
@@ -143,7 +155,7 @@ export default function PublicQuizSessionPage() {
   const getButtonText = () => {
     if (isPerQuestion) {
       if (!feedback) {
-        return submitSingleAnswerMutation.isPending ? 'Submitting...' : 'Submit Answer';
+        return submitSingleAnswerMutation.isPending || isSubmitting ? 'Submitting...' : 'Submit Answer';
       }
       return isLast ? 'View Results' : 'Next Question';
     }
@@ -164,16 +176,16 @@ export default function PublicQuizSessionPage() {
     : !isLast;
 
   return (
-    <div className="min-h-screen bg-[#060e17] text-slate-100 selection:bg-[#00bcd4]/30 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#f0f4f8] via-white to-[#00bcd4]/5 text-slate-800 selection:bg-[#00bcd4]/20 relative overflow-hidden">
       {/* Decorative starry glowing gradients */}
       <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-[#00bcd4]/5 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-[#00bcd4]/5 blur-[150px] pointer-events-none" />
  
       {/* Progress Header */}
-      <div className="sticky top-0 z-10 bg-[#0b192c]/80 backdrop-blur-lg border-b border-[#00bcd4]/15 px-4 py-3">
+      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-lg border-b border-slate-100 px-4 py-3">
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-bold text-slate-300">
+            <span className="text-sm font-bold text-slate-500">
               Question {currentIndex + 1} of {quiz.questions?.length || 0}
             </span>
             {timerMode === 'OVERALL' && timerSeconds && (
@@ -185,7 +197,7 @@ export default function PublicQuizSessionPage() {
             )}
             <span 
               className="text-sm font-extrabold text-[#00bcd4] tracking-wide"
-              style={{ textShadow: '0 0 8px rgba(0,188,212,0.5)' }}
+              style={{ textShadow: '0 0 8px rgba(0,188,212,0.15)' }}
             >
               {studentName}
             </span>
