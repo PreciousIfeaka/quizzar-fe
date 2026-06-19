@@ -24,3 +24,4 @@ dist-ssr
 .env*
 *.sw?
 AGENT_UI.md
+.antigravitycli

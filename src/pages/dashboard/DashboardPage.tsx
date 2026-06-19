@@ -1,23 +1,87 @@
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, Sparkles, Users, TrendingUp } from 'lucide-react';
+import {
+  BookOpen,
+  Users,
+  TrendingUp,
+  Search,
+  MoreVertical,
+  Beaker,
+  Globe,
+  Calculator,
+  Rocket,
+  ArrowRight,
+  Sparkles,
+  Link2,
+  Trash2,
+  BarChart2,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/authStore';
 import { quizApi } from '@/api/quiz.api';
 import { analyticsApi } from '@/api/analytics.api';
 import { AnimatedPage } from '@/components/common/AnimatedPage';
-import { StatCard } from '@/components/common/StatCard';
-import { QuizCard } from '@/components/quiz/QuizCard';
-import { QuizCardSkeleton } from '@/components/quiz/QuizCardSkeleton';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { staggerContainer, fadeUp } from '@/lib/motion';
+import { formatDate, copyToClipboard, buildPublicQuizUrl } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
+import type { QuizSummary } from '@/types/quiz.types';
+
+// Helper to render consistent category icon based on index/title
+const getCategoryIcon = (index: number) => {
+  const icons = [Beaker, Globe, Calculator, Rocket];
+  const colors = [
+    'bg-primary-container/20 text-primary',
+    'bg-secondary-container/20 text-secondary',
+    'bg-outline-variant/20 text-slate-500',
+    'bg-primary-container/20 text-primary',
+  ];
+  const IconComponent = icons[index % icons.length];
+  const colorClass = colors[index % colors.length];
+
+  return (
+    <div className={`w-8 h-8 rounded-lg ${colorClass} flex items-center justify-center`}>
+      <IconComponent className="w-4 h-4" />
+    </div>
+  );
+};
 
 export default function DashboardPage() {
   const { teacher } = useAuthStore();
   const navigate = useNavigate();
+  const [search, setSearch] = useState('');
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const [deleteTarget, setDeleteTarget] = useState<QuizSummary | null>(null);
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => quizApi.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['quizzes'] });
+      toast({ title: 'Quiz deleted', description: 'The quiz has been successfully deleted.' });
+    },
+    onError: () => {
+      toast({ title: 'Error', description: 'Failed to delete quiz.', variant: 'destructive' });
+    },
+  });
+
+  const handleCopyLink = async (e: React.MouseEvent, quizCode: string) => {
+    e.stopPropagation();
+    await copyToClipboard(buildPublicQuizUrl(quizCode));
+    toast({ title: 'Link copied!', description: 'Public quiz link copied to clipboard.' });
+  };
 
   const { data: quizzesData, isLoading: quizzesLoading } = useQuery({
-    queryKey: ['quizzes', 0, 4],
-    queryFn: () => quizApi.getAll(0, 4),
+    queryKey: ['quizzes', 0, 10], // load up to 10 for dashboard table
+    queryFn: () => quizApi.getAll(0, 10),
   });
 
   const { data: summaryData } = useQuery({
@@ -25,145 +89,257 @@ export default function DashboardPage() {
     queryFn: () => analyticsApi.getSummary(),
   });
 
-  const firstName = teacher?.name?.split(' ')[0] ?? 'Teacher';
+  const quizzes = quizzesData?.content ?? [];
+  
+  const filteredQuizzes = quizzes.filter((q) =>
+    q.title.toLowerCase().includes(search.toLowerCase()) ||
+    q.quizCode.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <AnimatedPage>
       {/* Welcome Banner */}
-      <div className="relative bg-[#0b192c] rounded-3xl p-8 mb-8 overflow-hidden shadow-md">
-        {/* Subtle grid pattern of VoyageMath */}
-        <div className="absolute inset-0 opacity-[0.05] pointer-events-none">
-          <svg width="100%" height="100%">
-            <pattern id="banner-grid" width="24" height="24" patternUnits="userSpaceOnUse">
-              <path d="M 24 0 L 0 0 0 24" fill="none" stroke="white" strokeWidth="1" />
-            </pattern>
-            <rect width="100%" height="100%" fill="url(#banner-grid)" />
-          </svg>
+      <div className="relative bg-[#0b192c] rounded-2xl py-6 px-8 mb-6 overflow-hidden text-white shadow-card border border-slate-800/60">
+        {/* Subtle grid pattern background */}
+        <div 
+          className="absolute inset-0 opacity-[0.05] pointer-events-none"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, rgba(255, 255, 255, 0.4) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(255, 255, 255, 0.4) 1px, transparent 1px)
+            `,
+            backgroundSize: '24px 24px',
+          }}
+        />
+        
+        {/* Concentric circles decoration on the right side */}
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[200px] h-[200px] opacity-15 pointer-events-none hidden md:block select-none">
+          <div className="absolute inset-0 rounded-full border-[1.5px] border-white/50 scale-[0.6]" />
+          <div className="absolute inset-0 rounded-full border-[1.5px] border-white/50 scale-[0.8]" />
+          <div className="absolute inset-0 rounded-full border-[1.5px] border-white/50 scale-[1.0]" />
         </div>
-        {/* Overlapping concentric circles */}
-        <div className="absolute right-[-5%] top-[-20%] w-96 h-96 opacity-[0.08] pointer-events-none">
-          <svg viewBox="0 0 100 100" className="w-full h-full stroke-white fill-none" strokeWidth="1">
-            <circle cx="50" cy="50" r="40" />
-            <circle cx="50" cy="50" r="30" />
-            <circle cx="50" cy="50" r="20" />
-          </svg>
-        </div>
- 
-        <div className="relative z-10 max-w-xl">
-          <motion.p
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-brand-200 text-xs font-bold uppercase tracking-widest mb-1.5"
-          >
-            Welcome back
-          </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.15 }}
-            className="text-3xl sm:text-4xl font-black text-white mb-3 tracking-tight"
-          >
-            Good to see you, {firstName}! 👋
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-brand-100 text-sm mb-6 max-w-md font-medium leading-relaxed"
-          >
+
+        <div className="relative z-10 max-w-2xl text-left">
+          <span className="text-[9px] font-black text-[#0A99AB] uppercase tracking-widest bg-[#0A99AB]/10 px-2.5 py-0.5 rounded-full border border-[#0A99AB]/20">
+            Welcome Back
+          </span>
+          <h2 className="text-2xl md:text-3xl font-black tracking-tight text-white mt-3 mb-1.5">
+            Good to see you, {teacher?.name ?? 'Instructor'}! 👋
+          </h2>
+          <p className="text-xs md:text-sm text-slate-300 font-medium leading-relaxed">
             Create interactive quizzes, track student attempts, and analyze real-time performance dashboard metrics.
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-          >
-            <button
-              onClick={() => navigate('/generate')}
-              className="inline-flex items-center gap-2 bg-white text-[#0b192c] hover:bg-brand-50 transition-all duration-200 font-extrabold text-xs uppercase tracking-wider px-6 py-3.5 rounded-xl shadow-md hover:shadow-lg active:scale-95"
-            >
-              <Sparkles className="w-4 h-4 text-[#00bcd4]" />
-              CREATE NEW QUIZ ↗
-            </button>
-          </motion.div>
+          </p>
         </div>
       </div>
 
-      {/* Stats Row */}
-      <motion.div
+      {/* Summary Analytics (Metrics Row) */}
+      <motion.section
         variants={staggerContainer}
         initial="hidden"
         animate="visible"
-        className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10"
       >
-        <motion.div variants={fadeUp}>
-          <StatCard
-            label="Total Quizzes"
-            value={summaryData?.totalQuizzes ?? quizzesData?.totalElements ?? 0}
-            icon={BookOpen}
-            color="brand"
-          />
-        </motion.div>
-        <motion.div variants={fadeUp}>
-          <StatCard
-            label="Total Attempts"
-            value={summaryData?.totalAttempts ?? 0}
-            icon={Users}
-            color="accent"
-          />
-        </motion.div>
-        <motion.div variants={fadeUp}>
-          <StatCard
-            label="Avg Score"
-            value={summaryData ? `${Math.round(summaryData.averageScore)}%` : '—'}
-            icon={TrendingUp}
-            color="success"
-          />
-        </motion.div>
-        <motion.div variants={fadeUp}>
-          <StatCard
-            label="This Month"
-            value={summaryData?.activeQuizzesThisMonth ?? 0}
-            icon={Sparkles}
-            color="energy"
-          />
-        </motion.div>
-      </motion.div>
-
-      {/* Recent Quizzes */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <span className="text-[10px] text-brand-600 font-bold uppercase tracking-widest">Overview</span>
-          <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-0.5 tracking-tight">Recent Quizzes</h2>
-        </div>
-        <button
-          onClick={() => navigate('/quizzes')}
-          className="inline-flex items-center gap-1 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider text-brand-600 bg-brand-50 hover:bg-brand-100 transition-all duration-200"
+        {/* Total Quizzes */}
+        <motion.div
+          variants={fadeUp}
+          className="bg-white p-6 rounded-[22px] border border-slate-100/80 flex items-center justify-between custom-shadow-interactive cursor-default"
         >
-          View all ↗
-        </button>
-      </div>
+          <div className="flex flex-col">
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider font-['Plus_Jakarta_Sans',sans-serif]">
+              Total Quizzes
+            </span>
+            <span className="text-[32px] font-extrabold text-slate-900 mt-2 font-['Plus_Jakarta_Sans',sans-serif] tracking-tight leading-none">
+              {summaryData?.totalQuizzes ?? quizzesData?.totalElements ?? 0}
+            </span>
+          </div>
+          <div className="w-[52px] h-[52px] rounded-[16px] bg-[#f1f3f6] text-[#1b253b] flex items-center justify-center flex-shrink-0">
+            <BookOpen className="w-5 h-5 stroke-[2.2]" />
+          </div>
+        </motion.div>
 
-      <motion.div
-        variants={staggerContainer}
-        initial="hidden"
-        animate="visible"
-        className="grid grid-cols-1 md:grid-cols-2 gap-6"
-      >
-        {quizzesLoading
-          ? Array.from({ length: 4 }).map((_, i) => (
-            <motion.div key={i} variants={fadeUp}>
-              <QuizCardSkeleton />
-            </motion.div>
-          ))
-          : quizzesData?.content.map(quiz => (
-            <motion.div key={quiz.id} variants={fadeUp}>
-              <QuizCard quiz={quiz} />
-            </motion.div>
-          ))
-        }
-      </motion.div>
+        {/* Total Attempts */}
+        <motion.div
+          variants={fadeUp}
+          className="bg-white p-6 rounded-[22px] border border-slate-100/80 flex items-center justify-between custom-shadow-interactive cursor-default"
+        >
+          <div className="flex flex-col">
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider font-['Plus_Jakarta_Sans',sans-serif]">
+              Total Attempts
+            </span>
+            <span className="text-[32px] font-extrabold text-slate-900 mt-2 font-['Plus_Jakarta_Sans',sans-serif] tracking-tight leading-none">
+              {summaryData?.totalAttempts ?? 0}
+            </span>
+          </div>
+          <div className="w-[52px] h-[52px] rounded-[16px] bg-[#ebf2ff] text-[#2563eb] flex items-center justify-center flex-shrink-0">
+            <Users className="w-5 h-5 stroke-[2.2]" />
+          </div>
+        </motion.div>
+
+        {/* Average Score */}
+        <motion.div
+          variants={fadeUp}
+          className="bg-white p-6 rounded-[22px] border border-slate-100/80 flex items-center justify-between custom-shadow-interactive cursor-default"
+        >
+          <div className="flex flex-col">
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider font-['Plus_Jakarta_Sans',sans-serif]">
+              Avg Score
+            </span>
+            <span className="text-[32px] font-extrabold text-slate-900 mt-2 font-['Plus_Jakarta_Sans',sans-serif] tracking-tight leading-none">
+              {summaryData ? `${Math.round(summaryData.averageScore)}%` : '—'}
+            </span>
+          </div>
+          <div className="w-[52px] h-[52px] rounded-[16px] bg-[#e6fbf2] text-[#04a162] flex items-center justify-center flex-shrink-0">
+            <TrendingUp className="w-5 h-5 stroke-[2.2]" />
+          </div>
+        </motion.div>
+
+        {/* This Month */}
+        <motion.div
+          variants={fadeUp}
+          className="bg-white p-6 rounded-[22px] border border-slate-100/80 flex items-center justify-between custom-shadow-interactive cursor-default"
+        >
+          <div className="flex flex-col">
+            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider font-['Plus_Jakarta_Sans',sans-serif]">
+              This Month
+            </span>
+            <span className="text-[32px] font-extrabold text-slate-900 mt-2 font-['Plus_Jakarta_Sans',sans-serif] tracking-tight leading-none">
+              {summaryData?.activeQuizzesThisMonth ?? 0}
+            </span>
+          </div>
+          <div className="w-[52px] h-[52px] rounded-[16px] bg-[#fff0f0] text-[#e02424] flex items-center justify-center flex-shrink-0">
+            <Sparkles className="w-5 h-5 stroke-[2.2]" />
+          </div>
+        </motion.div>
+      </motion.section>
+
+      {/* Main Dashboard Content */}
+      <section className="grid grid-cols-1 gap-8">
+        <div className="bg-white rounded-2xl custom-shadow overflow-hidden border border-outline-variant/20">
+          <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-white">
+            <h3 className="font-headline-md text-lg font-black text-slate-800">
+              Recent Quizzes
+            </h3>
+            <div className="flex gap-2">
+              <div className="relative">
+                <input
+                  className="pl-10 pr-4 py-2 bg-slate-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 transition-all w-64 text-slate-800 placeholder-slate-400 outline-none"
+                  placeholder="Search quizzes..."
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+                <Search className="absolute left-3 top-2.5 text-slate-400 w-4 h-4" />
+              </div>
+            </div>
+          </div>
+          <div className="p-6">
+            {quizzesLoading ? (
+              <div className="flex items-center justify-center py-20">
+                <div className="rounded-full border-2 border-slate-100 border-t-[#0A99AB] w-8 h-8 animate-spin" />
+              </div>
+            ) : filteredQuizzes.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-slate-400 text-center">
+                <BookOpen className="w-12 h-12 mb-3 stroke-[1.5] text-slate-350" />
+                <span className="text-sm font-semibold">No quizzes found.</span>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredQuizzes.map((quiz, index) => (
+                  <div
+                    key={quiz.id}
+                    className="bg-white rounded-2xl border border-slate-100 p-5 quiz-card-shadow-interactive hover:border-[#0A99AB]/30 flex flex-col justify-between relative group cursor-pointer"
+                    onClick={() => navigate(`/quizzes/${quiz.id}`)}
+                  >
+                    <div className="flex justify-between items-start gap-4 mb-3">
+                      <div className="flex items-center gap-2.5">
+                        {getCategoryIcon(index)}
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#0A99AB]/10 text-[#0A99AB] text-[10px] font-black uppercase tracking-wider">
+                          {quiz.questionCount} {quiz.questionCount === 1 ? 'Question' : 'Questions'}
+                        </span>
+                      </div>
+                      
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="p-1.5 rounded-lg text-slate-400 hover:text-slate-650 hover:bg-slate-50 transition-colors">
+                              <MoreVertical className="w-4 h-4" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem className="cursor-pointer" onClick={() => navigate(`/quizzes/${quiz.id}`)}>
+                              <BookOpen className="w-4 h-4 mr-2 text-slate-405" /> View Quiz
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer" onClick={(e) => handleCopyLink(e, quiz.quizCode)}>
+                              <Link2 className="w-4 h-4 mr-2 text-slate-405" /> Copy Link
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="cursor-pointer" onClick={() => navigate(`/quizzes/${quiz.id}/analytics`)}>
+                              <BarChart2 className="w-4 h-4 mr-2 text-slate-405" /> Analytics
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
+                              onClick={() => setDeleteTarget(quiz)}
+                            >
+                              <Trash2 className="w-4 h-4 mr-2" /> Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </div>
+                    
+                    <div className="flex-grow mb-4">
+                      <h4 className="font-extrabold text-slate-800 text-base mb-1.5 group-hover:text-[#0A99AB] transition-colors line-clamp-1">
+                        {quiz.title}
+                      </h4>
+                      <p className="text-xs text-slate-550 line-clamp-2 leading-relaxed">
+                        {quiz.description || 'No description provided.'}
+                      </p>
+                    </div>
+                    
+                    <div className="border-t border-slate-50 pt-4 flex items-center justify-between text-xs mt-auto">
+                      <div className="flex flex-col">
+                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Created</span>
+                        <span className="text-slate-500 font-semibold mt-0.5">
+                          {formatDate(quiz.createdAt)}
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Code</span>
+                        <span className="text-slate-500 font-semibold mt-0.5 font-mono">
+                          {quiz.quizCode}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="p-4 bg-slate-50/50 flex justify-center border-t border-slate-100">
+            <button
+              onClick={() => navigate('/quizzes')}
+              className="text-primary font-bold text-sm hover:underline flex items-center gap-1"
+            >
+              View All Quizzes <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => !open && setDeleteTarget(null)}
+        title="Delete Quiz"
+        description={deleteTarget ? `Are you sure you want to delete "${deleteTarget.title}"? This will remove all questions, sessions, and student results permanently.` : ''}
+        onConfirm={() => {
+          if (deleteTarget) {
+            deleteMutation.mutate(deleteTarget.id);
+            setDeleteTarget(null);
+          }
+        }}
+        loading={deleteMutation.isPending}
+        variant="danger"
+      />
     </AnimatedPage>
   );
 }

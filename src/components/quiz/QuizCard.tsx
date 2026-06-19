@@ -52,15 +52,15 @@ export function QuizCard({ quiz }: { quiz: QuizSummary }) {
         whileHover="hover"
         animate="rest"
         onClick={() => navigate(`/quizzes/${quiz.id}`)}
-        className="bg-white rounded-2xl border border-slate-100/60 shadow-md hover:shadow-lg cursor-pointer overflow-hidden group transition-all duration-300"
+        className="bg-white rounded-2xl border border-slate-100/60 quiz-card-shadow hover:shadow-lg cursor-pointer overflow-hidden group transition-all duration-300"
       >
         {/* Color accent bar */}
-        <div className="h-1 bg-brand-500" />
+        <div className="h-1 bg-gradient-brand" />
 
         <div className="p-5">
           <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex-1 min-w-0">
-              <h3 className="font-extrabold text-slate-900 text-base leading-snug truncate group-hover:text-brand-500 transition-colors">
+              <h3 className="font-extrabold text-slate-900 text-base leading-snug truncate group-hover:text-[#0a99ab] transition-colors">
                 {quiz.title}
               </h3>
               {quiz.description && (
@@ -115,7 +115,7 @@ export function QuizCard({ quiz }: { quiz: QuizSummary }) {
             <p className="text-xs text-muted-foreground">{formatDate(quiz.createdAt)}</p>
             <button
               onClick={handleCopyLink}
-              className="text-xs text-brand-600 font-bold flex items-center gap-1 hover:text-brand-700"
+              className="text-xs text-primary font-bold flex items-center gap-1 hover:text-[#0a99ab]"
             >
               <Link2 className="w-3.5 h-3.5" />
               Copy link

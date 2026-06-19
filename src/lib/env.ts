@@ -20,9 +20,7 @@ function optionalEnv(key: string, fallback: string): string {
 
 export const env = {
   apiBaseUrl:       requireEnv('VITE_API_BASE_URL'),
-  keycloakUrl:      requireEnv('VITE_KEYCLOAK_URL'),
-  keycloakRealm:    requireEnv('VITE_KEYCLOAK_REALM'),
-  keycloakClientId: requireEnv('VITE_KEYCLOAK_CLIENT_ID'),
+
   publicQuizBase:   optionalEnv('VITE_PUBLIC_QUIZ_BASE_URL', `${window.location.origin}/quiz`),
   isDev:            import.meta.env.DEV,
   isProd:           import.meta.env.PROD,

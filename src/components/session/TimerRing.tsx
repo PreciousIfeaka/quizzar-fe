@@ -6,14 +6,13 @@ interface TimerRingProps {
   seconds:  number;
   onExpire: () => void;
   size?:    'sm' | 'lg';
-  key?:     number;
 }
 
 export function TimerRing({ seconds, onExpire, size = 'lg' }: TimerRingProps) {
   const { seconds: remaining, percentage, isUrgent } = useTimer(seconds, onExpire);
 
-  const dim = size === 'lg' ? 100 : 52;
-  const stroke = size === 'lg' ? 6 : 4;
+  const dim = size === 'lg' ? 80 : 48;
+  const stroke = size === 'lg' ? 5 : 3;
   const r = (dim - stroke * 2) / 2;
   const circumference = 2 * Math.PI * r;
   const offset = circumference * (1 - percentage / 100);
@@ -26,7 +25,7 @@ export function TimerRing({ seconds, onExpire, size = 'lg' }: TimerRingProps) {
           cx={dim / 2} cy={dim / 2} r={r}
           fill="none" stroke="currentColor"
           strokeWidth={stroke}
-          className="text-[#1a0926]"
+          className="text-slate-100"
         />
         {/* Progress ring */}
         <motion.circle
@@ -38,17 +37,17 @@ export function TimerRing({ seconds, onExpire, size = 'lg' }: TimerRingProps) {
           strokeDashoffset={offset}
           className={cn(
             'transition-all duration-1000',
-            isUrgent ? 'stroke-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'stroke-[#c97dff] shadow-[0_0_8px_rgba(201,125,255,0.5)]'
+            isUrgent ? 'stroke-red-500' : 'stroke-[#0A99AB]'
           )}
         />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
         <span className={cn(
           'font-black tabular-nums',
-          size === 'lg' ? 'text-2xl' : 'text-sm',
-          isUrgent ? 'text-red-500 animate-pulse' : 'text-slate-200',
+          size === 'lg' ? 'text-xl text-slate-800' : 'text-[11px] text-slate-700',
+          isUrgent && 'text-red-500 animate-pulse',
         )}>
-          {remaining}
+          {remaining}s
         </span>
       </div>
     </div>

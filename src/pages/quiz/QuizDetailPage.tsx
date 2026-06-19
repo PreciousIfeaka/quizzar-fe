@@ -135,7 +135,7 @@ export default function QuizDetailPage() {
                     onClick={() => setExpandedQuestion(isExpanded ? null : question.id)}
                     className="w-full flex items-start gap-4 p-4 text-left hover:bg-slate-50/50 transition-colors"
                   >
-                    <span className="w-8 h-8 rounded-xl bg-brand-50 flex items-center justify-center text-sm font-black text-brand-600 flex-shrink-0">
+                    <span className="w-8 h-8 rounded-xl bg-[#00bcd4]/10 flex items-center justify-center text-sm font-black text-[#006672] flex-shrink-0">
                       {index + 1}
                     </span>
                     <div className="flex-1 min-w-0">

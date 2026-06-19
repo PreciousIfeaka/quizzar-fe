@@ -69,3 +69,83 @@
     -moz-osx-font-smoothing: grayscale;
   }
 }
+
+.grid-pattern {
+  background-image: linear-gradient(rgba(15, 43, 61, 0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(15, 43, 61, 0.045) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.teal-gradient, .primary-gradient {
+  background: linear-gradient(135deg, #001e2f 0%, #006877 100%);
+}
+.btn-gradient {
+  background: linear-gradient(90deg, #001e2f 0%, #006877 100%);
+  transition: all 0.3s ease;
+}
+.btn-gradient:hover {
+  filter: brightness(1.2);
+  transform: translateY(-1px);
+}
+.primary-gradient-hover:hover {
+  background: linear-gradient(135deg, #001e2f 0%, #00bdd6 100%);
+}
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+}
+.custom-shadow {
+  box-shadow: 
+    0 2px 4px rgba(11, 25, 44, 0.03), 
+    0 8px 16px rgba(11, 25, 44, 0.04), 
+    0 0 1px 0 rgba(11, 25, 44, 0.15),
+    0 4px 0px 0px rgba(11, 25, 44, 0.12); /* 3D tactile edge */
+}
+.custom-shadow-interactive {
+  box-shadow: 
+    0 2px 4px rgba(11, 25, 44, 0.03), 
+    0 8px 16px rgba(11, 25, 44, 0.04), 
+    0 0 1px 0 rgba(11, 25, 44, 0.15),
+    0 4px 0px 0px rgba(11, 25, 44, 0.12);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+.custom-shadow-interactive:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 4px 8px rgba(11, 25, 44, 0.04), 
+    0 16px 28px rgba(11, 25, 44, 0.08), 
+    0 0 1px 0 rgba(11, 25, 44, 0.2),
+    0 6px 0px 0px rgba(11, 25, 44, 0.18);
+}
+.quiz-card-shadow {
+  box-shadow: 
+    0 2px 4px rgba(10, 153, 171, 0.04), 
+    0 8px 16px rgba(10, 153, 171, 0.06), 
+    0 0 1px 0 rgba(10, 153, 171, 0.2),
+    0 4px 0px 0px rgba(10, 153, 171, 0.18);
+}
+.quiz-card-shadow-interactive {
+  box-shadow: 
+    0 2px 4px rgba(10, 153, 171, 0.04), 
+    0 8px 16px rgba(10, 153, 171, 0.06), 
+    0 0 1px 0 rgba(10, 153, 171, 0.2),
+    0 4px 0px 0px rgba(10, 153, 171, 0.18);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+.quiz-card-shadow-interactive:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 4px 8px rgba(10, 153, 171, 0.06), 
+    0 16px 28px rgba(10, 153, 171, 0.1), 
+    0 0 1px 0 rgba(10, 153, 171, 0.25),
+    0 6px 0px 0px rgba(10, 153, 171, 0.24);
+}
+.step-indicator {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #006877;
+  color: white;
+  font-weight: bold;
+}

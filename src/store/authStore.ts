@@ -7,21 +7,41 @@ interface AuthStore {
   isAuthenticated: boolean;
   isLoading: boolean;
   accessToken: string | null;
-  setTeacher: (teacher: Teacher) => void;
-  setAccessToken: (token: string) => void;
+  setTeacher: (teacher: Teacher | null) => void;
+  setAccessToken: (token: string | null) => void;
   setLoading: (loading: boolean) => void;
   logout: () => void;
 }
 
+const TOKEN_KEY = 'quizzar_access_token';
+
+// Read initial token from localStorage
+const initialToken = typeof window !== 'undefined'
+  ? localStorage.getItem(TOKEN_KEY)
+  : null;
+
 export const useAuthStore = create<AuthStore>()(
-  devtools((set) => ({
-    teacher: null,
-    isAuthenticated: false,
-    isLoading: true,
-    accessToken: null,
-    setTeacher: (teacher) => set({ teacher, isAuthenticated: true }),
-    setAccessToken: (token) => set({ accessToken: token }),
-    setLoading: (isLoading) => set({ isLoading }),
-    logout: () => set({ teacher: null, isAuthenticated: false, accessToken: null }),
-  }), { name: 'auth-store' })
+  devtools(
+    (set) => ({
+      teacher: null,
+      isAuthenticated: false,
+      isLoading: true,
+      accessToken: initialToken,
+      setTeacher: (teacher) => set({ teacher, isAuthenticated: !!teacher }),
+      setAccessToken: (token) => {
+        if (token) {
+          localStorage.setItem(TOKEN_KEY, token);
+        } else {
+          localStorage.removeItem(TOKEN_KEY);
+        }
+        set({ accessToken: token });
+      },
+      setLoading: (isLoading) => set({ isLoading }),
+      logout: () => {
+        localStorage.removeItem(TOKEN_KEY);
+        set({ teacher: null, isAuthenticated: false, accessToken: null });
+      },
+    }),
+    { name: 'auth-store' }
+  )
 );

@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
-import { Menu, Bell, ChevronDown } from 'lucide-react';
+import { Menu, ChevronDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { useAuth } from '../../hooks/useAuth';
-import { Avatar, AvatarFallback } from '../ui/avatar';
+import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger
@@ -12,6 +13,7 @@ import { QuizzarLogo } from '../common/QuizzarLogo';
 export function Navbar({ onMenuClick }: { onMenuClick: () => void }) {
   const { teacher } = useAuthStore();
   const { logout } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <motion.nav
@@ -32,14 +34,13 @@ export function Navbar({ onMenuClick }: { onMenuClick: () => void }) {
         </div>
 
         <div className="flex items-center gap-2">
-          <button className="p-2 rounded-lg hover:bg-slate-100 transition-colors relative">
-            <Bell className="w-5 h-5 text-slate-600" />
-          </button>
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl hover:bg-slate-100 transition-colors">
                 <Avatar className="w-8 h-8">
+                  {teacher?.avatarUrl ? (
+                    <AvatarImage src={teacher.avatarUrl} alt={teacher.name} className="object-cover" />
+                  ) : null}
                   <AvatarFallback className="bg-gradient-brand text-white text-sm font-semibold">
                     {teacher?.name?.charAt(0).toUpperCase() ?? 'T'}
                   </AvatarFallback>
@@ -52,10 +53,15 @@ export function Navbar({ onMenuClick }: { onMenuClick: () => void }) {
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem className="text-slate-700">Profile</DropdownMenuItem>
+              <DropdownMenuItem 
+                className="text-slate-700 cursor-pointer"
+                onClick={() => navigate('/settings')}
+              >
+                Profile
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
                 onClick={logout}
               >
                 Sign out

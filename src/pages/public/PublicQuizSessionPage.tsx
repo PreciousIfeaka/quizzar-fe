@@ -2,19 +2,18 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useMutation } from '@tanstack/react-query';
-import { ChevronRight } from 'lucide-react';
+import { ArrowRight, X } from 'lucide-react';
 import { useQuizStore } from '../../store/quizStore';
 import { sessionApi } from '../../api/session.api';
 import { QuestionCard } from '../../components/session/QuestionCard';
 import { TimerRing } from '../../components/session/TimerRing';
-import { BrandButton } from '../../components/common/BrandButton';
-import { ProgressBar } from '../../components/session/ProgressBar';
+import { QuizzarLogo } from '../../components/common/QuizzarLogo';
 import type { AnswerSubmission, SubmitAnswerRequest, QuestionResultResponse } from '../../types/session.types';
 
 export default function PublicQuizSessionPage() {
   const { quizCode } = useParams<{ quizCode: string }>();
   const navigate = useNavigate();
-  const { quiz, session, studentName, currentIndex, answers, recordAnswer, nextQuestion } =
+  const { quiz, session, currentIndex, answers, recordAnswer, nextQuestion } =
     useQuizStore();
   const [direction, setDirection] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -88,7 +87,7 @@ export default function PublicQuizSessionPage() {
   if (!currentQuestion) return null;
 
   const handleAnswer = (answer: Partial<AnswerSubmission>) => {
-    if (quiz.quizMode === 'PER_QUESTION' && feedback) return; // Prevent changing answer if already submitted
+    if (quiz.quizMode === 'PER_QUESTION' && feedback) return;
     const timeTaken = Math.round((Date.now() - questionStartTime.current) / 1000);
     recordAnswer({ questionId: currentQuestion.id, timeTakenSeconds: timeTaken, ...answer });
   };
@@ -102,7 +101,6 @@ export default function PublicQuizSessionPage() {
     setIsSubmitting(true);
     
     const timeTaken = Math.round((Date.now() - questionStartTime.current) / 1000);
-    // Record final selection state
     recordAnswer({ 
       questionId: currentQuestion.id, 
       selectedOptionId: currentAnswer?.selectedOptionId, 
@@ -152,6 +150,13 @@ export default function PublicQuizSessionPage() {
   const timerMode = session.timingMode;
   const timerSeconds = session.timerValueSeconds;
 
+  const getModeLabel = () => {
+    if (isPerQuestion) return 'INSTANT FEEDBACK';
+    if (timerMode === 'OVERALL') return 'TIMED MODE';
+    if (timerMode === 'PER_QUESTION') return 'PER-QUESTION TIMER';
+    return 'PRACTICE MODE';
+  };
+
   const getButtonText = () => {
     if (isPerQuestion) {
       if (!feedback) {
@@ -171,23 +176,40 @@ export default function PublicQuizSessionPage() {
     completeMutation.isPending || 
     isSubmitting;
 
-  const showIcon = isPerQuestion 
-    ? (!!feedback && !isLast) 
-    : !isLast;
+  const handleExit = () => {
+    if (window.confirm('Are you sure you want to exit the quiz? Your progress will be lost.')) {
+      navigate(`/quiz/${quizCode}`);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f0f4f8] via-white to-[#00bcd4]/5 text-slate-800 selection:bg-[#00bcd4]/20 relative overflow-hidden">
-      {/* Decorative starry glowing gradients */}
-      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-[#00bcd4]/5 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-[#00bcd4]/5 blur-[150px] pointer-events-none" />
- 
-      {/* Progress Header */}
-      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-lg border-b border-slate-100 px-4 py-3">
-        <div className="max-w-2xl mx-auto">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-bold text-slate-500">
-              Question {currentIndex + 1} of {quiz.questions?.length || 0}
-            </span>
+    <div className="min-h-screen bg-gradient-to-br from-[#f0f4f8] via-white to-[#0A99AB]/5 text-slate-800 selection:bg-[#0A99AB]/20 relative overflow-hidden flex flex-col font-['Plus_Jakarta_Sans',sans-serif]">
+      {/* Decorative gradients */}
+      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-[#0A99AB]/5 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-[#0A99AB]/5 blur-[150px] pointer-events-none" />
+
+      {/* Top Navigation — Transactional Layout (matches Stitch) */}
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 h-20 flex items-center">
+        <div className="w-full px-6 max-w-5xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-6">
+            <QuizzarLogo noLink />
+            <div className="h-8 w-px bg-slate-200 hidden md:block" />
+            <div className="hidden md:flex flex-col">
+              <span className="font-bold text-xs text-slate-800 uppercase tracking-widest leading-tight">{quiz.title}</span>
+              {quiz.description && <span className="text-slate-400 text-xs font-medium leading-normal truncate max-w-xs">{quiz.description}</span>}
+            </div>
+          </div>
+          <div className="flex items-center gap-5">
+            {/* Question progress */}
+            <div className="flex flex-col items-end">
+              <span className="font-bold text-xs text-[#0A99AB] uppercase tracking-wider">
+                Question {currentIndex + 1} of {quiz.questions?.length || 0}
+              </span>
+              <div className="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden mt-1.5">
+                <div className="h-full bg-[#0A99AB] rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
+              </div>
+            </div>
+            {/* Circular Timer in header (Overall timer) */}
             {timerMode === 'OVERALL' && timerSeconds && (
               <TimerRing
                 seconds={timerSeconds}
@@ -195,18 +217,31 @@ export default function PublicQuizSessionPage() {
                 size="sm"
               />
             )}
-            <span 
-              className="text-sm font-extrabold text-[#00bcd4] tracking-wide"
-              style={{ textShadow: '0 0 8px rgba(0,188,212,0.15)' }}
+            {/* Exit Button */}
+            <button
+              onClick={handleExit}
+              className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
             >
-              {studentName}
-            </span>
+              <X className="w-5 h-5" />
+            </button>
           </div>
-          <ProgressBar value={progress} />
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-2xl mx-auto px-4 py-8 relative z-10">
+      {/* Main Content Canvas */}
+      <main className="flex-grow container max-w-3xl mx-auto px-6 py-10 md:py-14 flex flex-col relative z-10">
+
+        {/* Step Narrative Header — question number + mode label */}
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-9 h-9 rounded-full bg-[#0A99AB] text-white flex items-center justify-center font-black text-sm shadow-[0_4px_14px_rgba(10,153,171,0.35)]">
+            {currentIndex + 1}
+          </div>
+          <span className="font-bold text-[10px] text-[#0A99AB] bg-[#0A99AB]/10 px-3 py-1 rounded-full uppercase tracking-widest border border-[#0A99AB]/10">
+            {getModeLabel()}
+          </span>
+        </div>
+
+        {/* Animated Question Area */}
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={currentIndex}
@@ -219,18 +254,26 @@ export default function PublicQuizSessionPage() {
             initial="hidden"
             animate="visible"
             exit="exit"
+            className="flex flex-col gap-6"
           >
+            {/* Large Question Text — prominent h1 matching Stitch design */}
+            <h1 className="text-2xl md:text-3xl lg:text-[2rem] font-extrabold text-slate-900 leading-snug tracking-tight">
+              {currentQuestion.questionText}
+            </h1>
+
+            {/* Per-question circular timer (centered below question text) */}
             {timerMode === 'PER_QUESTION' && timerSeconds && !feedback && (
-              <div className="flex justify-center mb-6">
+              <div className="flex justify-center">
                 <TimerRing
                   seconds={timerSeconds}
                   onExpire={isPerQuestion ? handleSubmitAnswer : handleNext}
                   size="lg"
-                  key={currentIndex}  // Reset timer on question change
+                  key={currentIndex}
                 />
               </div>
             )}
 
+            {/* QuestionCard (options + feedback, no question text) */}
             <QuestionCard
               question={currentQuestion}
               selectedOptionId={currentAnswer?.selectedOptionId}
@@ -239,21 +282,25 @@ export default function PublicQuizSessionPage() {
               onAnswerText={(text) => handleAnswer({ answerText: text })}
               disabled={isPerQuestion ? !!feedback : false}
               feedback={feedback}
+              hideQuestionText
             />
           </motion.div>
         </AnimatePresence>
 
-        <div className="flex justify-end mt-8">
-          <BrandButton
+        {/* Submit / Next Button — centered, full-width, prominent (matches Stitch) */}
+        <div className="flex justify-center mt-10 pb-4">
+          <motion.button
+            whileHover={{ scale: isButtonLoading ? 1 : 1.02 }}
+            whileTap={{ scale: isButtonLoading ? 1 : 0.97 }}
             onClick={handleNext}
-            loading={isButtonLoading}
-            size="lg"
-            icon={showIcon ? <ChevronRight className="w-5 h-5" /> : undefined}
+            disabled={isButtonLoading}
+            className="primary-gradient w-full max-w-lg flex items-center justify-center gap-3 text-white rounded-2xl px-12 py-5 font-black text-sm uppercase tracking-wide shadow-[0_20px_60px_rgba(10,153,171,0.22)] hover:shadow-[0_24px_70px_rgba(10,153,171,0.3)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group"
           >
-            {getButtonText()}
-          </BrandButton>
+            <span>{getButtonText()}</span>
+            {!isButtonLoading && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+          </motion.button>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

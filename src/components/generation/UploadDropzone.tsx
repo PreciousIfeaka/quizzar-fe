@@ -1,7 +1,7 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDropzone } from 'react-dropzone';
-import { Upload, File, X, Sparkles } from 'lucide-react';
+import { Upload, File, X, ArrowRight, Brain, Languages, ShieldCheck } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -28,6 +28,7 @@ type FormData = z.infer<typeof schema>;
 
 export function UploadDropzone({ onGenerating }: { onGenerating: (v: boolean) => void }) {
   const [file, setFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormData>({
@@ -36,8 +37,30 @@ export function UploadDropzone({ onGenerating }: { onGenerating: (v: boolean) =>
   });
 
   const onDrop = useCallback((accepted: File[]) => {
-    if (accepted[0]) setFile(accepted[0]);
+    if (accepted[0]) {
+      const selectedFile = accepted[0];
+      setFile(selectedFile);
+      // Simulate file upload progress
+      setUploadProgress(0);
+    }
   }, []);
+
+  useEffect(() => {
+    if (uploadProgress !== null && uploadProgress < 100) {
+      const timer = setTimeout(() => {
+        setUploadProgress((p) => (p !== null ? Math.min(p + 10, 100) : 0));
+      }, 80);
+      return () => clearTimeout(timer);
+    }
+  }, [uploadProgress]);
+
+  const quizMode = watch('quizMode');
+  const timingPreference = watch('timingPreference');
+  useEffect(() => {
+    if (quizMode === 'PER_QUESTION' && timingPreference === 'OVERALL') {
+      setValue('timingPreference', 'PER_QUESTION');
+    }
+  }, [quizMode, timingPreference, setValue]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -48,7 +71,7 @@ export function UploadDropzone({ onGenerating }: { onGenerating: (v: boolean) =>
       'text/plain': ['.txt'],
     },
     maxFiles: 1,
-    maxSize: 20 * 1024 * 1024,
+    maxSize: 50 * 1024 * 1024, // 50MB
   });
 
   const mutation = useMutation({
@@ -86,160 +109,221 @@ export function UploadDropzone({ onGenerating }: { onGenerating: (v: boolean) =>
   });
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-      {/* Dropzone */}
-      <div className="lg:col-span-3 space-y-4">
-        <div
-          {...getRootProps()}
-          className={cn(
-            'relative border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all duration-200',
-            isDragActive
-              ? 'border-[#00bcd4] bg-[#00bcd4]/5 scale-[1.01]'
-              : file
-                ? 'border-green-400 bg-green-50'
-                : 'border-slate-200 hover:border-[#00bcd4]/30 hover:bg-[#00bcd4]/5'
-          )}
-        >
-          <input {...getInputProps()} />
+    <div className="space-y-10">
+      {/* Upload Zone */}
+      <div
+        {...getRootProps()}
+        className={cn(
+          'border-2 border-dashed border-primary/30 rounded-[2rem] p-12 text-center transition-all duration-300 hover:border-primary group cursor-pointer relative overflow-hidden bg-slate-50/20',
+          isDragActive && 'border-primary bg-primary/5 scale-[1.01]'
+        )}
+      >
+        <input {...getInputProps()} />
+        <div className="flex flex-col items-center gap-4 py-8">
           <AnimatePresence mode="wait">
-            {file ? (
+            {file && uploadProgress === 100 ? (
               <motion.div
-                key="file"
-                initial={{ opacity: 0, scale: 0.9 }}
+                key="uploaded"
+                initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
                 className="flex flex-col items-center gap-3"
               >
-                <div className="w-14 h-14 rounded-2xl bg-green-100 flex items-center justify-center">
-                  <File className="w-7 h-7 text-green-600" />
+                <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mb-2">
+                  <File className="w-9 h-9 text-emerald-600" />
                 </div>
-                <div>
-                  <p className="font-semibold text-slate-800">{file.name}</p>
-                  <p className="text-sm text-muted-foreground">{(file.size / 1024).toFixed(0)} KB</p>
-                </div>
+                <h3 className="text-xl font-black text-slate-800">{file.name}</h3>
+                <p className="text-sm text-emerald-600 font-bold flex items-center gap-1">
+                  Ready for generation • {(file.size / 1024 / 1024).toFixed(2)} MB
+                </p>
                 <button
-                  onClick={(e) => { e.stopPropagation(); setFile(null); }}
-                  className="flex items-center gap-1.5 text-xs text-red-500 hover:text-red-600 font-medium"
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setFile(null);
+                    setUploadProgress(null);
+                  }}
+                  className="mt-2 text-xs text-red-500 hover:underline font-bold flex items-center gap-1"
                 >
-                  <X className="w-3.5 h-3.5" /> Remove file
+                  <X className="w-3.5 h-3.5" /> Remove File
                 </button>
               </motion.div>
             ) : (
               <motion.div
-                key="empty"
+                key="upload-prompt"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
                 className="flex flex-col items-center gap-3"
               >
-                <div className={cn(
-                  'w-14 h-14 rounded-2xl flex items-center justify-center transition-all',
-                  isDragActive ? 'bg-[#00bcd4] animate-pulse' : 'bg-slate-100'
-                )}>
-                  <Upload className={cn('w-7 h-7', isDragActive ? 'text-white' : 'text-slate-400')} />
+                <div className="w-20 h-20 bg-primary-container/10 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                  <Upload className="w-8 h-8 text-primary" />
                 </div>
-                <div>
-                  <p className="font-semibold text-slate-700">
-                    {isDragActive ? 'Drop it here!' : 'Drag & drop your file'}
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    PDF, DOCX, DOC, TXT — up to 20MB
-                  </p>
+                <h3 className="text-xl font-black text-slate-800">
+                  {isDragActive ? 'Drop your file here' : 'Drag & drop your file here'}
+                </h3>
+                <p className="text-sm text-slate-400 font-semibold">
+                  Supports PDF, DOCX, and TXT up to 50MB
+                </p>
+                <div className="mt-4 px-6 py-2 border border-slate-200 rounded-full text-primary font-bold hover:bg-primary hover:text-white transition-colors text-xs">
+                  Browse Files
                 </div>
-                <span className="text-xs bg-slate-100 text-slate-500 px-3 py-1 rounded-full">
-                  or click to browse
-                </span>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
+
+        {/* Progress Bar */}
+        {uploadProgress !== null && uploadProgress < 100 && (
+          <div className="absolute bottom-0 left-0 w-full h-1 bg-muted">
+            <div
+              className="h-full bg-[#0A99AB] transition-all duration-300"
+              style={{ width: `${uploadProgress}%` }}
+            />
+          </div>
+        )}
       </div>
 
-      {/* Form */}
+      {/* Configuration Card */}
       <form
         onSubmit={handleSubmit(d => mutation.mutate(d))}
-        className="lg:col-span-2 space-y-5"
+        className="bg-white rounded-[2rem] p-8 lg:p-12 shadow-sm border border-slate-100"
       >
-        <div className="space-y-1.5">
-          <Label htmlFor="quizTitle">Quiz Title *</Label>
-          <Input
-            id="quizTitle"
-            placeholder="e.g. Biology Chapter 3"
-            className="rounded-xl"
-            {...register('quizTitle')}
-          />
-          {errors.quizTitle && (
-            <p className="text-xs text-red-500">{errors.quizTitle.message}</p>
-          )}
+        <div className="flex items-center gap-4 mb-8">
+          <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">
+            1
+          </div>
+          <h2 className="text-xl font-black text-slate-800">Configuration Details</h2>
         </div>
 
-        <div className="space-y-1.5">
-          <Label htmlFor="quizDescription">Description</Label>
-          <Textarea
-            id="quizDescription"
-            placeholder="Optional description..."
-            rows={3}
-            className="rounded-xl resize-none"
-            {...register('quizDescription')}
-          />
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Quiz Title */}
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="quizTitle" className="font-bold text-xs text-slate-500 px-1">
+              Quiz Title *
+            </Label>
+            <Input
+              id="quizTitle"
+              className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+              placeholder="e.g. Modern Architecture Basics"
+              {...register('quizTitle')}
+            />
+            {errors.quizTitle && (
+              <p className="text-xs text-red-500">{errors.quizTitle.message}</p>
+            )}
+          </div>
 
-        {/* Quiz Mode */}
-        <div className="space-y-2">
-          <Label className="text-sm font-semibold">Quiz Mode</Label>
-          <div className="grid grid-cols-2 gap-2">
-            {[
-              { id: 'OVERALL', label: 'Overall Scoring', desc: 'Results shown at end' },
-              { id: 'PER_QUESTION', label: 'Instant Feedback', desc: 'Feedback per question' },
-            ].map(({ id, label, desc }) => {
-              const active = watch('quizMode') === id;
-              return (
-                <motion.button
-                  key={id}
-                  type="button"
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => {
-                    setValue('quizMode', id as any);
-                    if (id === 'PER_QUESTION' && watch('timingPreference') === 'OVERALL') {
-                      setValue('timingPreference', 'PER_QUESTION');
-                    }
-                  }}
-                  className={cn(
-                    'flex flex-col gap-1 p-3 rounded-xl border-2 text-left transition-all duration-200',
-                    active
-                      ? 'border-[#00bcd4] bg-[#00bcd4]/5 shadow-brand-sm'
-                      : 'border-slate-100 hover:border-[#00bcd4]/30 hover:bg-slate-50'
-                  )}
-                >
-                  <span className={cn('text-xs font-bold', active ? 'text-[#00bcd4]' : 'text-slate-700')}>
-                    {label}
-                  </span>
-                  <span className="text-[10px] text-muted-foreground leading-tight">{desc}</span>
-                </motion.button>
-              );
-            })}
+          {/* Timing Preference */}
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="timingPreference" className="font-bold text-xs text-slate-500 px-1">
+              Timing Preference
+            </Label>
+            <div className="relative">
+              <select
+                id="timingPreference"
+                className="w-full appearance-none bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none text-sm"
+                {...register('timingPreference')}
+              >
+                <option value="AI_SUGGESTED">AI Suggested</option>
+                <option value="NONE">None</option>
+                <option value="PER_QUESTION">Per Question</option>
+                <option value="OVERALL">Overall</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Description (Full Width) */}
+          <div className="md:col-span-2 flex flex-col gap-2">
+            <Label htmlFor="quizDescription" className="font-bold text-xs text-slate-500 px-1">
+              Quiz Description
+            </Label>
+            <Textarea
+              id="quizDescription"
+              className="w-full bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none resize-none text-sm"
+              placeholder="Describe the focus of this quiz to help the AI refine questions..."
+              rows={4}
+              {...register('quizDescription')}
+            />
+          </div>
+
+          {/* Timing Selector manual values */}
+          <div className="md:col-span-2">
+            <TimingSelector
+              value={watch('timingPreference')}
+              onChange={(v) => setValue('timingPreference', v)}
+              manualSeconds={watch('manualTimerSeconds')}
+              onManualSecondsChange={(v) => setValue('manualTimerSeconds', v)}
+              disabledTimingModes={watch('quizMode') === 'PER_QUESTION' ? ['OVERALL'] : []}
+            />
+          </div>
+
+          {/* Quiz Mode */}
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="quizMode" className="font-bold text-xs text-slate-500 px-1">
+              Quiz Mode
+            </Label>
+            <div className="relative">
+              <select
+                id="quizMode"
+                className="w-full appearance-none bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none text-sm"
+                {...register('quizMode')}
+              >
+                <option value="OVERALL">Overall Assessment</option>
+                <option value="PER_QUESTION">Per Question</option>
+              </select>
+            </div>
+            {watch('quizMode') === 'PER_QUESTION' && (
+              <p className="text-[11px] text-amber-600 font-medium leading-relaxed mt-1.5 flex items-center gap-1">
+                ⚠️ Overall timing is unavailable in Instant Feedback mode.
+              </p>
+            )}
           </div>
         </div>
 
-        <TimingSelector
-          value={watch('timingPreference')}
-          onChange={(v) => setValue('timingPreference', v)}
-          manualSeconds={watch('manualTimerSeconds')}
-          onManualSecondsChange={(v) => setValue('manualTimerSeconds', v)}
-          disabledTimingModes={watch('quizMode') === 'PER_QUESTION' ? ['OVERALL'] : []}
-        />
-
-        <BrandButton
-          type="submit"
-          disabled={!file}
-          loading={mutation.isPending}
-          icon={<Sparkles className="w-4 h-4" />}
-          className="w-full"
-          size="lg"
-        >
-          Generate Quiz
-        </BrandButton>
+        {/* Action Bar */}
+        <div className="mt-12 pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-3">
+            <div className="flex -space-x-2">
+              <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-300" />
+              <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-400" />
+              <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-500" />
+            </div>
+            <span className="font-semibold text-slate-400 text-xs">Used by 12,000+ Educators</span>
+          </div>
+          <BrandButton
+            type="submit"
+            disabled={!file || uploadProgress !== 100}
+            loading={mutation.isPending}
+            className="primary-gradient text-white px-10 py-4 rounded-xl font-bold text-sm shadow-md flex items-center gap-3 transition-transform active:scale-95 group"
+          >
+            <span>Upload & Generate</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </BrandButton>
+        </div>
       </form>
+
+      {/* Decorative Grid items */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-slate-50/50 rounded-2xl p-6 border border-slate-100 flex flex-col gap-2">
+          <Brain className="w-6 h-6 text-primary mb-2" />
+          <h4 className="font-bold text-sm text-slate-800">Neural Analysis</h4>
+          <p className="text-xs text-slate-500 leading-relaxed">
+            AI reads context, diagrams, and formatting to create relevant questions and distractors.
+          </p>
+        </div>
+        <div className="bg-slate-50/50 rounded-2xl p-6 border border-slate-100 flex flex-col gap-2">
+          <Languages className="w-6 h-6 text-primary mb-2" />
+          <h4 className="font-bold text-sm text-slate-800">Multilingual Support</h4>
+          <p className="text-xs text-slate-500 leading-relaxed">
+            Works with documents in over 30 languages with native curriculum alignment.
+          </p>
+        </div>
+        <div className="bg-slate-50/50 rounded-2xl p-6 border border-slate-100 flex flex-col gap-2">
+          <ShieldCheck className="w-6 h-6 text-primary mb-2" />
+          <h4 className="font-bold text-sm text-slate-800">High Accuracy</h4>
+          <p className="text-xs text-slate-500 leading-relaxed">
+            Questions are automatically validated against educational standards (e.g. Bloom's Taxonomy).
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

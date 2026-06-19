@@ -1,9 +1,10 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Upload, FileText, BarChart2, Zap, Clock, Volume2, VolumeX } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
 import { useAuthStore } from '../store/authStore';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
+import { staggerContainer, fadeUp } from '../lib/motion';
+import { QuizzarLogo } from '../components/common/QuizzarLogo';
 
 const features = [
   { icon: Upload, title: 'Upload & Extract', desc: 'Upload PDFs, Word docs, or text files — AI extracts and formats questions instantly.', color: 'bg-brand-50 text-brand-500' },
@@ -15,7 +16,6 @@ const features = [
 ];
 
 export default function LandingPage() {
-  const { login } = useAuth();
   const { isAuthenticated: storeAuth } = useAuthStore();
   const navigate = useNavigate();
 
@@ -73,7 +73,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[#fafbff] font-sans antialiased overflow-x-hidden text-slate-800">
       {/* Subtle faint grid background for the entire upper page */}
-      <div 
+      <div
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage: `
@@ -91,16 +91,12 @@ export default function LandingPage() {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
-            <span className="text-[#0b192c] font-black text-2xl tracking-tight">
-              Quizz<span className="font-semibold text-[#00bcd4]">ar</span>
-            </span>
-          </div>
+          <QuizzarLogo size="md" to="/" />
 
           {/* Action Buttons */}
           <div className="flex items-center">
-            <button 
-              onClick={login}
+            <button
+              onClick={() => navigate('/signin')}
               className="bg-[#0b192c] hover:bg-[#081322] text-white font-extrabold px-6 py-2.5 rounded-xl text-xs tracking-wider transition-all duration-200 shadow-[0_4px_14px_rgba(11,25,44,0.25)] hover:shadow-[0_6px_20px_rgba(11,25,44,0.35)]"
             >
               LOGIN
@@ -111,7 +107,7 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="relative pt-36 pb-24 px-6 max-w-7xl mx-auto min-h-[calc(100vh-80px)] flex flex-col lg:flex-row items-center gap-16 z-10">
-        
+
         {/* Left Column (Typography & Call to Action) */}
         <div className="flex-1 text-left max-w-xl">
           <motion.div
@@ -151,7 +147,7 @@ export default function LandingPage() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-lg text-slate-600 font-medium leading-relaxed mb-10 max-w-lg"
           >
-            Quizzar delivers targeted, interactive step-by-step quiz experiences, making it effortless to generate, distribute, and analyze assessments.
+            Quizzar delivers targeted, interactive step-by-step quiz experiences, making it effortless to generate, distribute, and analyze quizzes.
           </motion.p>
 
           <motion.div
@@ -160,8 +156,8 @@ export default function LandingPage() {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="flex flex-col sm:flex-row gap-4"
           >
-            <button 
-              onClick={login}
+            <button
+              onClick={() => navigate('/signup')}
               className="bg-gradient-brand text-white font-black px-10 py-5 rounded-2xl text-lg tracking-wider transition-all duration-200 shadow-[0_8px_30px_rgba(0,188,212,0.25)] hover:shadow-[0_12px_35px_rgba(0,188,212,0.35)] flex items-center justify-center gap-2.5 group hover:scale-[1.02] active:scale-[0.98]"
             >
               GET STARTED
@@ -172,7 +168,7 @@ export default function LandingPage() {
 
         {/* Right Column (Floating Mockups Stack) */}
         <div className="flex-1 relative w-full max-w-xl h-[480px] md:h-[520px] flex items-center justify-center mt-8 lg:mt-0">
-          
+
           {/* Subtle concentric background arcs behind mockups */}
           <div className="absolute w-[440px] h-[440px] border border-brand-500/10 rounded-full pointer-events-none" />
           <div className="absolute w-[320px] h-[320px] border border-brand-500/5 rounded-full pointer-events-none" />
@@ -211,22 +207,21 @@ export default function LandingPage() {
             animate={{ opacity: 1, x: 0, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             whileHover={{ y: -4, transition: { duration: 0.2 } }}
-            className="absolute top-4 left-0 md:left-4 z-30 w-[270px] md:w-[310px] bg-gradient-to-b from-[#1b4344] to-[#0f2828] border-2 border-[#2b595a]/70 rounded-2xl p-5 shadow-[0_20px_45px_rgba(15,40,40,0.4)] text-white"
+            className="absolute top-4 left-0 md:left-4 z-30 w-[270px] md:w-[310px] bg-gradient-to-b from-[#1b4344] to-[#0f2828] border-2 border-[#2b595a]/70 rounded-2xl p-5 quiz-card-shadow-interactive text-white"
           >
             <div className="flex items-start justify-between">
               {/* Question Text */}
               <p className="text-xs font-semibold leading-relaxed text-slate-100 pr-8">
                 Which planet in our solar system is known as the Red Planet?
               </p>
-              
+
               {/* TTS Read Aloud Icon Button */}
-              <button 
+              <button
                 onClick={handleSpeechToggle}
-                className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
-                  isSpeaking 
-                    ? 'bg-[#00d68f]/20 text-[#00d68f] border border-[#00d68f]/40 animate-pulse' 
+                className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center transition-all ${isSpeaking
+                    ? 'bg-[#00d68f]/20 text-[#00d68f] border border-[#00d68f]/40 animate-pulse'
                     : 'bg-white/10 hover:bg-white/20 text-slate-200'
-                }`}
+                  }`}
                 title="Read question aloud"
               >
                 {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
@@ -235,23 +230,21 @@ export default function LandingPage() {
 
             {/* Answer Choices */}
             <div className="mt-5 flex gap-3">
-              <button 
+              <button
                 onClick={() => selectOption('Mars')}
-                className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all ${
-                  selectedMockOption === 'Mars' 
-                    ? 'bg-[#00d68f] text-white shadow-[0_0_15px_rgba(0,214,143,0.4)] border border-[#00e89c]' 
+                className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all ${selectedMockOption === 'Mars'
+                    ? 'bg-[#00d68f] text-white shadow-[0_0_15px_rgba(0,214,143,0.4)] border border-[#00e89c]'
                     : 'bg-[#2a2b2c] hover:bg-[#343638] text-slate-200 border border-white/5'
-                }`}
+                  }`}
               >
                 Mars
               </button>
-              <button 
+              <button
                 onClick={() => selectOption('Venus')}
-                className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all ${
-                  selectedMockOption === 'Venus' 
-                    ? 'bg-[#b83c42] text-white shadow-[0_0_15px_rgba(184,60,66,0.5)] border border-[#d64a51]' 
+                className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all ${selectedMockOption === 'Venus'
+                    ? 'bg-[#b83c42] text-white shadow-[0_0_15px_rgba(184,60,66,0.5)] border border-[#d64a51]'
                     : 'bg-[#2a2b2c] hover:bg-[#343638] text-slate-200 border border-white/5'
-                }`}
+                  }`}
               >
                 Venus
               </button>
@@ -263,7 +256,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="absolute top-12 right-2 md:right-10 z-10 w-[350px] md:w-[400px] bg-white border border-slate-100 rounded-3xl p-6 shadow-[0_15px_40px_rgba(99,102,241,0.06)] flex flex-col"
+            className="absolute top-12 right-2 md:right-10 z-10 w-[350px] md:w-[400px] bg-white border border-slate-100 rounded-3xl p-6 custom-shadow-interactive flex flex-col"
           >
             {/* QuizGuide Header */}
             <div className="flex items-center gap-1.5 mb-4">
@@ -281,7 +274,7 @@ export default function LandingPage() {
               <div className="absolute w-24 h-24 border border-dashed border-[#00bcd4]/30 rounded-full" />
               {/* Mars planet on the path */}
               <div className="absolute w-3 h-3 rounded-full bg-red-500 border border-red-600 shadow-[0_0_6px_rgba(239,68,68,0.5)] z-20" style={{ transform: 'rotate(45deg) translate(48px) rotate(-45deg)' }} />
-              
+
               {/* Measurements Tag */}
               <div className="absolute top-2 right-4 flex flex-col items-center">
                 <span className="text-[8px] font-bold text-[#00bcd4] bg-white px-1 leading-none shadow-sm z-10 border border-[#00bcd4]/20 rounded">
@@ -294,7 +287,7 @@ export default function LandingPage() {
             <div className="text-left mt-2">
               <p className="text-[#1e293b] font-black text-xs">Identify the planet</p>
               <p className="text-slate-400 font-semibold text-[10px] mt-0.5">Orbit order from the Sun:</p>
-              
+
               {/* Progress step */}
               <div className="flex items-center gap-1.5 text-slate-800 font-bold text-xs mt-2 bg-slate-50 p-2 rounded-lg border border-slate-100 w-fit">
                 <span className="text-[10px] text-slate-600">Mercury, Venus, Earth,</span>
@@ -311,7 +304,7 @@ export default function LandingPage() {
             animate={{ opacity: 1, x: 0, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
             whileHover={{ y: -4, transition: { duration: 0.2 } }}
-            className="absolute bottom-6 right-0 md:right-4 z-40 w-[250px] md:w-[280px] bg-white border border-[#2563eb]/10 rounded-2xl p-5 shadow-[0_20px_45px_rgba(99,102,241,0.12)] flex flex-col text-left"
+            className="absolute bottom-6 right-0 md:right-4 z-40 w-[250px] md:w-[280px] bg-white border border-[#2563eb]/10 rounded-2xl p-5 custom-shadow-interactive flex flex-col text-left"
           >
             {/* Step Label */}
             <div className="flex items-center gap-2">
@@ -330,17 +323,16 @@ export default function LandingPage() {
 
             {/* Step Choices */}
             <div className="mt-4 flex gap-2">
-              <button 
+              <button
                 onClick={() => selectOption('Copper')}
-                className={`flex-1 py-1.5 rounded-lg text-[10px] font-bold border transition-all ${
-                  selectedMockOption === 'Copper' 
-                    ? 'border-slate-300 bg-slate-50 text-slate-400' 
+                className={`flex-1 py-1.5 rounded-lg text-[10px] font-bold border transition-all ${selectedMockOption === 'Copper'
+                    ? 'border-slate-300 bg-slate-50 text-slate-400'
                     : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700'
-                }`}
+                  }`}
               >
                 Copper
               </button>
-              <button 
+              <button
                 onClick={() => selectOption('Iron')}
                 className="flex-1 py-1.5 rounded-lg text-[10px] font-bold bg-[#00d68f] hover:bg-[#00c281] text-white transition-all shadow-[0_2px_8px_rgba(0,214,143,0.2)]"
               >
@@ -363,12 +355,19 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+          >
             {features.map(({ icon: Icon, title, desc, color }) => (
               <motion.div
                 key={title}
+                variants={fadeUp}
                 whileHover={{ y: -4, transition: { duration: 0.2 } }}
-                className="bg-[#fafbff] rounded-2xl p-7 border border-slate-100 hover:border-[#00bcd4]/30 hover:shadow-[0_12px_30px_rgba(0,188,212,0.08)] transition-all duration-300 flex flex-col text-left group"
+                className="bg-[#fafbff] rounded-2xl p-7 border border-slate-100 hover:border-[#00bcd4]/30 custom-shadow-interactive flex flex-col text-left group"
               >
                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-5 ${color} shadow-sm group-hover:scale-110 transition-transform duration-300`}>
                   <Icon className="w-5 h-5 text-brand-500" />
@@ -377,14 +376,14 @@ export default function LandingPage() {
                 <p className="text-sm text-slate-500 leading-relaxed font-medium">{desc}</p>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* CTA Section */}
       <section className="py-24 px-6 bg-slate-50 relative border-t border-slate-100 overflow-hidden">
         {/* Subtle background grids inside CTA */}
-        <div 
+        <div
           className="absolute inset-0 pointer-events-none"
           style={{
             backgroundImage: `
@@ -402,8 +401,8 @@ export default function LandingPage() {
           <p className="text-slate-500 text-lg font-medium mb-10 max-w-xl mx-auto leading-relaxed">
             Empower your users with highly interactive, instant-feedback quiz sessions.
           </p>
-          <button 
-            onClick={login}
+          <button
+            onClick={() => navigate('/signup')}
             className="bg-gradient-brand hover:scale-[1.02] active:scale-[0.98] text-white font-black px-14 py-5 rounded-2xl text-lg md:text-xl tracking-wider transition-all duration-200 shadow-[0_10px_35px_rgba(0,188,212,0.25)] flex items-center gap-2.5 mx-auto group"
           >
             GET STARTED NOW

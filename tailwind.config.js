@@ -87,8 +87,8 @@ export default {
         'brand-sm': '0 2px 8px rgba(0,188,212,0.15)',
         'brand-md': '0 4px 20px rgba(0,188,212,0.25)',
         'brand-lg': '0 8px 40px rgba(0,188,212,0.35)',
-        'card': '0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.06)',
-        'card-hover': '0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,188,212,0.15)',
+        'card': '0 12px 25px -4px rgba(11, 25, 44, 0.09), 0 4px 12px -2px rgba(11, 25, 44, 0.05), 0 0 1px 0 rgba(11, 25, 44, 0.12)',
+        'card-hover': '0 20px 35px -8px rgba(11, 25, 44, 0.16), 0 8px 20px -6px rgba(0, 188, 212, 0.15), 0 0 1px 0 rgba(11, 25, 44, 0.2)',
       },
       animation: {
         'shimmer': 'shimmer 2s linear infinite',
