@@ -20,11 +20,37 @@ export default function PublicQuizSessionPage() {
   const [feedback, setFeedback] = useState<QuestionResultResponse | null>(null);
   const questionStartTime = useRef(Date.now());
   const submittingRef = useRef(false);
+  const autoAdvanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isLastRef = useRef(false);
 
   // Guard: redirect if no active session
   useEffect(() => {
     if (!quiz || !session) navigate(`/quiz/${quizCode}`, { replace: true });
   }, []);
+
+  // Auto-advance after feedback is shown in PER_QUESTION mode
+  useEffect(() => {
+    if (!feedback) return;
+    if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
+
+    autoAdvanceTimer.current = setTimeout(() => {
+      if (isLastRef.current) {
+        setIsSubmitting(true);
+        submittingRef.current = true;
+        completeMutation.mutate();
+      } else {
+        setDirection(1);
+        setFeedback(null);
+        submittingRef.current = false;
+        nextQuestion();
+        questionStartTime.current = Date.now();
+      }
+    }, 800);
+
+    return () => {
+      if (autoAdvanceTimer.current) clearTimeout(autoAdvanceTimer.current);
+    };
+  }, [feedback]);
 
   const submitMutation = useMutation({
     mutationFn: () => {
@@ -81,6 +107,7 @@ export default function PublicQuizSessionPage() {
 
   const currentQuestion = quiz.questions?.[currentIndex];
   const isLast = currentIndex === (quiz.questions?.length || 0) - 1;
+  isLastRef.current = isLast; // keep ref in sync for use inside setTimeout callback
   const currentAnswer = answers.find(a => a.questionId === currentQuestion?.id);
   const progress = ((currentIndex + 1) / (quiz.questions?.length || 1)) * 100;
 
@@ -247,9 +274,9 @@ export default function PublicQuizSessionPage() {
             key={currentIndex}
             custom={direction}
             variants={{
-              hidden: (d: number) => ({ opacity: 0, x: d * 60 }),
-              visible: { opacity: 1, x: 0, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } },
-              exit: (d: number) => ({ opacity: 0, x: d * -60, transition: { duration: 0.2 } }),
+              hidden: (d: number) => ({ opacity: 0, x: d * 40 }),
+              visible: { opacity: 1, x: 0, transition: { duration: 0.2, ease: [0.22, 1, 0.36, 1] } },
+              exit: (d: number) => ({ opacity: 0, x: d * -30, transition: { duration: 0.12 } }),
             }}
             initial="hidden"
             animate="visible"
@@ -289,16 +316,28 @@ export default function PublicQuizSessionPage() {
 
         {/* Submit / Next Button — centered, full-width, prominent (matches Stitch) */}
         <div className="flex justify-center mt-10 pb-4">
-          <motion.button
-            whileHover={{ scale: isButtonLoading ? 1 : 1.02 }}
-            whileTap={{ scale: isButtonLoading ? 1 : 0.97 }}
-            onClick={handleNext}
-            disabled={isButtonLoading}
-            className="primary-gradient w-full max-w-lg flex items-center justify-center gap-3 text-white rounded-2xl px-12 py-5 font-black text-sm uppercase tracking-wide shadow-[0_20px_60px_rgba(10,153,171,0.22)] hover:shadow-[0_24px_70px_rgba(10,153,171,0.3)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group"
-          >
-            <span>{getButtonText()}</span>
-            {!isButtonLoading && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
-          </motion.button>
+          {isPerQuestion && feedback ? (
+            // Auto-advancing indicator — no button needed
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex items-center gap-3 text-slate-500 text-sm font-bold"
+            >
+              <div className="w-5 h-5 rounded-full border-2 border-[#0A99AB] border-t-transparent animate-spin" />
+              <span>{isLast ? 'Loading results…' : 'Moving to next question…'}</span>
+            </motion.div>
+          ) : (
+            <motion.button
+              whileHover={{ scale: isButtonLoading ? 1 : 1.02 }}
+              whileTap={{ scale: isButtonLoading ? 1 : 0.97 }}
+              onClick={handleNext}
+              disabled={isButtonLoading}
+              className="primary-gradient w-full max-w-lg flex items-center justify-center gap-3 text-white rounded-2xl px-12 py-5 font-black text-sm uppercase tracking-wide shadow-[0_20px_60px_rgba(10,153,171,0.22)] hover:shadow-[0_24px_70px_rgba(10,153,171,0.3)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group"
+            >
+              <span>{getButtonText()}</span>
+              {!isButtonLoading && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+            </motion.button>
+          )}
         </div>
       </main>
     </div>

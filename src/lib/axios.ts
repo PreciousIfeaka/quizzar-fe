@@ -4,6 +4,7 @@ import { useAuthStore } from '../store/authStore';
 
 const api = axios.create({
   baseURL: env.apiBaseUrl,
+  timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -32,6 +33,7 @@ api.interceptors.response.use(
 // Separate unauthenticated instance for public quiz endpoints and auth routes
 export const publicApi = axios.create({
   baseURL: env.apiBaseUrl,
+  timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 });
 

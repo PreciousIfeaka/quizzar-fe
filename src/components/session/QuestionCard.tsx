@@ -49,13 +49,8 @@ export function QuestionCard({
 
   return (
     <div className="bg-white rounded-3xl border border-slate-100 shadow-card overflow-hidden relative">
-      {/* Decorative fun floating glowing elements inside the question card */}
-      <div className="absolute top-4 right-16 w-3 h-3 rounded-full bg-[#0A99AB]/10 animate-pulse pointer-events-none" />
-      <div className="absolute bottom-8 left-6 w-2.5 h-2.5 rounded-full bg-[#0A99AB]/10 animate-bounce pointer-events-none" style={{ animationDuration: '3s' }} />
-      <div className="absolute top-1/2 left-4 w-1.5 h-1.5 rounded-full bg-[#f5a623]/10 animate-ping pointer-events-none" style={{ animationDuration: '5s' }} />
-
       <div className="h-2 bg-gradient-to-r from-[#0A99AB] to-[#577D84]" />
-      <div className="p-8">
+      <div className="p-6 md:p-8">
         <div className="flex items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-2">
             <span className={cn(
@@ -164,74 +159,48 @@ export function QuestionCard({
           </div>
         )}
 
-        {/* MCQ Scattered Grid Layout */}
+        {/* MCQ options */}
         {question.questionType === 'MCQ' && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 py-2">
-            {question.options?.map((option, i) => (
-              <motion.div
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-2">
+            {question.options?.map((option) => (
+              <OptionButton
                 key={option.id}
-                initial={{ opacity: 0, scale: 0.9, y: 15 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{
-                  type: "spring",
-                  stiffness: 260,
-                  damping: 20,
-                  delay: i * 0.05
-                }}
-              >
-                <OptionButton
-                  label={option.label}
-                  text={option.text}
-                  selected={selectedOptionId === option.id}
-                  onClick={() => onSelectOption(option.id)}
-                  disabled={disabled}
-                  correct={
-                    feedback 
-                      ? option.label === feedback.correctOptionLabel
-                        ? true 
-                        : selectedOptionId === option.id 
-                          ? false 
-                          : null 
-                      : undefined
-                  }
-                />
-              </motion.div>
+                label={option.label}
+                text={option.text}
+                selected={selectedOptionId === option.id}
+                onClick={() => onSelectOption(option.id)}
+                disabled={disabled}
+                correct={
+                  feedback
+                    ? option.label === feedback.correctOptionLabel ? true
+                      : selectedOptionId === option.id ? false
+                      : null
+                    : undefined
+                }
+              />
             ))}
           </div>
         )}
 
-        {/* True or False - Styled just like MCQ options */}
+        {/* True or False options */}
         {question.questionType === 'TRUE_FALSE' && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 py-2">
-            {question.options?.map((option, i) => (
-              <motion.div
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-2">
+            {question.options?.map((option) => (
+              <OptionButton
                 key={option.id}
-                initial={{ opacity: 0, scale: 0.9, y: 15 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{
-                  type: "spring",
-                  stiffness: 260,
-                  damping: 20,
-                  delay: i * 0.05
-                }}
-              >
-                <OptionButton
-                  label={option.label}
-                  text={option.text}
-                  selected={selectedOptionId === option.id}
-                  onClick={() => onSelectOption(option.id)}
-                  disabled={disabled}
-                  correct={
-                    feedback 
-                      ? option.label === feedback.correctOptionLabel
-                        ? true 
-                        : selectedOptionId === option.id 
-                          ? false 
-                          : null 
-                      : undefined
-                  }
-                />
-              </motion.div>
+                label={option.label}
+                text={option.text}
+                selected={selectedOptionId === option.id}
+                onClick={() => onSelectOption(option.id)}
+                disabled={disabled}
+                correct={
+                  feedback
+                    ? option.label === feedback.correctOptionLabel ? true
+                      : selectedOptionId === option.id ? false
+                      : null
+                    : undefined
+                }
+              />
             ))}
           </div>
         )}
@@ -239,8 +208,9 @@ export function QuestionCard({
 
       {feedback && (
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.15 }}
           className={cn(
             "p-5 border-t text-center flex flex-col sm:flex-row items-center justify-between gap-4 font-black uppercase tracking-wider text-sm relative z-10",
             feedback.correct 
@@ -261,9 +231,14 @@ export function QuestionCard({
           </div>
           
           <div className="flex items-center gap-3">
-            {feedback.correctOptionText && (
+            {!feedback.correct && feedback.correctOptionText && (
               <span className="text-xs font-bold text-slate-600 normal-case">
-                Correct answer: <strong className="text-slate-800 font-extrabold">{feedback.correctOptionLabel}. {feedback.correctOptionText}</strong>
+                Correct answer:{' '}
+                <strong className="text-slate-800 font-extrabold">
+                  {question.questionType === 'TRUE_FALSE'
+                    ? feedback.correctOptionText
+                    : `${feedback.correctOptionLabel}. ${feedback.correctOptionText}`}
+                </strong>
               </span>
             )}
             <span className="bg-slate-100 px-4 py-1.5 rounded-full border border-slate-200 text-xs font-black text-[#f5a623]">
