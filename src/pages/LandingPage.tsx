@@ -89,7 +89,7 @@ export default function LandingPage() {
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 md:h-20 flex items-center justify-between">
           {/* Logo */}
           <QuizzarLogo size="md" to="/" />
 
@@ -97,7 +97,7 @@ export default function LandingPage() {
           <div className="flex items-center">
             <button
               onClick={() => navigate('/signin')}
-              className="bg-[#0b192c] hover:bg-[#081322] text-white font-extrabold px-6 py-2.5 rounded-xl text-xs tracking-wider transition-all duration-200 shadow-[0_4px_14px_rgba(11,25,44,0.25)] hover:shadow-[0_6px_20px_rgba(11,25,44,0.35)]"
+              className="bg-[#0b192c] hover:bg-[#081322] text-white font-extrabold px-4 md:px-6 py-2 md:py-2.5 rounded-xl text-xs tracking-wider transition-all duration-200 shadow-[0_4px_14px_rgba(11,25,44,0.25)] hover:shadow-[0_6px_20px_rgba(11,25,44,0.35)]"
             >
               LOGIN
             </button>
@@ -106,15 +106,15 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-36 pb-24 px-6 max-w-7xl mx-auto min-h-[calc(100vh-80px)] flex flex-col lg:flex-row items-center gap-16 z-10">
+      <section className="relative pt-28 md:pt-36 pb-16 md:pb-24 px-4 md:px-6 max-w-7xl mx-auto min-h-[calc(100vh-64px)] flex flex-col lg:flex-row items-center gap-10 md:gap-16 z-10">
 
         {/* Left Column (Typography & Call to Action) */}
-        <div className="flex-1 text-left max-w-xl">
+        <div className="flex-1 text-left max-w-xl w-full">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-1.5 bg-[#00bcd4]/5 text-[#00bcd4] text-xs font-black px-4 py-2 rounded-full border border-[#00bcd4]/10 mb-8 tracking-wider uppercase"
+            className="inline-flex items-center gap-1.5 bg-[#00bcd4]/5 text-[#00bcd4] text-xs font-black px-4 py-2 rounded-full border border-[#00bcd4]/10 mb-6 tracking-wider uppercase"
           >
             <Sparkles className="w-3.5 h-3.5" />
             AI-Powered Quiz Platform
@@ -124,7 +124,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-5xl md:text-[64px] font-black text-slate-800 leading-[1.08] tracking-tight mb-8"
+            className="text-4xl sm:text-5xl md:text-[64px] font-black text-slate-800 leading-[1.08] tracking-tight mb-6 md:mb-8"
           >
             GENERATE SMART
             <br />
@@ -158,7 +158,7 @@ export default function LandingPage() {
           >
             <button
               onClick={() => navigate('/signup')}
-              className="bg-gradient-brand text-white font-black px-10 py-5 rounded-2xl text-lg tracking-wider transition-all duration-200 shadow-[0_8px_30px_rgba(0,188,212,0.25)] hover:shadow-[0_12px_35px_rgba(0,188,212,0.35)] flex items-center justify-center gap-2.5 group hover:scale-[1.02] active:scale-[0.98]"
+              className="bg-gradient-brand text-white font-black px-8 md:px-10 py-4 md:py-5 rounded-2xl text-base md:text-lg tracking-wider transition-all duration-200 shadow-[0_8px_30px_rgba(0,188,212,0.25)] hover:shadow-[0_12px_35px_rgba(0,188,212,0.35)] flex items-center justify-center gap-2.5 group hover:scale-[1.02] active:scale-[0.98] w-full sm:w-auto"
             >
               GET STARTED
               <span className="transition-transform duration-200 group-hover:translate-x-1 group-hover:-translate-y-0.5 text-xl">↗</span>
@@ -166,8 +166,8 @@ export default function LandingPage() {
           </motion.div>
         </div>
 
-        {/* Right Column (Floating Mockups Stack) */}
-        <div className="flex-1 relative w-full max-w-xl h-[480px] md:h-[520px] flex items-center justify-center mt-8 lg:mt-0">
+        {/* Right Column (Floating Mockups Stack) - hidden on mobile */}
+        <div className="hidden lg:flex flex-1 relative w-full max-w-xl h-[480px] md:h-[520px] items-center justify-center mt-8 lg:mt-0">
 
           {/* Subtle concentric background arcs behind mockups */}
           <div className="absolute w-[440px] h-[440px] border border-brand-500/10 rounded-full pointer-events-none" />

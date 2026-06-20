@@ -72,7 +72,7 @@ export default function QuizDetailPage() {
             <span className="text-muted-foreground">/</span>
             <span className="text-sm text-slate-700 font-medium truncate">{quiz.title}</span>
           </div>
-          <h1 className="text-3xl font-black text-slate-900 truncate">{quiz.title}</h1>
+          <h1 className="text-2xl md:text-3xl font-black text-slate-900 truncate">{quiz.title}</h1>
           {quiz.description && (
             <p className="text-muted-foreground mt-1">{quiz.description}</p>
           )}
@@ -88,13 +88,13 @@ export default function QuizDetailPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
           <button
             onClick={() => navigate(`/quizzes/${id}/analytics`)}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-100 text-sm font-medium text-slate-600 hover:border-[#00bcd4]/30 hover:bg-[#00bcd4]/5 hover:text-[#00bcd4] transition-all"
           >
             <BarChart2 className="w-4 h-4" />
-            Analytics
+            <span className="hidden sm:inline">Analytics</span>
           </button>
           <button
             onClick={() => setDeleteOpen(true)}

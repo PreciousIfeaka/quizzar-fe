@@ -10,7 +10,7 @@ const navItems = [
   { to: '/settings', label: 'Settings', icon: Settings },
 ];
 
-export function Sidebar({ open }: { open: boolean }) {
+export function Sidebar({ open, onClose }: { open: boolean; onClose?: () => void }) {
   return (
     <AnimatePresence>
       {open && (
@@ -29,6 +29,7 @@ export function Sidebar({ open }: { open: boolean }) {
               <NavLink
                 key={to}
                 to={to}
+                onClick={onClose}
                 className={({ isActive }) => cn(
                   'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
                   isActive
@@ -50,6 +51,7 @@ export function Sidebar({ open }: { open: boolean }) {
           <div className="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-slate-50">
             <NavLink
               to="/generate"
+              onClick={onClose}
               className="flex items-center justify-center gap-2 w-full py-3 rounded-xl primary-gradient text-white text-sm font-bold shadow-md hover:brightness-110 active:scale-[0.98] transition-all"
             >
               <Plus className="w-4 h-4" />

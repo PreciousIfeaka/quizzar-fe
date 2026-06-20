@@ -156,15 +156,15 @@ export default function SettingsPage() {
 
   return (
     <AnimatedPage>
-      <div className="mb-8">
-        <h1 className="text-3xl font-black text-slate-900 tracking-tight">Account Settings</h1>
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Account Settings</h1>
         <p className="text-muted-foreground mt-1">Manage your teacher profile and security configurations.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Side: Avatar Details Card */}
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-card p-8 flex flex-col items-center text-center relative overflow-hidden">
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-card p-6 md:p-8 flex flex-col items-center text-center relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-[#00bcd4]/5 rounded-bl-full pointer-events-none"></div>
             
             {/* Avatar upload display */}
@@ -213,7 +213,7 @@ export default function SettingsPage() {
         {/* Right Side: Inputs Section */}
         <div className="lg:col-span-2 space-y-8">
           {/* Profile form */}
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-card p-8 md:p-10">
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-card p-5 md:p-10">
             <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-50">
               <div className="w-10 h-10 rounded-xl bg-[#00bcd4]/10 text-[#00bcd4] flex items-center justify-center">
                 <User className="w-5 h-5" />
@@ -254,7 +254,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Security / Password form */}
-          <div className="bg-white rounded-3xl border border-slate-100 shadow-card p-8 md:p-10">
+          <div className="bg-white rounded-3xl border border-slate-100 shadow-card p-5 md:p-10">
             <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-50">
               <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center">
                 <Lock className="w-5 h-5" />

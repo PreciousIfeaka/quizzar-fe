@@ -137,7 +137,7 @@ export default function QuizAnalyticsPage() {
       </motion.section>
 
       {/* Per-Question Performance Chart */}
-      <section className="bg-white p-8 md:p-12 rounded-3xl custom-shadow border border-slate-100 mb-12">
+      <section className="bg-white p-5 md:p-8 lg:p-12 rounded-3xl custom-shadow border border-slate-100 mb-8 md:mb-12">
         <div className="flex items-center justify-between mb-10">
           <h2 className="font-headline-md text-xl font-bold text-slate-800">
             Per-Question Performance
@@ -184,11 +184,11 @@ export default function QuizAnalyticsPage() {
 
       {/* Student Results List */}
       <section className="bg-white rounded-3xl custom-shadow border border-slate-100 overflow-hidden">
-        <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="p-5 md:p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <h2 className="font-headline-md text-xl font-bold text-slate-800">
             Student Results
           </h2>
-          <div className="relative max-w-sm w-full">
+          <div className="relative w-full md:max-w-sm">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
             <input
               className="w-full pl-12 pr-4 py-2.5 rounded-full border border-slate-200 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-sm outline-none text-slate-700"
@@ -200,93 +200,137 @@ export default function QuizAnalyticsPage() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          {filteredResults.length === 0 ? (
-            <div className="text-center py-12 text-slate-400 text-sm">
-              No student attempts match your criteria.
-            </div>
-          ) : (
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50">
-                  <th className="p-6 font-bold text-slate-500 text-xs uppercase tracking-wider">
-                    Student Name
-                  </th>
-                  <th className="p-6 font-bold text-slate-500 text-xs uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="p-6 font-bold text-slate-500 text-xs uppercase tracking-wider">
-                    Score
-                  </th>
-                  <th className="p-6 font-bold text-slate-500 text-xs uppercase tracking-wider">
-                    Time
-                  </th>
-                  <th className="p-6 font-bold text-slate-500 text-xs uppercase tracking-wider text-right">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {filteredResults.map((result) => {
-                  const pct = Math.round(result.percentageScore);
-                  const passed = pct >= 50;
-                  const initials = result.studentName
-                    .split(' ')
-                    .map((n) => n.charAt(0))
-                    .join('')
-                    .slice(0, 2)
-                    .toUpperCase();
-
-                  return (
-                    <tr key={result.sessionId} className="hover:bg-slate-50/50 transition-colors group">
-                      <td className="p-6">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-sm flex-shrink-0">
-                            {initials || 'S'}
-                          </div>
-                          <span className="font-bold text-slate-800">{result.studentName}</span>
+        {filteredResults.length === 0 ? (
+          <div className="text-center py-12 text-slate-400 text-sm">
+            No student attempts match your criteria.
+          </div>
+        ) : (
+          <>
+            {/* Mobile card view */}
+            <div className="sm:hidden divide-y divide-slate-100">
+              {filteredResults.map((result) => {
+                const pct = Math.round(result.percentageScore);
+                const passed = pct >= 50;
+                const initials = result.studentName
+                  .split(' ')
+                  .map((n) => n.charAt(0))
+                  .join('')
+                  .slice(0, 2)
+                  .toUpperCase();
+                return (
+                  <div key={result.sessionId} className="p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-sm flex-shrink-0">
+                          {initials || 'S'}
                         </div>
-                      </td>
-                      <td className="p-6">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-bold ${
+                        <span className="font-bold text-slate-800 text-sm">{result.studentName}</span>
+                      </div>
+                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                        passed ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-red-50 text-red-700 border border-red-100'
+                      }`}>
+                        {passed ? 'PASSED' : 'FAILED'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <div className="w-20 h-1.5 bg-muted rounded-full overflow-hidden">
+                          <div className="h-full bg-[#0A99AB]" style={{ width: `${pct}%` }} />
+                        </div>
+                        <span className="font-bold text-slate-800">{pct}%</span>
+                      </div>
+                      <span className="text-slate-400">{result.timeTakenSeconds ? formatSeconds(result.timeTakenSeconds) : '—'}</span>
+                      <button
+                        onClick={() => setSelectedSessionId(result.sessionId)}
+                        className="text-primary hover:underline font-bold text-xs"
+                      >
+                        Review
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop table view */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-50">
+                    <th className="p-6 font-bold text-slate-500 text-xs uppercase tracking-wider">
+                      Student Name
+                    </th>
+                    <th className="p-6 font-bold text-slate-500 text-xs uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="p-6 font-bold text-slate-500 text-xs uppercase tracking-wider">
+                      Score
+                    </th>
+                    <th className="p-6 font-bold text-slate-500 text-xs uppercase tracking-wider">
+                      Time
+                    </th>
+                    <th className="p-6 font-bold text-slate-500 text-xs uppercase tracking-wider text-right">
+                      Action
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {filteredResults.map((result) => {
+                    const pct = Math.round(result.percentageScore);
+                    const passed = pct >= 50;
+                    const initials = result.studentName
+                      .split(' ')
+                      .map((n) => n.charAt(0))
+                      .join('')
+                      .slice(0, 2)
+                      .toUpperCase();
+
+                    return (
+                      <tr key={result.sessionId} className="hover:bg-slate-50/50 transition-colors group">
+                        <td className="p-6">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary text-sm flex-shrink-0">
+                              {initials || 'S'}
+                            </div>
+                            <span className="font-bold text-slate-800">{result.studentName}</span>
+                          </div>
+                        </td>
+                        <td className="p-6">
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                             passed
                               ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
                               : 'bg-red-50 text-red-700 border border-red-100'
-                          }`}
-                        >
-                          {passed ? 'COMPLETED' : 'FAILED'}
-                        </span>
-                      </td>
-                      <td className="p-6">
-                        <div className="flex items-center gap-3">
-                          <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-[#0A99AB]"
-                              style={{ width: `${pct}%` }}
-                            />
+                          }`}>
+                            {passed ? 'COMPLETED' : 'FAILED'}
+                          </span>
+                        </td>
+                        <td className="p-6">
+                          <div className="flex items-center gap-3">
+                            <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
+                              <div className="h-full bg-[#0A99AB]" style={{ width: `${pct}%` }} />
+                            </div>
+                            <span className="font-bold text-slate-800">{pct}%</span>
                           </div>
-                          <span className="font-bold text-slate-800">{pct}%</span>
-                        </div>
-                      </td>
-                      <td className="p-6 text-slate-500">
-                        {result.timeTakenSeconds ? formatSeconds(result.timeTakenSeconds) : '—'}
-                      </td>
-                      <td className="p-6 text-right">
-                        <button
-                          onClick={() => setSelectedSessionId(result.sessionId)}
-                          className="text-primary hover:underline font-bold text-sm"
-                        >
-                          Review
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
-        </div>
+                        </td>
+                        <td className="p-6 text-slate-500">
+                          {result.timeTakenSeconds ? formatSeconds(result.timeTakenSeconds) : '—'}
+                        </td>
+                        <td className="p-6 text-right">
+                          <button
+                            onClick={() => setSelectedSessionId(result.sessionId)}
+                            className="text-primary hover:underline font-bold text-sm"
+                          >
+                            Review
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </section>
 
       <SessionResultDialog

@@ -91,11 +91,11 @@ export default function PublicQuizResultPage() {
             className="bg-white rounded-3xl border border-slate-100/80 custom-shadow overflow-hidden w-full"
           >
             <div className={cn('h-2', result.passed ? 'bg-gradient-success' : 'bg-gradient-energy')} />
-            <div className="p-6 md:p-8 flex flex-col md:flex-row items-center md:items-stretch gap-8">
+            <div className="p-5 md:p-8 flex flex-col md:flex-row items-center md:items-stretch gap-6 md:gap-8">
               
               {/* Score donut — simplified & rescaled */}
               <div className="flex flex-col items-center justify-center md:border-r md:border-slate-100 md:pr-8 min-w-[150px]">
-                <div className="relative inline-flex items-center justify-center w-28 h-28">
+                <div className="relative inline-flex items-center justify-center w-24 h-24 md:w-28 md:h-28">
                   <svg className="w-full h-full -rotate-90" viewBox="0 0 140 140">
                     <circle cx="70" cy="70" r="58" fill="none" stroke="#f1f5f9" strokeWidth="10" />
                     <motion.circle
@@ -127,7 +127,7 @@ export default function PublicQuizResultPage() {
               </div>
 
               {/* Stats & Actions right column */}
-              <div className="flex-1 flex flex-col justify-between text-center md:text-left py-1">
+              <div className="flex-1 flex flex-col justify-between text-center md:text-left py-1 w-full">
                 <div>
                   <h1 className="text-2xl font-black text-slate-950 mb-1">
                     {result.passed ? `Great job, ${result.studentName}!` : `Keep practicing, ${result.studentName}!`}
@@ -185,9 +185,9 @@ export default function PublicQuizResultPage() {
       </main>
       
       {/* Footer */}
-      <footer className="w-full py-8 border-t border-slate-100 bg-slate-50 flex flex-col md:flex-row justify-between items-center gap-4 px-12 mt-12 text-slate-400 text-xs">
+      <footer className="w-full py-6 md:py-8 border-t border-slate-100 bg-slate-50 flex flex-col md:flex-row justify-between items-center gap-3 px-6 md:px-12 mt-8 md:mt-12 text-slate-400 text-xs">
         <QuizzarLogo size="sm" noLink />
-        <div className="flex gap-6">
+        <div className="flex gap-4 md:gap-6">
           <a href="#" className="hover:text-primary transition-colors font-semibold">Privacy Policy</a>
           <a href="#" className="hover:text-primary transition-colors font-semibold">Terms of Service</a>
           <a href="#" className="hover:text-primary transition-colors font-semibold">Help Center</a>

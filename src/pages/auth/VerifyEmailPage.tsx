@@ -138,7 +138,7 @@ export default function VerifyEmailPage() {
       <div className="fixed inset-0 grid-pattern pointer-events-none z-0 opacity-50"></div>
 
       {/* Header / Logo */}
-      <header className="absolute top-0 left-0 w-full h-20 flex items-center px-12 max-w-[1280px] mx-auto z-10">
+      <header className="absolute top-0 left-0 w-full h-16 md:h-20 flex items-center px-4 md:px-12 max-w-[1280px] mx-auto z-10">
         <QuizzarLogo noLink size="md" />
       </header>
 

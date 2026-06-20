@@ -188,24 +188,24 @@ export default function PublicQuizSessionPage() {
       <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-[#0A99AB]/5 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-[#0A99AB]/5 blur-[150px] pointer-events-none" />
 
-      {/* Top Navigation — Transactional Layout (matches Stitch) */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 h-20 flex items-center">
-        <div className="w-full px-6 max-w-5xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-6">
+      {/* Top Navigation — Transactional Layout */}
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100 h-16 md:h-20 flex items-center">
+        <div className="w-full px-4 md:px-6 max-w-5xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-3 md:gap-6 min-w-0">
             <QuizzarLogo noLink />
             <div className="h-8 w-px bg-slate-200 hidden md:block" />
-            <div className="hidden md:flex flex-col">
-              <span className="font-bold text-xs text-slate-800 uppercase tracking-widest leading-tight">{quiz.title}</span>
+            <div className="hidden md:flex flex-col min-w-0">
+              <span className="font-bold text-xs text-slate-800 uppercase tracking-widest leading-tight truncate max-w-[200px]">{quiz.title}</span>
               {quiz.description && <span className="text-slate-400 text-xs font-medium leading-normal truncate max-w-xs">{quiz.description}</span>}
             </div>
           </div>
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-3 md:gap-5 flex-shrink-0">
             {/* Question progress */}
             <div className="flex flex-col items-end">
-              <span className="font-bold text-xs text-[#0A99AB] uppercase tracking-wider">
-                Question {currentIndex + 1} of {quiz.questions?.length || 0}
+              <span className="font-bold text-[10px] md:text-xs text-[#0A99AB] uppercase tracking-wider">
+                Q {currentIndex + 1}/{quiz.questions?.length || 0}
               </span>
-              <div className="w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden mt-1.5">
+              <div className="w-20 sm:w-28 md:w-32 h-1.5 bg-slate-100 rounded-full overflow-hidden mt-1.5">
                 <div className="h-full bg-[#0A99AB] rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
               </div>
             </div>
@@ -220,16 +220,16 @@ export default function PublicQuizSessionPage() {
             {/* Exit Button */}
             <button
               onClick={handleExit}
-              className="w-10 h-10 rounded-full flex items-center justify-center hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+              className="w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4 md:w-5 md:h-5" />
             </button>
           </div>
         </div>
       </header>
 
       {/* Main Content Canvas */}
-      <main className="flex-grow container max-w-3xl mx-auto px-6 py-10 md:py-14 flex flex-col relative z-10">
+      <main className="flex-grow container max-w-3xl mx-auto px-4 md:px-6 py-6 md:py-10 lg:py-14 flex flex-col relative z-10">
 
         {/* Step Narrative Header — question number + mode label */}
         <div className="flex items-center gap-3 mb-6">
@@ -257,7 +257,7 @@ export default function PublicQuizSessionPage() {
             className="flex flex-col gap-6"
           >
             {/* Large Question Text — prominent h1 matching Stitch design */}
-            <h1 className="text-2xl md:text-3xl lg:text-[2rem] font-extrabold text-slate-900 leading-snug tracking-tight">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-[2rem] font-extrabold text-slate-900 leading-snug tracking-tight">
               {currentQuestion.questionText}
             </h1>
 

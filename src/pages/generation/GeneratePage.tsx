@@ -75,29 +75,29 @@ export default function GeneratePage() {
               exit="exit"
             >
               {/* Hero Section for Hub */}
-              <div className="max-w-3xl mb-16">
-                <div className="inline-flex items-center gap-2 bg-[#00bcd4]/10 border border-[#00bcd4]/20 px-4 py-1.5 rounded-full text-primary mb-6">
+              <div className="max-w-3xl mb-8 md:mb-16">
+                <div className="inline-flex items-center gap-2 bg-[#00bcd4]/10 border border-[#00bcd4]/20 px-4 py-1.5 rounded-full text-primary mb-4 md:mb-6">
                   <Sparkles className="w-3.5 h-3.5 text-primary" />
                   <span className="font-extrabold text-[10px] tracking-wider uppercase">
                     AI-POWERED QUIZ PLATFORM
                   </span>
                 </div>
-                <h1 className="font-headline-lg text-4xl font-black text-slate-900 mb-6 leading-tight">
+                <h1 className="font-headline-lg text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 mb-4 md:mb-6 leading-tight">
                   Generate Smart Quizzes,
                   <br />
-                  <span className="primary-gradient text-white px-4 py-1.5 inline-block mt-2 rounded-xl text-3xl font-black shadow-sm">
+                  <span className="primary-gradient text-white px-3 py-1 md:px-4 md:py-1.5 inline-block mt-2 rounded-xl text-xl sm:text-2xl md:text-3xl font-black shadow-sm">
                     Step-by-Step
                   </span>
                 </h1>
-                <p className="font-body-lg text-slate-500 leading-relaxed">
+                <p className="font-body-lg text-slate-500 leading-relaxed text-sm md:text-base">
                   Empower your classroom with precision-engineered quizzes. Choose your creation method and let our AI handle the complex formatting while you focus on teaching.
                 </p>
               </div>
 
               {/* Bento Grid for Quiz Creation Modes */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8 mb-10 md:mb-20">
                 {/* Paste Text Card */}
-                <div className="group relative bg-white rounded-3xl p-8 border border-slate-100 custom-shadow-interactive">
+                <div className="group relative bg-white rounded-3xl p-5 md:p-8 border border-slate-100 custom-shadow-interactive">
                   <div className="absolute top-6 right-6">
                     <div className="step-indicator">1</div>
                   </div>
@@ -118,7 +118,7 @@ export default function GeneratePage() {
                 </div>
 
                 {/* Upload Document Card */}
-                <div className="group relative bg-white rounded-3xl p-8 border border-slate-100 custom-shadow-interactive">
+                <div className="group relative bg-white rounded-3xl p-5 md:p-8 border border-slate-100 custom-shadow-interactive">
                   <div className="absolute top-6 right-6">
                     <div className="step-indicator">2</div>
                   </div>
@@ -139,7 +139,7 @@ export default function GeneratePage() {
                 </div>
 
                 {/* Manual Specs Card */}
-                <div className="group relative bg-white rounded-3xl p-8 border border-slate-100 custom-shadow-interactive">
+                <div className="group relative bg-white rounded-3xl p-5 md:p-8 border border-slate-100 custom-shadow-interactive">
                   <div className="absolute top-6 right-6">
                     <div className="step-indicator">3</div>
                   </div>
@@ -161,8 +161,8 @@ export default function GeneratePage() {
               </div>
 
               {/* Recent Generation Activity */}
-              <section className="mt-20">
-                <div className="flex items-center justify-between mb-8">
+              <section className="mt-8 md:mt-20">
+                <div className="flex items-center justify-between mb-5 md:mb-8">
                   <h2 className="text-xl font-black text-slate-800 flex items-center gap-2">
                     <History className="w-5 h-5 text-primary" /> Recent Activity
                   </h2>
@@ -183,7 +183,7 @@ export default function GeneratePage() {
                       <div
                         key={quiz.id}
                         onClick={() => navigate(`/quizzes/${quiz.id}`)}
-                        className="bg-white p-6 rounded-2xl border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6 hover:bg-slate-50/50 transition-colors group cursor-pointer shadow-[0px_2px_8px_rgba(0,0,0,0.02)]"
+                        className="bg-white p-4 md:p-6 rounded-2xl border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 hover:bg-slate-50/50 transition-colors group cursor-pointer shadow-[0px_2px_8px_rgba(0,0,0,0.02)]"
                       >
                         <div className="flex items-center gap-6 w-full md:w-auto">
                           <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary flex-shrink-0">

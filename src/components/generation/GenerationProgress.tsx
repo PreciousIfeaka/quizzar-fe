@@ -46,7 +46,7 @@ export function GenerationProgress() {
         </div>
       </div>
 
-      <h2 className="text-2xl font-black text-slate-800 mb-2">AI is working its magic</h2>
+      <h2 className="text-2xl font-black text-slate-800 mb-2">Your Quiz is being generated</h2>
       <p className="text-muted-foreground mb-8 text-sm">This usually takes 15–30 seconds</p>
 
       {/* Step progress */}

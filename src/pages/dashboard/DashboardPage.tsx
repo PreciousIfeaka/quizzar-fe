@@ -99,7 +99,7 @@ export default function DashboardPage() {
   return (
     <AnimatedPage>
       {/* Welcome Banner */}
-      <div className="relative bg-[#0b192c] rounded-2xl py-6 px-8 mb-6 overflow-hidden text-white shadow-card border border-slate-800/60">
+      <div className="relative bg-[#0b192c] rounded-2xl py-5 px-5 md:py-6 md:px-8 mb-6 overflow-hidden text-white shadow-card border border-slate-800/60">
         {/* Subtle grid pattern background */}
         <div 
           className="absolute inset-0 opacity-[0.05] pointer-events-none"
@@ -215,14 +215,14 @@ export default function DashboardPage() {
       {/* Main Dashboard Content */}
       <section className="grid grid-cols-1 gap-8">
         <div className="bg-white rounded-2xl custom-shadow overflow-hidden border border-outline-variant/20">
-          <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-white">
+          <div className="p-4 md:p-6 border-b border-slate-100 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white">
             <h3 className="font-headline-md text-lg font-black text-slate-800">
               Recent Quizzes
             </h3>
-            <div className="flex gap-2">
-              <div className="relative">
+            <div className="flex gap-2 w-full sm:w-auto">
+              <div className="relative flex-1 sm:flex-none">
                 <input
-                  className="pl-10 pr-4 py-2 bg-slate-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 transition-all w-64 text-slate-800 placeholder-slate-400 outline-none"
+                  className="pl-10 pr-4 py-2 bg-slate-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 transition-all w-full sm:w-56 text-slate-800 placeholder-slate-400 outline-none"
                   placeholder="Search quizzes..."
                   type="text"
                   value={search}

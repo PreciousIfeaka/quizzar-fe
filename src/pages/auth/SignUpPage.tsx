@@ -116,7 +116,7 @@ export default function SignUpPage() {
         </div>
 
         {/* Register Form Area (Right Side) */}
-        <div className="flex flex-col justify-center p-8 md:p-16 lg:p-20 bg-white">
+        <div className="flex flex-col justify-center p-6 md:p-16 lg:p-20 bg-white">
           <div className="max-w-md mx-auto w-full">
             {/* Mobile Logo */}
             <div className="md:hidden flex items-center justify-center gap-2 mb-8">
