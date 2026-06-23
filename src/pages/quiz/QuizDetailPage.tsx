@@ -139,7 +139,7 @@ export default function QuizDetailPage() {
                       {index + 1}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-slate-800 leading-snug line-clamp-2">
+                      <p className="text-sm font-semibold text-slate-800 leading-snug break-words">
                         {question.questionText}
                       </p>
                       <div className="flex items-center gap-2 mt-1.5">
