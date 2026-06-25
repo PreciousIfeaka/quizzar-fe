@@ -211,21 +211,19 @@ export function UploadDropzone({ onGenerating }: { onGenerating: (v: boolean) =>
             )}
           </div>
 
-          {/* Timing Preference */}
+          {/* Quiz Mode */}
           <div className="flex flex-col gap-2">
-            <Label htmlFor="timingPreference" className="font-bold text-xs text-slate-500 px-1">
-              Timing Preference
+            <Label htmlFor="quizMode" className="font-bold text-xs text-slate-500 px-1">
+              Quiz Mode
             </Label>
             <div className="relative">
               <select
-                id="timingPreference"
+                id="quizMode"
                 className="w-full appearance-none bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none text-sm"
-                {...register('timingPreference')}
+                {...register('quizMode')}
               >
-                <option value="AI_SUGGESTED">AI Suggested</option>
-                <option value="NONE">None</option>
+                <option value="OVERALL">Overall Assessment</option>
                 <option value="PER_QUESTION">Per Question</option>
-                <option value="OVERALL">Overall</option>
               </select>
             </div>
           </div>
@@ -254,40 +252,10 @@ export function UploadDropzone({ onGenerating }: { onGenerating: (v: boolean) =>
               disabledTimingModes={watch('quizMode') === 'PER_QUESTION' ? ['OVERALL'] : []}
             />
           </div>
-
-          {/* Quiz Mode */}
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="quizMode" className="font-bold text-xs text-slate-500 px-1">
-              Quiz Mode
-            </Label>
-            <div className="relative">
-              <select
-                id="quizMode"
-                className="w-full appearance-none bg-slate-50/50 border border-slate-200 rounded-xl px-4 py-3 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none text-sm"
-                {...register('quizMode')}
-              >
-                <option value="OVERALL">Overall Assessment</option>
-                <option value="PER_QUESTION">Per Question</option>
-              </select>
-            </div>
-            {watch('quizMode') === 'PER_QUESTION' && (
-              <p className="text-[11px] text-amber-600 font-medium leading-relaxed mt-1.5 flex items-center gap-1">
-                ⚠️ Overall timing is unavailable in Instant Feedback mode.
-              </p>
-            )}
-          </div>
         </div>
 
         {/* Action Bar */}
-        <div className="mt-12 pt-8 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-3">
-            <div className="flex -space-x-2">
-              <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-300" />
-              <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-400" />
-              <div className="w-8 h-8 rounded-full border-2 border-white bg-slate-500" />
-            </div>
-            <span className="font-semibold text-slate-400 text-xs">Used by 12,000+ Educators</span>
-          </div>
+        <div className="mt-12 pt-8 border-t border-slate-100 flex justify-end">
           <BrandButton
             type="submit"
             disabled={!file || uploadProgress !== 100}

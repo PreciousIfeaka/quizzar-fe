@@ -74,7 +74,7 @@ export function TimingSelector({
         })}
       </div>
 
-      {disabledTimingModes.includes('OVERALL') && (
+      {disabledTimingModes.includes('OVERALL') && value === 'OVERALL' && (
         <p className="text-[11px] text-amber-600 font-medium leading-relaxed mt-1.5 flex items-center gap-1">
           ⚠️ Overall timing is unavailable in Instant Feedback mode.
         </p>

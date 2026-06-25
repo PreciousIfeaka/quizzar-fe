@@ -197,7 +197,6 @@ export default function PublicQuizSessionPage() {
             <div className="h-8 w-px bg-slate-200 hidden md:block" />
             <div className="hidden md:flex flex-col min-w-0">
               <span className="font-bold text-xs text-slate-800 uppercase tracking-widest leading-tight truncate max-w-[200px]">{quiz.title}</span>
-              {quiz.description && <span className="text-slate-400 text-xs font-medium leading-normal truncate max-w-xs">{quiz.description}</span>}
             </div>
           </div>
           <div className="flex items-center gap-3 md:gap-5 flex-shrink-0">

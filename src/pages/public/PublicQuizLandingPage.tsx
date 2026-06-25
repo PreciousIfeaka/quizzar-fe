@@ -83,9 +83,6 @@ export default function PublicQuizLandingPage() {
                 <h1 className="font-headline-md text-2xl font-black text-slate-900 mb-2 leading-tight">
                   {quiz.title}
                 </h1>
-                {quiz.description && (
-                  <p className="text-slate-500 text-sm leading-relaxed mb-4">{quiz.description}</p>
-                )}
               </div>
             </div>
 
