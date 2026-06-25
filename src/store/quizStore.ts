@@ -38,10 +38,12 @@ export const useQuizStore = create<QuizSessionStore>()(
     timeRemaining: null,
 
     setQuiz: (quiz) => {
-      const randomizedQuestions = shuffle(quiz.questions || []).map((q) => ({
-        ...q,
-        options: q.options ? shuffle(q.options) : undefined,
-      }));
+      const randomizedQuestions = shuffle(quiz.questions || []).map((q) => {
+        if (q.options) {
+          return { ...q, options: shuffle(q.options) };
+        }
+        return q;
+      });
       set({ quiz: { ...quiz, questions: randomizedQuestions } });
     },
     setSession: (session) => set({ session }),
