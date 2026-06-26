@@ -7,5 +7,5 @@ export interface SendFeedbackRequest {
 
 export const feedbackApi = {
   sendFeedback: (data: SendFeedbackRequest): Promise<void> =>
-    api.post('/api/v1/send-feedback', data).then(r => r.data),
+    api.post('/api/v1/auth/send-feedback', data).then(r => r.data),
 };
