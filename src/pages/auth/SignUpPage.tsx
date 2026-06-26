@@ -106,7 +106,7 @@ export default function SignUpPage() {
                 <p className="font-bold text-white text-xs leading-normal">
                   "Quizzar reduced my quiz preparation time by 80%. The AI suggestions are spookily accurate!"
                 </p>
-                <p className="text-[#49ffbd] font-bold text-[11px] mt-2">Dr. Sarah Jenkins, Stanford University</p>
+                <p className="text-[#49ffbd] font-bold text-[11px] mt-2">James, 8th Grade Math Tutor</p>
               </div>
             </div>
           </div>

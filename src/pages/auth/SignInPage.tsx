@@ -82,8 +82,8 @@ export default function SignInPage() {
                   <User className="w-6 h-6" />
                 </div>
                 <div>
-                  <p className="text-white font-bold text-sm">Sarah Jenkins</p>
-                  <p className="text-slate-300 text-xs">Professor of Digital Learning</p>
+                  <p className="text-white font-bold text-sm">Sarah</p>
+                  <p className="text-slate-300 text-xs">Tutor</p>
                 </div>
               </div>
               <p className="mt-4 text-slate-200 italic text-xs leading-relaxed">
