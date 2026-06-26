@@ -39,13 +39,12 @@ export default function SignUpPage() {
     }
   }, [googleSignin, navigate, toast]);
 
-  const { promptGoogle } = useGoogleAuth({
+  const { triggerGoogleLogin, hiddenButton } = useGoogleAuth({
     onCredential: handleGoogleCredential,
-    onBlocked: () =>
+    onError: () =>
       toast({
-        title: 'Google Sign-In Unavailable',
-        description:
-          'Google authentication services could not be loaded. If you have an ad blocker or privacy extension active, please disable it for this site and refresh.',
+        title: 'Google Sign-In Failed',
+        description: 'Google sign-in was cancelled or failed. Please try again.',
         variant: 'destructive',
       }),
   });
@@ -59,7 +58,7 @@ export default function SignUpPage() {
       });
       return;
     }
-    promptGoogle();
+    triggerGoogleLogin();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -94,6 +93,8 @@ export default function SignUpPage() {
 
   return (
     <div className="bg-[#f7f9fb] font-['Plus_Jakarta_Sans',sans-serif] text-[#191c1e] min-h-screen relative overflow-hidden flex items-center justify-center p-4 md:p-12">
+      {/* Hidden Google Login button — triggered programmatically by the custom button */}
+      {hiddenButton}
       {/* Grid Background Layer */}
       <div className="fixed inset-0 grid-pattern pointer-events-none z-0"></div>
 

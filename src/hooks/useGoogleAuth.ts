@@ -1,102 +1,77 @@
-import { useEffect, useRef, useCallback } from 'react';
-
-// Module-level guard: ensure the GIS script is only injected once, and
-// all pending callbacks are flushed when the script eventually loads.
-let gsiScriptLoaded = false;
-const pendingCallbacks: Array<() => void> = [];
-
-function loadGsiScript(onReady: () => void) {
-  if (gsiScriptLoaded) {
-    // Script already fully loaded — call immediately.
-    onReady();
-    return;
-  }
-
-  // Queue the callback regardless of whether the tag already exists.
-  pendingCallbacks.push(onReady);
-
-  if (!document.getElementById('google-gsi-script')) {
-    const script = document.createElement('script');
-    script.id = 'google-gsi-script';
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-    script.onload = () => {
-      gsiScriptLoaded = true;
-      // Drain the queue so every waiting caller gets notified.
-      pendingCallbacks.splice(0).forEach((cb) => cb());
-    };
-    script.onerror = () => {
-      // Script blocked (ad blocker etc.) — drain queue silently.
-      pendingCallbacks.splice(0);
-    };
-    document.body.appendChild(script);
-  }
-  // If the tag already exists but hasn't fired onload yet, the callback is
-  // already queued above and will be called when onload fires.
-}
+import { useRef, useCallback } from 'react';
+import { GoogleLogin } from '@react-oauth/google';
 
 interface UseGoogleAuthOptions {
   /** Called with the raw ID token after a successful Google sign-in. */
   onCredential: (idToken: string) => void;
-  /** Called when the Google SDK is not available (e.g. blocked by ad blocker). */
-  onBlocked?: () => void;
+  /** Called when the Google sign-in fails or is dismissed. */
+  onError?: () => void;
 }
 
 /**
- * Loads the Google Identity Services script once (module-level singleton)
- * and exposes a `promptGoogle()` function that opens the One Tap / popup.
+ * Uses the official GoogleLogin component from @react-oauth/google rendered
+ * as a visually-hidden element. Clicking the custom button programmatically
+ * clicks the hidden Google button via a ref, which opens the Google sign-in
+ * popup and returns a credential (id_token) directly.
  *
- * Key design decisions:
- * - `initialize()` is re-called on each page mount so the callback always
- *   points to the current page's handler. GIS warns about this in dev but
- *   the last init wins, which is correct.
- * - We use `ux_mode: 'popup'` instead of `renderButton`, avoiding the
- *   invisible-iframe overlay technique that caused dead-click regions.
- * - The `onCredential` reference is kept fresh via a ref so re-renders
- *   don't cause stale closure bugs.
+ * This approach:
+ * - Requires zero manual GIS SDK calls
+ * - Works with any custom button design
+ * - Is not affected by ad blockers any more than the standard Google button
+ * - Returns an id_token so the backend needs no changes
  */
-export function useGoogleAuth({ onCredential, onBlocked }: UseGoogleAuthOptions) {
-  // Keep the latest callback stable via a ref.
-  const onCredentialRef = useRef(onCredential);
-  useEffect(() => {
-    onCredentialRef.current = onCredential;
-  }, [onCredential]);
+export function useGoogleAuth({ onCredential, onError }: UseGoogleAuthOptions) {
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    const init = () => {
-      if (cancelled) return;
-      const google = (window as any).google;
-      if (!google?.accounts?.id) return;
-
-      google.accounts.id.initialize({
-        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || '',
-        callback: (response: any) => {
-          const idToken = response?.credential;
-          if (idToken) onCredentialRef.current(idToken);
-        },
-        ux_mode: 'popup',
-        cancel_on_tap_outside: false,
-      });
-    };
-
-    loadGsiScript(init);
-
-    return () => {
-      cancelled = true;
-    };
+  const triggerGoogleLogin = useCallback(() => {
+    // Find the iframe/div rendered by GoogleLogin inside the hidden container
+    // and programmatically click it to open the Google popup.
+    const btn = containerRef.current?.querySelector('div[role="button"]') as HTMLElement | null;
+    if (btn) {
+      btn.click();
+    } else {
+      // Fallback: click anything clickable inside the container
+      const anyClickable = containerRef.current?.querySelector('[tabindex]') as HTMLElement | null;
+      anyClickable?.click();
+    }
   }, []);
 
-  const promptGoogle = useCallback(() => {
-    const google = (window as any).google;
-    if (!google?.accounts?.id) {
-      onBlocked?.();
-      return;
-    }
-    google.accounts.id.prompt();
-  }, [onBlocked]);
+  const hiddenButton = (
+    <div
+      ref={containerRef}
+      style={{
+        position: 'absolute',
+        width: '1px',
+        height: '1px',
+        overflow: 'hidden',
+        opacity: 0,
+        pointerEvents: 'none',
+        userSelect: 'none',
+        clip: 'rect(0,0,0,0)',
+        whiteSpace: 'nowrap',
+      }}
+      aria-hidden="true"
+    >
+      <GoogleLogin
+        onSuccess={(credentialResponse) => {
+          const idToken = credentialResponse.credential;
+          if (idToken) {
+            onCredential(idToken);
+          } else {
+            console.error('[useGoogleAuth] No credential in response');
+            onError?.();
+          }
+        }}
+        onError={() => {
+          console.error('[useGoogleAuth] Google sign-in failed');
+          onError?.();
+        }}
+        useOneTap={false}
+        type="standard"
+        size="large"
+      />
+    </div>
+  );
 
-  return { promptGoogle };
+  return { triggerGoogleLogin, hiddenButton };
 }
