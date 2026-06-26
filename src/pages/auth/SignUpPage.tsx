@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/use-toast';
 import { QuizzarLogo } from '../../components/common/QuizzarLogo';
 import { User } from 'lucide-react';
+import { useGoogleAuth } from '../../hooks/useGoogleAuth';
 
 export default function SignUpPage() {
   const { signup, googleSignin } = useAuth();
@@ -17,10 +18,7 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
 
-  const handleGoogleCredentialResponse = async (response: any) => {
-    const idToken = response.credential;
-    if (!idToken) return;
-
+  const handleGoogleCredential = useCallback(async (idToken: string) => {
     setLoading(true);
     try {
       await googleSignin(idToken);
@@ -39,36 +37,18 @@ export default function SignUpPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [googleSignin, navigate, toast]);
 
-  useEffect(() => {
-    const initGoogle = () => {
-      const google = (window as any).google;
-      if (google) {
-        google.accounts.id.initialize({
-          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || '',
-          callback: handleGoogleCredentialResponse,
-        });
-        google.accounts.id.renderButton(
-          document.getElementById('google-signup-btn-container'),
-          { theme: 'outline', size: 'large', width: '380' }
-        );
-      }
-    };
-
-    // Dynamically load Google client script if not already present
-    if (!document.getElementById('google-gsi-script')) {
-      const script = document.createElement('script');
-      script.id = 'google-gsi-script';
-      script.src = 'https://accounts.google.com/gsi/client';
-      script.async = true;
-      script.defer = true;
-      script.onload = initGoogle;
-      document.body.appendChild(script);
-    } else {
-      initGoogle();
-    }
-  }, []);
+  const { promptGoogle } = useGoogleAuth({
+    onCredential: handleGoogleCredential,
+    onBlocked: () =>
+      toast({
+        title: 'Google Sign-In Unavailable',
+        description:
+          'Google authentication services could not be loaded. If you have an ad blocker or privacy extension active, please disable it for this site and refresh.',
+        variant: 'destructive',
+      }),
+  });
 
   const handleCustomButtonClick = () => {
     if (!agreedToTerms) {
@@ -79,19 +59,7 @@ export default function SignUpPage() {
       });
       return;
     }
-
-    const google = (window as any).google;
-    if (!google) {
-      toast({
-        title: 'Google Sign-In Blocked or Loading',
-        description: 'Google authentication services could not be loaded. If you are using an ad blocker, Brave Shield, or privacy extension, please disable it for this site and refresh.',
-        variant: 'destructive',
-      });
-      return;
-    }
-    if (google.accounts?.id) {
-      google.accounts.id.prompt();
-    }
+    promptGoogle();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -329,7 +297,7 @@ export default function SignUpPage() {
             </div>
 
             {/* Social Buttons */}
-            <div className="w-full relative overflow-hidden">
+            <div className="w-full">
                <button
                  className="w-full flex items-center justify-center gap-3 py-3 border border-[#bbc9cc] bg-white rounded-xl hover:bg-slate-50 transition-colors text-xs font-bold text-slate-650 disabled:opacity-50"
                  type="button"
@@ -356,13 +324,6 @@ export default function SignUpPage() {
                  </svg>
                  Continue with Google
                </button>
-               {/* Transparent Google Button Overlay (scaled to fully cover the custom button) */}
-               <div
-                 id="google-signup-btn-container"
-                 className={`absolute -inset-4 opacity-0 z-10 cursor-pointer overflow-hidden [&_iframe]:w-[200%] [&_iframe]:h-[200%] [&_iframe]:max-w-none [&_iframe]:absolute [&_iframe]:left-1/2 [&_iframe]:top-1/2 [&_iframe]:-translate-x-1/2 [&_iframe]:-translate-y-1/2 [&_iframe]:scale-150 [&_iframe]:cursor-pointer ${
-                   agreedToTerms ? 'pointer-events-auto' : 'pointer-events-none'
-                 }`}
-               />
              </div>
 
             {/* Footer Link */}
