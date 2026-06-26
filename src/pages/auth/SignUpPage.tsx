@@ -306,7 +306,7 @@ export default function SignUpPage() {
                     fill="#EA4335"
                   ></path>
                 </svg>
-                Google
+                Continue with Google
               </button>
               {/* Transparent Google Button Overlay */}
               <div

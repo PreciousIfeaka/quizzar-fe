@@ -272,7 +272,7 @@ export default function SignInPage() {
                       fill="#EA4335"
                     ></path>
                   </svg>
-                  <span>Google</span>
+                  <span>Continue with Google</span>
                 </button>
                 {/* Transparent Google Button Overlay */}
                 <div
