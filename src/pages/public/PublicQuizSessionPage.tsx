@@ -152,6 +152,40 @@ export default function PublicQuizSessionPage() {
   const timerMode = session.timingMode;
   const timerSeconds = session.timerValueSeconds;
 
+  // Auto-submit if user reconnected/refocused and time has already run out
+  useEffect(() => {
+    const handleReconnected = () => {
+      if (
+        isPerQuestion &&
+        timerMode === 'PER_QUESTION' &&
+        timerSeconds &&
+        !feedback &&
+        !submittingRef.current &&
+        navigator.onLine
+      ) {
+        const elapsedTime = (Date.now() - questionStartTime.current) / 1000;
+        if (elapsedTime >= timerSeconds) {
+          handleSubmitAnswer();
+        }
+      }
+    };
+
+    window.addEventListener('online', handleReconnected);
+    window.addEventListener('focus', handleReconnected);
+    
+    // Check immediately on mount/update
+    handleReconnected();
+
+    // Periodically check every second to recover from offline/throttled states
+    const interval = setInterval(handleReconnected, 1000);
+
+    return () => {
+      window.removeEventListener('online', handleReconnected);
+      window.removeEventListener('focus', handleReconnected);
+      clearInterval(interval);
+    };
+  }, [isPerQuestion, timerMode, timerSeconds, feedback]);
+
   const getModeLabel = () => {
     if (isPerQuestion) return 'INSTANT FEEDBACK';
     if (timerMode === 'OVERALL') return 'TIMED MODE';

@@ -166,17 +166,7 @@ export default function SignInPage() {
                 </div>
               </div>
 
-              {/* Remember Me */}
-              <div className="flex items-center gap-3">
-                <input
-                  className="w-5 h-5 rounded border-[#bbc9cc] text-[#006877] focus:ring-[#006877]/20"
-                  id="remember"
-                  type="checkbox"
-                />
-                <label className="text-xs text-slate-500 cursor-pointer select-none" htmlFor="remember">
-                  Keep me signed in for 30 days
-                </label>
-              </div>
+
 
               {/* Sign In Button */}
               <button
