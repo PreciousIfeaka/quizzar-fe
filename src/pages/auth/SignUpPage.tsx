@@ -73,12 +73,12 @@ export default function SignUpPage() {
     const google = (window as any).google;
     if (!google) {
       toast({
-        title: 'Loading Google Sign-In',
-        description: 'Google authentication services are still loading. Please try again in a few seconds.',
+        title: 'Google Sign-In Blocked or Loading',
+        description: 'Google authentication services could not be loaded. If you are using an ad blocker, Brave Shield, or privacy extension, please disable it for this site and refresh.',
+        variant: 'destructive',
       });
       return;
     }
-    // Fallback: Trigger Google One Tap prompt if the iframe click was somehow missed
     if (google.accounts?.id) {
       google.accounts.id.prompt();
     }
