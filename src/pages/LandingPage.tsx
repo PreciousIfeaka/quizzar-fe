@@ -410,6 +410,30 @@ export default function LandingPage() {
           </button>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-slate-100 py-12 px-6 relative z-10">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-slate-400 text-xs font-semibold">
+          <div className="flex flex-col items-center md:items-start gap-1">
+            <QuizzarLogo size="sm" noLink />
+            <p className="mt-1">© 2026 Quizzar AI Platform. All rights reserved.</p>
+          </div>
+          <div className="flex gap-6">
+            <button
+              onClick={() => navigate('/privacy')}
+              className="hover:text-[#00bcd4] transition-colors cursor-pointer bg-transparent border-none p-0 font-semibold"
+            >
+              Privacy Policy
+            </button>
+            <button
+              onClick={() => navigate('/terms')}
+              className="hover:text-[#00bcd4] transition-colors cursor-pointer bg-transparent border-none p-0 font-semibold"
+            >
+              Terms of Use
+            </button>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

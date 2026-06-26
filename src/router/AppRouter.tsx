@@ -18,6 +18,8 @@ import SignUpPage from '../pages/auth/SignUpPage';
 import VerifyEmailPage from '../pages/auth/VerifyEmailPage';
 import ForgotPasswordPage from '../pages/auth/ForgotPasswordPage';
 import SettingsPage from '../pages/dashboard/SettingsPage';
+import TermsPage from '../pages/public/TermsPage';
+import PrivacyPage from '../pages/public/PrivacyPage';
 
 export default function AppRouter() {
   return (
@@ -31,6 +33,8 @@ export default function AppRouter() {
       <Route path="/quiz/:quizCode" element={<PageTransition><PublicQuizLandingPage /></PageTransition>} />
       <Route path="/quiz/:quizCode/session" element={<PageTransition><PublicQuizSessionPage /></PageTransition>} />
       <Route path="/quiz/:quizCode/result" element={<PageTransition><PublicQuizResultPage /></PageTransition>} />
+      <Route path="/terms" element={<PageTransition><TermsPage /></PageTransition>} />
+      <Route path="/privacy" element={<PageTransition><PrivacyPage /></PageTransition>} />
 
       {/* Protected routes — wrapped in AppShell */}
       <Route element={<ProtectedRoute />}>

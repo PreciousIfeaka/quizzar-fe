@@ -272,18 +272,18 @@ export default function SignUpPage() {
 
       {/* Global Footer Mini */}
       <footer className="fixed bottom-6 left-0 w-full px-8 pointer-events-none">
-        <div className="max-w-[1280px] mx-auto flex justify-between items-center text-[10px] text-slate-450 font-bold tracking-widest uppercase">
+        <div className="max-w-[1280px] mx-auto flex justify-between items-center text-[10px] text-slate-455 font-bold tracking-widest uppercase">
           <p>© 2024 QUIZZAR AI PLATFORM</p>
           <div className="flex gap-6 pointer-events-auto">
             <a className="hover:text-[#006877] transition-colors" href="#">
               HELP
             </a>
-            <a className="hover:text-[#006877] transition-colors" href="#">
+            <Link className="hover:text-[#006877] transition-colors" to="/privacy">
               PRIVACY
-            </a>
-            <a className="hover:text-[#006877] transition-colors" href="#">
+            </Link>
+            <Link className="hover:text-[#006877] transition-colors" to="/terms">
               TERMS
-            </a>
+            </Link>
           </div>
         </div>
       </footer>

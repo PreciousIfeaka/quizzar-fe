@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/use-toast';
 import { QuizzarLogo } from '../../components/common/QuizzarLogo';
@@ -222,12 +222,12 @@ export default function VerifyEmailPage() {
       <footer className="w-full py-12 px-8 max-w-[1280px] mx-auto flex flex-col md:flex-row justify-between items-center gap-4 border-t border-[#bbc9cc]/50 mt-16 text-slate-500 z-10 text-xs">
         <div>© 2024 Quizzar AI Platform. All rights reserved.</div>
         <div className="flex gap-6">
-          <a className="hover:text-[#006877] transition-colors" href="#">
+          <Link className="hover:text-[#006877] transition-colors" to="/privacy">
             Privacy Policy
-          </a>
-          <a className="hover:text-[#006877] transition-colors" href="#">
+          </Link>
+          <Link className="hover:text-[#006877] transition-colors" to="/terms">
             Terms of Service
-          </a>
+          </Link>
           <a className="hover:text-[#006877] transition-colors" href="#">
             Contact Support
           </a>

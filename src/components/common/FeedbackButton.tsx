@@ -77,7 +77,7 @@ export function FeedbackButton() {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
- 
+
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       handleImageChange(e.dataTransfer.files[0]);
     }
@@ -101,12 +101,9 @@ export function FeedbackButton() {
             'Content-Type': image.type,
           },
         });
-
-        // 3. Construct public S3 URL
-        imageUrl = `https://dailyfoods3bucket.s3.amazonaws.com/${s3Key}`;
+        imageUrl = s3Key;
       }
 
-      // 4. Submit the feedback payload containing text and imageUrl
       await feedbackApi.sendFeedback({
         text: text.trim(),
         imageUrl,

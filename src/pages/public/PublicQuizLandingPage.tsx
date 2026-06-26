@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Clock, BookOpen, User, Rocket, ArrowRight, Info } from 'lucide-react';
@@ -182,8 +182,8 @@ export default function PublicQuizLandingPage() {
             <p className="text-slate-400 text-xs font-semibold">© 2026 Quizzar AI Platform</p>
           </div>
           <div className="flex gap-4 md:gap-6 text-slate-400 text-xs font-semibold">
-            <a className="hover:text-primary transition-colors" href="#">Privacy Policy</a>
-            <a className="hover:text-primary transition-colors" href="#">Terms of Service</a>
+            <Link className="hover:text-primary transition-colors" to="/privacy">Privacy Policy</Link>
+            <Link className="hover:text-primary transition-colors" to="/terms">Terms of Service</Link>
             <a className="hover:text-primary transition-colors" href="#">Contact Support</a>
           </div>
         </div>

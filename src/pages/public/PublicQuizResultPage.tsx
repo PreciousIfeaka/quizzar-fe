@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { RefreshCw, Clock, CheckCircle2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -188,8 +188,8 @@ export default function PublicQuizResultPage() {
       <footer className="w-full py-6 md:py-8 border-t border-slate-100 bg-slate-50 flex flex-col md:flex-row justify-between items-center gap-3 px-6 md:px-12 mt-8 md:mt-12 text-slate-400 text-xs">
         <QuizzarLogo size="sm" noLink />
         <div className="flex gap-4 md:gap-6">
-          <a href="#" className="hover:text-primary transition-colors font-semibold">Privacy Policy</a>
-          <a href="#" className="hover:text-primary transition-colors font-semibold">Terms of Service</a>
+          <Link to="/privacy" className="hover:text-primary transition-colors font-semibold">Privacy Policy</Link>
+          <Link to="/terms" className="hover:text-primary transition-colors font-semibold">Terms of Service</Link>
           <a href="#" className="hover:text-primary transition-colors font-semibold">Help Center</a>
         </div>
         <div className="font-semibold">© 2026 Quizzar AI Education</div>
