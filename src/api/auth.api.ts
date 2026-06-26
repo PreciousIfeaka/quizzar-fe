@@ -48,4 +48,8 @@ export const authApi = {
   getAvatarUploadUrl: (filename: string, contentType: string): Promise<PresignedUrlResponse> =>
     api.post(`/api/v1/teachers/avatar/presigned-url?filename=${encodeURIComponent(filename)}&contentType=${encodeURIComponent(contentType)}`)
       .then(r => r.data.data),
+
+  googleSignin: (token: string): Promise<AuthResponse> =>
+    publicApi.post('/api/v1/auth/google/signin', { token })
+      .then(r => r.data.data),
 };

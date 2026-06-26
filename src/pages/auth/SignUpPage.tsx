@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/use-toast';
@@ -6,7 +6,7 @@ import { QuizzarLogo } from '../../components/common/QuizzarLogo';
 import { User } from 'lucide-react';
 
 export default function SignUpPage() {
-  const { signup } = useAuth();
+  const { signup, googleSignin } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -15,6 +15,59 @@ export default function SignUpPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const handleGoogleCredentialResponse = async (response: any) => {
+    const idToken = response.credential;
+    if (!idToken) return;
+
+    setLoading(true);
+    try {
+      await googleSignin(idToken);
+      toast({
+        title: 'Welcome!',
+        description: 'You have signed up and logged in successfully with Google.',
+      });
+      navigate('/dashboard', { replace: true });
+    } catch (err: any) {
+      console.error('Google sign-up error:', err);
+      toast({
+        title: 'Registration Failed',
+        description: err.response?.data?.message || 'Google sign-up failed. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const initGoogle = () => {
+      const google = (window as any).google;
+      if (google) {
+        google.accounts.id.initialize({
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID || '',
+          callback: handleGoogleCredentialResponse,
+        });
+        google.accounts.id.renderButton(
+          document.getElementById('google-signup-btn-container'),
+          { theme: 'outline', size: 'large', width: '380' }
+        );
+      }
+    };
+
+    // Dynamically load Google client script if not already present
+    if (!document.getElementById('google-gsi-script')) {
+      const script = document.createElement('script');
+      script.id = 'google-gsi-script';
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = initGoogle;
+      document.body.appendChild(script);
+    } else {
+      initGoogle();
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -229,11 +282,11 @@ export default function SignUpPage() {
             </div>
 
             {/* Social Buttons */}
-            <div className="w-full">
+            <div className="w-full relative overflow-hidden">
               <button
                 className="w-full flex items-center justify-center gap-3 py-3 border border-[#bbc9cc] bg-white rounded-xl hover:bg-slate-50 transition-colors text-xs font-bold text-slate-650"
                 type="button"
-                onClick={() => toast({ title: 'OAuth', description: 'Social login is not available.' })}
+                disabled={loading}
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24">
                   <path
@@ -255,6 +308,11 @@ export default function SignUpPage() {
                 </svg>
                 Google
               </button>
+              {/* Transparent Google Button Overlay */}
+              <div
+                id="google-signup-btn-container"
+                className="absolute inset-0 opacity-0 z-10 cursor-pointer [&_iframe]:w-full [&_iframe]:h-full [&_iframe]:cursor-pointer"
+              />
             </div>
 
             {/* Footer Link */}

@@ -52,6 +52,17 @@ export function useAuth() {
     }
   };
 
+  const handleGoogleSignin = async (idToken: string) => {
+    setLoading(true);
+    try {
+      const response = await authApi.googleSignin(idToken);
+      setAccessToken(response.accessToken);
+      setTeacher(response.profile);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSignup = async (data: SignUpRequest) => {
     return await authApi.signup(data);
   };
@@ -88,6 +99,7 @@ export function useAuth() {
     isAuthenticated,
     isLoading,
     signin: handleSignin,
+    googleSignin: handleGoogleSignin,
     signup: handleSignup,
     verifyEmail: handleVerifyEmail,
     resendOtp: handleResendOtp,
