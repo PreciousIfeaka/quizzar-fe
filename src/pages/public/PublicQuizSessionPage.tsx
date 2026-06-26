@@ -94,6 +94,7 @@ export default function PublicQuizSessionPage() {
   };
 
   const isPerQuestion = quiz.quizMode === 'PER_QUESTION';
+  const hasAnswered = !!(currentAnswer?.selectedOptionId || currentAnswer?.answerText?.trim());
 
   const handleSubmitAnswer = () => {
     if (submitSingleAnswerMutation.isPending || feedback || isSubmitting || submittingRef.current) return;
@@ -176,6 +177,10 @@ export default function PublicQuizSessionPage() {
     submitSingleAnswerMutation.isPending ||
     completeMutation.isPending ||
     isSubmitting;
+
+  const isSubmitDisabled =
+    isButtonLoading ||
+    (isPerQuestion && !feedback && !hasAnswered);
 
   const handleExit = () => {
     if (window.confirm('Are you sure you want to exit the quiz? Your progress will be lost.')) {
@@ -290,14 +295,14 @@ export default function PublicQuizSessionPage() {
         {/* Submit / Next Button — centered, full-width, prominent (matches Stitch) */}
         <div className="flex justify-center mt-10 pb-4">
           <motion.button
-            whileHover={{ scale: isButtonLoading ? 1 : 1.02 }}
-            whileTap={{ scale: isButtonLoading ? 1 : 0.97 }}
+            whileHover={{ scale: isSubmitDisabled ? 1 : 1.02 }}
+            whileTap={{ scale: isSubmitDisabled ? 1 : 0.97 }}
             onClick={handleNext}
-            disabled={isButtonLoading}
+            disabled={isSubmitDisabled}
             className="primary-gradient w-full max-w-lg flex items-center justify-center gap-3 text-white rounded-2xl px-12 py-5 font-black text-sm uppercase tracking-wide shadow-[0_20px_60px_rgba(10,153,171,0.22)] hover:shadow-[0_24px_70px_rgba(10,153,171,0.3)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group"
           >
             <span>{getButtonText()}</span>
-            {!isButtonLoading && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+            {!isSubmitDisabled && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
           </motion.button>
         </div>
       </main>
