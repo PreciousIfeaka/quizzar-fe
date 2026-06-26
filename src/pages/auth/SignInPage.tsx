@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/use-toast';
@@ -15,6 +15,12 @@ export default function SignInPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [lastUsed, setLastUsed] = useState<string | null>(null);
+
+  useEffect(() => {
+    const method = localStorage.getItem('quizzar_last_auth_method');
+    setLastUsed(method);
+  }, []);
 
   const handleGoogleCredential = useCallback(async (idToken: string) => {
     setLoading(true);
@@ -202,7 +208,7 @@ export default function SignInPage() {
 
               {/* Sign In Button */}
               <button
-                className="w-full btn-gradient py-4 rounded-xl flex items-center justify-center gap-2 group shadow-lg shadow-[#006877]/10 disabled:opacity-50"
+                className="relative w-full btn-gradient py-4 rounded-xl flex items-center justify-center gap-2 group shadow-lg shadow-[#006877]/10 disabled:opacity-50"
                 type="submit"
                 disabled={loading}
               >
@@ -212,6 +218,12 @@ export default function SignInPage() {
                 {!loading && (
                   <span className="material-symbols-outlined text-white group-hover:translate-x-1 transition-transform">
                     arrow_forward
+                  </span>
+                )}
+                {lastUsed === 'password' && (
+                  <span className="absolute -top-2.5 right-4 px-2.5 py-0.5 bg-[#00bdd6] text-white text-[9px] font-extrabold uppercase tracking-wider rounded-full shadow-[0_2px_8px_rgba(0,189,214,0.3)] flex items-center gap-1 border border-white">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#49ffbd] animate-pulse"></span>
+                    Last Used
                   </span>
                 )}
               </button>
@@ -229,7 +241,7 @@ export default function SignInPage() {
               {/* Social Buttons */}
               <div className="w-full">
                 <button
-                  className="w-full flex items-center justify-center gap-3 py-3 border border-[#bbc9cc] bg-white rounded-xl hover:bg-slate-50 transition-colors text-xs font-bold text-slate-650 disabled:opacity-50"
+                  className="relative w-full flex items-center justify-center gap-3 py-3 border border-[#bbc9cc] bg-white rounded-xl hover:bg-slate-50 transition-colors text-xs font-bold text-slate-650 disabled:opacity-50"
                   type="button"
                   disabled={loading}
                   onClick={() => triggerGoogleLogin()}
@@ -253,6 +265,12 @@ export default function SignInPage() {
                     ></path>
                   </svg>
                   <span>Continue with Google</span>
+                  {lastUsed === 'google' && (
+                    <span className="absolute -top-2.5 right-4 px-2.5 py-0.5 bg-[#006877] text-white text-[9px] font-extrabold uppercase tracking-wider rounded-full shadow-[0_2px_8px_rgba(0,104,119,0.3)] flex items-center gap-1 border border-white">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#49ffbd] animate-pulse"></span>
+                      Last Used
+                    </span>
+                  )}
                 </button>
               </div>
             </form>

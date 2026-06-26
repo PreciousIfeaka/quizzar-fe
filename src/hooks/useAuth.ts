@@ -47,6 +47,7 @@ export function useAuth() {
       const response = await authApi.signin(data);
       setAccessToken(response.accessToken);
       setTeacher(response.profile);
+      localStorage.setItem('quizzar_last_auth_method', 'password');
     } finally {
       setLoading(false);
     }
@@ -58,6 +59,7 @@ export function useAuth() {
       const response = await authApi.googleSignin(idToken);
       setAccessToken(response.accessToken);
       setTeacher(response.profile);
+      localStorage.setItem('quizzar_last_auth_method', 'google');
     } finally {
       setLoading(false);
     }
@@ -73,6 +75,7 @@ export function useAuth() {
       const response = await authApi.verifyEmail(data);
       setAccessToken(response.accessToken);
       setTeacher(response.profile);
+      localStorage.setItem('quizzar_last_auth_method', 'password');
     } finally {
       setLoading(false);
     }
