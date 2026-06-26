@@ -70,7 +70,7 @@ export default function DashboardPage() {
   });
 
   const quizzes = quizzesData?.content ?? [];
-  
+
   const filteredQuizzes = quizzes.filter((q) =>
     q.title.toLowerCase().includes(search.toLowerCase()) ||
     q.quizCode.toLowerCase().includes(search.toLowerCase())
@@ -81,7 +81,7 @@ export default function DashboardPage() {
       {/* Welcome Banner */}
       <div className="relative bg-[#0b192c] rounded-2xl py-5 px-5 md:py-6 md:px-8 mb-6 overflow-hidden text-white shadow-card border border-slate-800/60">
         {/* Subtle grid pattern background */}
-        <div 
+        <div
           className="absolute inset-0 opacity-[0.05] pointer-events-none"
           style={{
             backgroundImage: `
@@ -91,7 +91,7 @@ export default function DashboardPage() {
             backgroundSize: '24px 24px',
           }}
         />
-        
+
         {/* Concentric circles decoration on the right side */}
         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[200px] h-[200px] opacity-15 pointer-events-none hidden md:block select-none">
           <div className="absolute inset-0 rounded-full border-[1.5px] border-white/50 scale-[0.6]" />
@@ -224,7 +224,7 @@ export default function DashboardPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredQuizzes.map((quiz, index) => (
+                {filteredQuizzes.map((quiz) => (
                   <div
                     key={quiz.id}
                     className="bg-white rounded-2xl border border-slate-100 p-5 quiz-card-shadow-interactive hover:border-[#0A99AB]/30 flex flex-col justify-between relative group cursor-pointer"
@@ -236,7 +236,7 @@ export default function DashboardPage() {
                           {quiz.questionCount} {quiz.questionCount === 1 ? 'Question' : 'Questions'}
                         </span>
                       </div>
-                      
+
                       <div onClick={(e) => e.stopPropagation()}>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -265,7 +265,7 @@ export default function DashboardPage() {
                         </DropdownMenu>
                       </div>
                     </div>
-                    
+
                     <div className="flex-grow mb-4">
                       <h4 className="font-extrabold text-slate-800 text-base mb-1.5 group-hover:text-[#0A99AB] transition-colors line-clamp-1">
                         {quiz.title}
@@ -274,7 +274,7 @@ export default function DashboardPage() {
                         {quiz.description || 'No description provided.'}
                       </p>
                     </div>
-                    
+
                     <div className="border-t border-slate-50 pt-4 flex items-center justify-between text-xs mt-auto">
                       <div className="flex flex-col">
                         <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">Created</span>
