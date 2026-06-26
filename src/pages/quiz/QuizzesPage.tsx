@@ -137,7 +137,7 @@ export default function QuizzesPage() {
           <>
             {/* Mobile card view */}
             <div className="sm:hidden divide-y divide-slate-100">
-              {filtered.map((quiz, index) => (
+              {filtered.map((quiz) => (
                 <div
                   key={quiz.id}
                   className="p-4 hover:bg-slate-50/50 transition-colors cursor-pointer"
@@ -211,7 +211,7 @@ export default function QuizzesPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {filtered.map((quiz, index) => (
+                  {filtered.map((quiz) => (
                     <tr
                       key={quiz.id}
                       className="hover:bg-slate-50/50 transition-colors group cursor-pointer"
@@ -297,17 +297,16 @@ export default function QuizzesPage() {
               const pageNum = totalPages <= 7
                 ? i
                 : page <= 3 ? i
-                : page >= totalPages - 4 ? totalPages - 7 + i
-                : page - 3 + i;
+                  : page >= totalPages - 4 ? totalPages - 7 + i
+                    : page - 3 + i;
               return (
                 <button
                   key={pageNum}
                   onClick={() => setPage(pageNum)}
-                  className={`w-9 h-9 rounded-xl text-sm font-semibold transition-all ${
-                    pageNum === page
-                      ? 'bg-brand-500 text-white shadow-brand-sm'
-                      : 'text-slate-600 hover:bg-slate-100'
-                  }`}
+                  className={`w-9 h-9 rounded-xl text-sm font-semibold transition-all ${pageNum === page
+                    ? 'bg-brand-500 text-white shadow-brand-sm'
+                    : 'text-slate-600 hover:bg-slate-100'
+                    }`}
                 >
                   {pageNum + 1}
                 </button>
