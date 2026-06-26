@@ -69,6 +69,21 @@ export default function SignUpPage() {
     }
   }, []);
 
+  const handleCustomButtonClick = () => {
+    const google = (window as any).google;
+    if (!google) {
+      toast({
+        title: 'Loading Google Sign-In',
+        description: 'Google authentication services are still loading. Please try again in a few seconds.',
+      });
+      return;
+    }
+    // Fallback: Trigger Google One Tap prompt if the iframe click was somehow missed
+    if (google.accounts?.id) {
+      google.accounts.id.prompt();
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !password) {
@@ -287,6 +302,7 @@ export default function SignUpPage() {
                 className="w-full flex items-center justify-center gap-3 py-3 border border-[#bbc9cc] bg-white rounded-xl hover:bg-slate-50 transition-colors text-xs font-bold text-slate-650"
                 type="button"
                 disabled={loading}
+                onClick={handleCustomButtonClick}
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24">
                   <path
@@ -308,10 +324,10 @@ export default function SignUpPage() {
                 </svg>
                 Continue with Google
               </button>
-              {/* Transparent Google Button Overlay */}
+              {/* Transparent Google Button Overlay (scaled to fully cover the custom button) */}
               <div
                 id="google-signup-btn-container"
-                className="absolute inset-0 opacity-0 z-10 cursor-pointer [&_iframe]:w-full [&_iframe]:h-full [&_iframe]:cursor-pointer"
+                className="absolute -inset-4 opacity-0 z-10 cursor-pointer overflow-hidden [&_iframe]:w-[200%] [&_iframe]:h-[200%] [&_iframe]:max-w-none [&_iframe]:absolute [&_iframe]:left-1/2 [&_iframe]:top-1/2 [&_iframe]:-translate-x-1/2 [&_iframe]:-translate-y-1/2 [&_iframe]:scale-150 [&_iframe]:cursor-pointer pointer-events-auto"
               />
             </div>
 
