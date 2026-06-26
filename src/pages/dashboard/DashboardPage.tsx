@@ -6,12 +6,8 @@ import {
   TrendingUp,
   Search,
   MoreVertical,
-  Beaker,
-  Globe,
-  Calculator,
-  Rocket,
   ArrowRight,
-  Sparkles,
+  Calendar,
   Link2,
   Trash2,
   BarChart2,
@@ -36,23 +32,7 @@ import { useToast } from '@/hooks/use-toast';
 import type { QuizSummary } from '@/types/quiz.types';
 
 // Helper to render consistent category icon based on index/title
-const getCategoryIcon = (index: number) => {
-  const icons = [Beaker, Globe, Calculator, Rocket];
-  const colors = [
-    'bg-primary-container/20 text-primary',
-    'bg-secondary-container/20 text-secondary',
-    'bg-outline-variant/20 text-slate-500',
-    'bg-primary-container/20 text-primary',
-  ];
-  const IconComponent = icons[index % icons.length];
-  const colorClass = colors[index % colors.length];
 
-  return (
-    <div className={`w-8 h-8 rounded-lg ${colorClass} flex items-center justify-center`}>
-      <IconComponent className="w-4 h-4" />
-    </div>
-  );
-};
 
 export default function DashboardPage() {
   const { teacher } = useAuthStore();
@@ -207,7 +187,7 @@ export default function DashboardPage() {
             </span>
           </div>
           <div className="w-[52px] h-[52px] rounded-[16px] bg-[#fff0f0] text-[#e02424] flex items-center justify-center flex-shrink-0">
-            <Sparkles className="w-5 h-5 stroke-[2.2]" />
+            <Calendar className="w-5 h-5 stroke-[2.2]" />
           </div>
         </motion.div>
       </motion.section>
@@ -252,7 +232,6 @@ export default function DashboardPage() {
                   >
                     <div className="flex justify-between items-start gap-4 mb-3">
                       <div className="flex items-center gap-2.5">
-                        {getCategoryIcon(index)}
                         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#0A99AB]/10 text-[#0A99AB] text-[10px] font-black uppercase tracking-wider">
                           {quiz.questionCount} {quiz.questionCount === 1 ? 'Question' : 'Questions'}
                         </span>

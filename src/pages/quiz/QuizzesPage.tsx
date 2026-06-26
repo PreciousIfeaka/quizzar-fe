@@ -10,10 +10,6 @@ import {
   Link2,
   BarChart2,
   Trash2,
-  Beaker,
-  Globe,
-  Calculator,
-  Rocket,
 } from 'lucide-react';
 import { quizApi } from '../../api/quiz.api';
 import { AnimatedPage } from '../../components/common/AnimatedPage';
@@ -33,23 +29,7 @@ import type { QuizSummary } from '../../types/quiz.types';
 
 const PAGE_SIZE = 12;
 
-const getCategoryIcon = (index: number) => {
-  const icons = [Beaker, Globe, Calculator, Rocket];
-  const colors = [
-    'bg-primary-container/20 text-primary',
-    'bg-secondary-container/20 text-secondary',
-    'bg-outline-variant/20 text-slate-500',
-    'bg-primary-container/20 text-primary',
-  ];
-  const IconComponent = icons[index % icons.length];
-  const colorClass = colors[index % colors.length];
 
-  return (
-    <div className={`w-8 h-8 rounded-lg ${colorClass} flex items-center justify-center`}>
-      <IconComponent className="w-4 h-4" />
-    </div>
-  );
-};
 
 export default function QuizzesPage() {
   const navigate = useNavigate();
@@ -165,7 +145,6 @@ export default function QuizzesPage() {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                      {getCategoryIcon(index)}
                       <div className="flex-1 min-w-0">
                         <span className="font-semibold text-slate-800 block truncate text-sm">{quiz.title}</span>
                         {quiz.description && (
@@ -240,7 +219,6 @@ export default function QuizzesPage() {
                     >
                       <td className="px-6 py-4 max-w-[220px] md:max-w-[320px]">
                         <div className="flex items-center gap-3">
-                          {getCategoryIcon(index)}
                           <div className="flex flex-col min-w-0 flex-1">
                             <span className="font-semibold text-slate-800 hover:text-primary transition-colors block truncate">
                               {quiz.title}
