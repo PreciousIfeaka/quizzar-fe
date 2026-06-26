@@ -56,7 +56,7 @@ export default function QuizAnalyticsPage() {
           <ChevronRight className="w-3 h-3" />
           <span className="text-primary truncate max-w-xs">{data.quizTitle}</span>
         </div>
-        
+
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <h1 className="font-headline-lg text-3xl font-black text-slate-900 mb-2">
@@ -226,9 +226,8 @@ export default function QuizAnalyticsPage() {
                         </div>
                         <span className="font-bold text-slate-800 text-sm">{result.studentName}</span>
                       </div>
-                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                        passed ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-red-50 text-red-700 border border-red-100'
-                      }`}>
+                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${passed ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-red-50 text-red-700 border border-red-100'
+                        }`}>
                         {passed ? 'PASSED' : 'FAILED'}
                       </span>
                     </div>
@@ -296,11 +295,10 @@ export default function QuizAnalyticsPage() {
                           </div>
                         </td>
                         <td className="p-6">
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                            passed
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${passed
                               ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
                               : 'bg-red-50 text-red-700 border border-red-100'
-                          }`}>
+                            }`}>
                             {passed ? 'COMPLETED' : 'FAILED'}
                           </span>
                         </td>

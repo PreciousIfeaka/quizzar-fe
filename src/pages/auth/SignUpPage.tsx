@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/use-toast';
 import { QuizzarLogo } from '../../components/common/QuizzarLogo';
+import { User } from 'lucide-react';
 
 export default function SignUpPage() {
   const { signup } = useAuth();
@@ -98,12 +99,8 @@ export default function SignUpPage() {
 
           <div className="relative z-10 mt-auto">
             <div className="bg-[#30495d]/50 backdrop-blur-xl border border-white/10 p-6 rounded-2xl flex items-start gap-4">
-              <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 border-2 border-[#a2eeff] bg-[#f7f9fb]">
-                <img
-                  className="w-full h-full object-cover"
-                  alt="Sarah Jenkins"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSS5BHLEerRkhGhyRYOhbh_KWglcIvoggNJ5zTspwrQVuxOzJZOLxKcvEHYsjV9izowgFsHy_vvnrAuUOEZ-5MDysum8R6qpq8U09Gj28fKSAgOUlwWxqQkG599Fy3fTdwxtGg3ot3IPCBCCNGcjeqrweSnympvQSeLnpEyuKkOFgJ1vmfKxWdzq5xWLAjqEL0VN1OTPDREX6PnwKxvJDqMI9tsO6g2P0f_D1XLiUIVsXLZ5IpDBTIp-5VaS8QJdaJI3zg3-CtxA"
-                />
+              <div className="w-12 h-12 rounded-full border-2 border-[#a2eeff] shadow-lg bg-white/10 flex items-center justify-center text-[#a2eeff] shrink-0">
+                <User className="w-6 h-6" />
               </div>
               <div>
                 <p className="font-bold text-white text-xs leading-normal">
