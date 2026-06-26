@@ -39,7 +39,7 @@ export default function SignUpPage() {
     }
   }, [googleSignin, navigate, toast]);
 
-  const { triggerGoogleLogin, hiddenButton } = useGoogleAuth({
+  const { triggerGoogleLogin } = useGoogleAuth({
     onCredential: handleGoogleCredential,
     onError: () =>
       toast({
@@ -93,8 +93,6 @@ export default function SignUpPage() {
 
   return (
     <div className="bg-[#f7f9fb] font-['Plus_Jakarta_Sans',sans-serif] text-[#191c1e] min-h-screen relative overflow-hidden flex items-center justify-center p-4 md:p-12">
-      {/* Hidden Google Login button — triggered programmatically by the custom button */}
-      {hiddenButton}
       {/* Grid Background Layer */}
       <div className="fixed inset-0 grid-pattern pointer-events-none z-0"></div>
 

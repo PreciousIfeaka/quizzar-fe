@@ -37,7 +37,7 @@ export default function SignInPage() {
     }
   }, [googleSignin, navigate, toast]);
 
-  const { triggerGoogleLogin, hiddenButton } = useGoogleAuth({
+  const { triggerGoogleLogin } = useGoogleAuth({
     onCredential: handleGoogleCredential,
     onError: () =>
       toast({
@@ -46,10 +46,6 @@ export default function SignInPage() {
         variant: 'destructive',
       }),
   });
-
-  const handleGoogleButtonClick = () => {
-    triggerGoogleLogin();
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,8 +79,6 @@ export default function SignInPage() {
 
   return (
     <div className="bg-[#f7f9fb] font-['Plus_Jakarta_Sans',sans-serif] text-[#191c1e] min-h-screen relative overflow-hidden flex items-center justify-center p-4 md:p-12">
-      {/* Hidden Google Login button — triggered programmatically by the custom button */}
-      {hiddenButton}
       {/* Grid Background Layer */}
       <div className="fixed inset-0 grid-pattern pointer-events-none z-0"></div>
 
@@ -238,7 +232,7 @@ export default function SignInPage() {
                   className="w-full flex items-center justify-center gap-3 py-3 border border-[#bbc9cc] bg-white rounded-xl hover:bg-slate-50 transition-colors text-xs font-bold text-slate-650 disabled:opacity-50"
                   type="button"
                   disabled={loading}
-                  onClick={handleGoogleButtonClick}
+                  onClick={() => triggerGoogleLogin()}
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24">
                     <path
