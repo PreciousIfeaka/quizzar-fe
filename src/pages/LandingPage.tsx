@@ -166,8 +166,8 @@ export default function LandingPage() {
           </motion.div>
         </div>
 
-        {/* Right Column (Floating Mockups Stack) - hidden on mobile */}
-        <div className="hidden lg:flex flex-1 relative w-full max-w-xl h-[480px] md:h-[520px] items-center justify-center mt-8 lg:mt-0">
+        {/* Right Column (Floating Mockups Stack) - responsive on mobile */}
+        <div className="flex flex-1 relative w-full max-w-xl h-[360px] sm:h-[450px] lg:h-[520px] items-center justify-center mt-12 lg:mt-0 scale-[0.65] min-[400px]:scale-[0.75] min-[480px]:scale-[0.85] sm:scale-95 lg:scale-100 origin-center">
 
           {/* Subtle concentric background arcs behind mockups */}
           <div className="absolute w-[440px] h-[440px] border border-brand-500/10 rounded-full pointer-events-none" />
