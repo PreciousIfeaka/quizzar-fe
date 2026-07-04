@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { Clock, BookOpen, User, Rocket, ArrowRight, Info } from 'lucide-react';
+import { Clock, BookOpen, User, Rocket, ArrowRight, Info, Lock, CalendarX, AlertCircle, RefreshCw } from 'lucide-react';
 import { sessionApi } from '../../api/session.api';
 import { useQuizStore } from '../../store/quizStore';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { QuizzarLogo } from '../../components/common/QuizzarLogo';
 import { staggerContainer } from '../../lib/motion';
+import { toast } from '../../hooks/use-toast';
 
 export default function PublicQuizLandingPage() {
   const { quizCode } = useParams<{ quizCode: string }>();
@@ -21,6 +22,7 @@ export default function PublicQuizLandingPage() {
     queryKey: ['public-quiz', quizCode],
     queryFn: () => sessionApi.getPublicQuiz(quizCode!),
     enabled: !!quizCode,
+    retry: false,
   });
 
   const startMutation = useMutation({
@@ -32,7 +34,60 @@ export default function PublicQuizLandingPage() {
       setStudentName(name.trim());
       navigate(`/quiz/${quizCode}/session`);
     },
+    onError: (err: any) => {
+      const apiMsg = err.response?.data?.message || 'Failed to start quiz session';
+      toast({
+        title: 'Unable to start quiz',
+        description: apiMsg,
+        variant: 'destructive',
+      });
+    },
   });
+
+  const [timeLeft, setTimeLeft] = useState<string>('');
+
+  const axiosError = error as any;
+  const errorStatus = axiosError?.response?.status;
+  const errorData = axiosError?.response?.data;
+
+  const isNotYetOpen = errorStatus === 423 || quiz?.availabilityStatus === 'NOT_YET_OPEN';
+  const isClosed = errorStatus === 410 || quiz?.availabilityStatus === 'CLOSED';
+  
+  const opensAt = errorData?.opensAt || quiz?.scheduledOpenAt;
+  const closesAt = quiz?.scheduledCloseAt;
+
+  useEffect(() => {
+    if (isNotYetOpen && opensAt) {
+      const targetTime = new Date(opensAt).getTime();
+      
+      const updateTimer = () => {
+        const now = new Date().getTime();
+        const diff = targetTime - now;
+        
+        if (diff <= 0) {
+          setTimeLeft('Open now! Refresh the page.');
+          return;
+        }
+        
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        let parts = [];
+        if (days > 0) parts.push(`${days}d`);
+        if (hours > 0 || days > 0) parts.push(`${hours}h`);
+        if (minutes > 0 || hours > 0 || days > 0) parts.push(`${minutes}m`);
+        parts.push(`${seconds}s`);
+        
+        setTimeLeft(parts.join(' '));
+      };
+      
+      updateTimer();
+      const interval = setInterval(updateTimer, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [isNotYetOpen, opensAt]);
 
   if (isLoading) return (
     <div className="min-h-screen flex items-center justify-center">
@@ -40,14 +95,127 @@ export default function PublicQuizLandingPage() {
     </div>
   );
 
-  if (error || !quiz) return (
-    <div className="min-h-screen flex items-center justify-center text-center px-4">
-      <div>
-        <h1 className="text-2xl font-black text-slate-800 mb-2">Quiz not found</h1>
-        <p className="text-muted-foreground">This link may be invalid or the quiz has been deleted.</p>
+  // Locked Status view
+  if (isNotYetOpen) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#f0f4f8] via-white to-[#0A99AB]/5 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] relative overflow-hidden">
+        <div className="fixed inset-0 grid-pattern pointer-events-none z-0"></div>
+        <header className="p-4 md:p-6 max-w-5xl mx-auto w-full z-10">
+          <QuizzarLogo noLink />
+        </header>
+        <main className="flex-1 flex items-center justify-center px-4 py-8 z-10 max-w-md mx-auto w-full">
+          <div className="bg-white p-8 rounded-3xl border border-slate-100/80 custom-shadow text-center space-y-6 w-full">
+            <div className="w-16 h-16 bg-[#ffdcc3]/40 text-[#f5a623] rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+              <Lock className="w-8 h-8" />
+            </div>
+            <div>
+              <h1 className="font-headline-md text-2xl font-black text-slate-900 mb-2 leading-tight">
+                Quiz is Locked
+              </h1>
+              <p className="text-slate-500 text-xs leading-relaxed">
+                This challenge has not opened yet. It is scheduled to open on:
+              </p>
+              <p className="font-bold text-slate-800 text-xs mt-1.5">
+                {opensAt ? new Date(opensAt).toLocaleString() : 'a future scheduled date'}
+              </p>
+            </div>
+
+            {timeLeft && (
+              <div className="bg-[#f5a623]/5 border border-[#f5a623]/15 rounded-2xl p-4">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
+                  Starts In
+                </span>
+                <span className="font-headline-display text-2xl font-black text-[#f5a623] font-mono">
+                  {timeLeft}
+                </span>
+              </div>
+            )}
+
+            <button
+              onClick={() => window.location.reload()}
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all"
+            >
+               <RefreshCw className="w-3.5 h-3.5" />
+               Refresh Status
+            </button>
+          </div>
+        </main>
       </div>
-    </div>
-  );
+    );
+  }
+
+  // Closed Status view
+  if (isClosed) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#f0f4f8] via-white to-[#0A99AB]/5 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] relative overflow-hidden">
+        <div className="fixed inset-0 grid-pattern pointer-events-none z-0"></div>
+        <header className="p-4 md:p-6 max-w-5xl mx-auto w-full z-10">
+          <QuizzarLogo noLink />
+        </header>
+        <main className="flex-1 flex items-center justify-center px-4 py-8 z-10 max-w-md mx-auto w-full">
+          <div className="bg-white p-8 rounded-3xl border border-slate-100/80 custom-shadow text-center space-y-6 w-full">
+            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+              <CalendarX className="w-8 h-8" />
+            </div>
+            <div>
+              <h1 className="font-headline-md text-2xl font-black text-slate-900 mb-2 leading-tight">
+                Quiz is Closed
+              </h1>
+              <p className="text-slate-500 text-xs leading-relaxed">
+                The availability window for this quiz has ended. You can no longer start a session.
+              </p>
+              {closesAt && (
+                <p className="text-[10px] text-slate-400 mt-2">
+                  Closed at: {new Date(closesAt).toLocaleString()}
+                </p>
+              )}
+            </div>
+
+            <Link
+              to="/"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all"
+            >
+              Return to Landing Page
+            </Link>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Error fetching or other availability issues
+  if (error || !quiz) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#f0f4f8] via-white to-[#0A99AB]/5 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] relative overflow-hidden">
+        <div className="fixed inset-0 grid-pattern pointer-events-none z-0"></div>
+        <header className="p-4 md:p-6 max-w-5xl mx-auto w-full z-10">
+          <QuizzarLogo noLink />
+        </header>
+        <main className="flex-1 flex items-center justify-center px-4 py-8 z-10 max-w-md mx-auto w-full">
+          <div className="bg-white p-8 rounded-3xl border border-slate-100/80 custom-shadow text-center space-y-6 w-full">
+            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+              <AlertCircle className="w-8 h-8" />
+            </div>
+            <div>
+              <h1 className="font-headline-md text-2xl font-black text-slate-900 mb-2 leading-tight">
+                Quiz Unavailable
+              </h1>
+              <p className="text-slate-500 text-xs leading-relaxed">
+                {errorData?.message || 'This quiz is not currently available. Please check the code and try again.'}
+              </p>
+            </div>
+
+            <Link
+              to="/"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-all"
+            >
+              Return to Landing Page
+            </Link>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f0f4f8] via-white to-[#0A99AB]/5 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] selection:bg-[#0A99AB]/20 relative overflow-hidden">
@@ -83,6 +251,9 @@ export default function PublicQuizLandingPage() {
                 <h1 className="font-headline-md text-2xl font-black text-slate-900 mb-2 leading-tight">
                   {quiz.title}
                 </h1>
+                {quiz.description && (
+                  <p className="text-slate-500 text-xs leading-relaxed mt-2">{quiz.description}</p>
+                )}
               </div>
             </div>
 

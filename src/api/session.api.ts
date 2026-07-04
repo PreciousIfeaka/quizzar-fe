@@ -9,15 +9,15 @@ export const sessionApi = {
     publicApi.post(`/public/quiz/${quizCode}/start`, data).then(r => r.data.data),
 
   submitAnswers: (quizCode: string, sessionId: string, data: SubmitAnswersRequest): Promise<QuizResult> =>
-    publicApi.post(`/public/quiz/${quizCode}/sessions/${sessionId}/submit`, data)
+    publicApi.post(`/public/quiz/${quizCode}/sessions/${sessionId}/submit`, data, { timeout: 60_000 })
       .then(r => r.data.data),
 
   submitSingleAnswer: (quizCode: string, sessionId: string, data: SubmitAnswerRequest): Promise<QuestionResultResponse> =>
-    publicApi.post(`/public/quiz/${quizCode}/sessions/${sessionId}/submit-answer`, data)
+    publicApi.post(`/public/quiz/${quizCode}/sessions/${sessionId}/submit-answer`, data, { timeout: 60_000 })
       .then(r => r.data.data),
 
   completeSession: (quizCode: string, sessionId: string): Promise<QuizResult> =>
-    publicApi.post(`/public/quiz/${quizCode}/sessions/${sessionId}/complete`)
+    publicApi.post(`/public/quiz/${quizCode}/sessions/${sessionId}/complete`, {}, { timeout: 60_000 })
       .then(r => r.data.data),
 
   getSessionResults: (quizCode: string, sessionId: string): Promise<QuizResult> =>

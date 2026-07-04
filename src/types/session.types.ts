@@ -4,10 +4,14 @@ export interface PublicQuiz {
   id: string;
   title: string;
   description?: string;
+  quizCode: string;
   timingMode: TimingMode;
   quizMode: QuizMode;
   timerValueSeconds?: number;
   questions: Question[];  // no correct answers
+  scheduledOpenAt: string | null;
+  scheduledCloseAt: string | null;
+  availabilityStatus: 'AVAILABLE' | 'NOT_YET_OPEN' | 'CLOSED';
 }
 
 export interface StartSessionRequest {

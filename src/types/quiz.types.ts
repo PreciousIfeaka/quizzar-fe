@@ -17,6 +17,7 @@ export interface Question {
   orderIndex: number;
   points: number;
   options: AnswerOption[];
+  acceptedAnswers?: string[];
 }
 
 export interface Quiz {
@@ -30,6 +31,9 @@ export interface Quiz {
   aiSuggestedTimeSeconds?: number;
   aiSuggestedTimingMode?: string;
   questions: Question[];
+  scheduledOpenAt: string | null;
+  scheduledCloseAt: string | null;
+  status: 'DRAFT' | 'PUBLISHED';
   createdAt: string;
   updatedAt: string;
 }
@@ -42,6 +46,9 @@ export interface QuizSummary {
   questionCount: number;
   timingMode?: TimingMode;
   quizMode?: QuizMode;
+  scheduledOpenAt: string | null;
+  scheduledCloseAt: string | null;
+  status: 'DRAFT' | 'PUBLISHED';
   createdAt: string;
 }
 
@@ -59,4 +66,35 @@ export interface UpdateQuizRequest {
   timingMode?: TimingMode;
   quizMode?: QuizMode;
   timerValueSeconds?: number;
+  status?: 'DRAFT' | 'PUBLISHED';
+}
+
+export interface AddQuestionRequest {
+  questionText: string;
+  questionType: QuestionType;
+  points?: number;
+  options?: {
+    label: string;
+    optionText: string;
+    isCorrect: boolean;
+  }[];
+  acceptedAnswers?: string[];
+}
+
+export interface UpdateQuestionRequest {
+  questionText?: string;
+  questionType?: QuestionType;
+  points?: number;
+  options?: {
+    id?: string;
+    label: string;
+    optionText: string;
+    isCorrect: boolean;
+  }[];
+  acceptedAnswers?: string[];
+}
+
+export interface UpdateQuizScheduleRequest {
+  scheduledOpenAt: string | null;
+  scheduledCloseAt: string | null;
 }

@@ -8,6 +8,7 @@ import { sessionApi } from '../../api/session.api';
 import { QuestionCard } from '../../components/session/QuestionCard';
 import { TimerRing } from '../../components/session/TimerRing';
 import { QuizzarLogo } from '../../components/common/QuizzarLogo';
+import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import type { AnswerSubmission, SubmitAnswerRequest, QuestionResultResponse } from '../../types/session.types';
 
 export default function PublicQuizSessionPage() {
@@ -26,9 +27,16 @@ export default function PublicQuizSessionPage() {
     if (!quiz || !session) navigate(`/quiz/${quizCode}`, { replace: true });
   }, []);
 
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const submitMutation = useMutation({
     mutationFn: () => {
       return sessionApi.submitAnswers(quizCode!, session!.sessionId, { answers });
+    },
+    onMutate: () => {
+      setIsSubmitting(true);
+      submittingRef.current = true;
+      setSubmitError(null);
     },
     onSuccess: (result) => {
       navigate(`/quiz/${quizCode}/result`, {
@@ -38,8 +46,9 @@ export default function PublicQuizSessionPage() {
         }
       });
     },
-    onError: () => {
-      setIsSubmitting(false);
+    onError: (err: any) => {
+      const apiMsg = err.response?.data?.message || 'Failed to submit quiz results';
+      setSubmitError(apiMsg);
       submittingRef.current = false;
     },
   });
@@ -63,6 +72,11 @@ export default function PublicQuizSessionPage() {
     mutationFn: () => {
       return sessionApi.completeSession(quizCode!, session!.sessionId);
     },
+    onMutate: () => {
+      setIsSubmitting(true);
+      submittingRef.current = true;
+      setSubmitError(null);
+    },
     onSuccess: (result) => {
       navigate(`/quiz/${quizCode}/result`, {
         state: {
@@ -71,13 +85,86 @@ export default function PublicQuizSessionPage() {
         }
       });
     },
-    onError: () => {
-      setIsSubmitting(false);
+    onError: (err: any) => {
+      const apiMsg = err.response?.data?.message || 'Failed to complete quiz session';
+      setSubmitError(apiMsg);
       submittingRef.current = false;
     }
   });
 
   if (!quiz || !session) return null;
+
+  const isPerQuestion = quiz.quizMode === 'PER_QUESTION';
+
+  if (isSubmitting && !submitError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#f0f4f8] via-white to-[#0A99AB]/5 flex flex-col items-center justify-center font-['Plus_Jakarta_Sans',sans-serif] relative overflow-hidden">
+        <div className="fixed inset-0 grid-pattern pointer-events-none z-0"></div>
+        <div className="bg-white p-8 rounded-3xl border border-slate-100/80 custom-shadow text-center space-y-6 max-w-md w-full mx-4 z-10">
+          <LoadingSpinner size="lg" className="mx-auto text-[#0A99AB]" />
+          <div>
+            <h1 className="font-headline-md text-2xl font-black text-slate-900 mb-2 leading-tight">
+              Processing Results...
+            </h1>
+            <p className="text-slate-500 text-sm leading-relaxed">
+              We are grading your answers and preparing your scorecard. Please do not close or refresh this page.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (submitError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#f0f4f8] via-white to-[#0A99AB]/5 flex flex-col items-center justify-center font-['Plus_Jakarta_Sans',sans-serif] relative overflow-hidden">
+        <div className="fixed inset-0 grid-pattern pointer-events-none z-0"></div>
+        <div className="bg-white p-8 rounded-3xl border border-slate-100/80 custom-shadow text-center space-y-6 max-w-md w-full mx-4 z-10">
+          <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+            <X className="w-8 h-8" />
+          </div>
+          <div>
+            <h1 className="font-headline-md text-2xl font-black text-slate-900 mb-2 leading-tight">
+              Submission Failed
+            </h1>
+            <p className="text-slate-500 text-sm leading-relaxed mb-4">
+              An error occurred while processing your submission:
+            </p>
+            <div className="bg-red-50/50 border border-red-100 rounded-2xl p-4 text-xs font-semibold text-red-650 mb-4 break-words">
+              {submitError}
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <button
+              onClick={() => {
+                setSubmitError(null);
+                setIsSubmitting(true);
+                submittingRef.current = true;
+                if (isPerQuestion) {
+                  completeMutation.mutate();
+                } else {
+                  submitMutation.mutate();
+                }
+              }}
+              className="w-full primary-gradient text-white py-3.5 px-6 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-[#0A99AB]/15 hover:scale-[1.01] active:scale-95 transition-all text-xs"
+            >
+              Try Again
+            </button>
+            <button
+              onClick={() => {
+                setSubmitError(null);
+                setIsSubmitting(false);
+                submittingRef.current = false;
+              }}
+              className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-3.5 px-6 rounded-xl font-bold flex items-center justify-center gap-2 transition-all text-xs"
+            >
+              Back to Last Question
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const currentQuestion = quiz.questions?.[currentIndex];
   const isLast = currentIndex === (quiz.questions?.length || 0) - 1;
@@ -93,7 +180,6 @@ export default function PublicQuizSessionPage() {
     recordAnswer({ questionId: currentQuestion.id, timeTakenSeconds: timeTaken, ...answer });
   };
 
-  const isPerQuestion = quiz.quizMode === 'PER_QUESTION';
   const hasAnswered = !!(currentAnswer?.selectedOptionId || currentAnswer?.answerText?.trim());
 
   const handleSubmitAnswer = () => {

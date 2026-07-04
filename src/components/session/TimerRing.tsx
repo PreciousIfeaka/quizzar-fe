@@ -8,10 +8,29 @@ interface TimerRingProps {
   size?:    'sm' | 'lg';
 }
 
+function formatTime(s: number): string {
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+
+  if (h > 0) {
+    return `${h}h ${m}m ${sec}s`;
+  }
+  if (m > 0) {
+    return `${m}m ${sec}s`;
+  }
+  return `${sec}s`;
+}
+
 export function TimerRing({ seconds, onExpire, size = 'lg' }: TimerRingProps) {
   const { seconds: remaining, percentage, isUrgent } = useTimer(seconds, onExpire);
 
-  const dim = size === 'lg' ? 80 : 48;
+  // For sm ring, widen slightly when showing Mm Ss so the text doesn't overflow
+  const hasMinutes = remaining >= 60;
+  const hasHours   = remaining >= 3600;
+  const lgDim = hasHours ? 112 : hasMinutes ? 96 : 80;
+  const smDim = hasHours ? 72  : hasMinutes ? 60 : 48;
+  const dim   = size === 'lg' ? lgDim : smDim;
   const stroke = size === 'lg' ? 5 : 3;
   const r = (dim - stroke * 2) / 2;
   const circumference = 2 * Math.PI * r;
@@ -43,11 +62,13 @@ export function TimerRing({ seconds, onExpire, size = 'lg' }: TimerRingProps) {
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
         <span className={cn(
-          'font-black tabular-nums',
-          size === 'lg' ? 'text-xl text-slate-800' : 'text-[11px] text-slate-700',
+          'font-black tabular-nums text-center leading-none',
+          size === 'lg'
+            ? (hasHours ? 'text-[11px]' : hasMinutes ? 'text-sm' : 'text-xl') + ' text-slate-800'
+            : (hasHours ? 'text-[8px]'  : hasMinutes ? 'text-[9px]' : 'text-[11px]') + ' text-slate-700',
           isUrgent && 'text-red-500 animate-pulse',
         )}>
-          {remaining}s
+          {formatTime(remaining)}
         </span>
       </div>
     </div>

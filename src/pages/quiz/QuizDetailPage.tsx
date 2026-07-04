@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { BarChart2, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { BarChart2, Trash2, Plus, Edit, Calendar, GripVertical } from 'lucide-react';
 import { quizApi } from '../../api/quiz.api';
 import { AnimatedPage } from '../../components/common/AnimatedPage';
 import { QuizLinkPanel } from '../../components/quiz/QuizLinkPanel';
@@ -13,7 +13,9 @@ import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { staggerContainer, fadeUp } from '../../lib/motion';
 import { toast } from '../../hooks/use-toast';
 import { cn } from '../../lib/utils';
-import type { QuestionType } from '../../types/quiz.types';
+import type { Question, QuestionType } from '../../types/quiz.types';
+import QuestionEditDialog from '../../components/quiz/QuestionEditDialog';
+import ScheduleEditDialog from '../../components/quiz/ScheduleEditDialog';
 
 const typeLabels: Record<QuestionType, string> = {
   MCQ: 'MCQ',
@@ -31,8 +33,20 @@ export default function QuizDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  
   const [expandedQuestion, setExpandedQuestion] = useState<string | null>(null);
+  
+  // Dialog/modal states
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [questionEditOpen, setQuestionEditOpen] = useState(false);
+  const [selectedQuestion, setSelectedQuestion] = useState<Question | undefined>(undefined);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
+  
+  // Question deletion
+  const [questionToDelete, setQuestionToDelete] = useState<Question | null>(null);
+
+  // Drag and drop state
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   const { data: quiz, isLoading } = useQuery({
     queryKey: ['quiz', id],
@@ -48,6 +62,77 @@ export default function QuizDetailPage() {
       navigate('/quizzes');
     },
   });
+
+  const deleteQuestionMutation = useMutation({
+    mutationFn: (questionId: string) => quizApi.deleteQuestion(id!, questionId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['quiz', id] });
+      toast({ title: 'Question deleted' });
+      setQuestionToDelete(null);
+    },
+    onError: (err: any) => {
+      const apiMsg = err.response?.data?.message || 'Failed to delete question';
+      toast({
+        title: 'Delete Failed',
+        description: apiMsg,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const reorderMutation = useMutation({
+    mutationFn: (orderedQuestionIds: string[]) => quizApi.reorderQuestions(id!, orderedQuestionIds),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['quiz', id] });
+      toast({ title: 'Questions reordered' });
+    },
+    onError: (err: any) => {
+      const apiMsg = err.response?.data?.message || 'Failed to reorder questions';
+      toast({
+        title: 'Reordering Failed',
+        description: apiMsg,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const toggleStatusMutation = useMutation({
+    mutationFn: (status: 'DRAFT' | 'PUBLISHED') => quizApi.update(id!, { status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['quiz', id] });
+      toast({ title: 'Quiz status updated' });
+    },
+    onError: (err: any) => {
+      const apiMsg = err.response?.data?.message || 'Failed to update status';
+      toast({
+        title: 'Update Failed',
+        description: apiMsg,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Drag and Drop handlers
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    e.dataTransfer.setData('text/plain', index.toString());
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent, toIndex: number) => {
+    e.preventDefault();
+    if (!quiz?.questions || draggedIndex === null || draggedIndex === toIndex) return;
+
+    const reordered = [...quiz.questions];
+    const [moved] = reordered.splice(draggedIndex, 1);
+    reordered.splice(toIndex, 0, moved);
+
+    setDraggedIndex(null);
+    reorderMutation.mutate(reordered.map(q => q.id));
+  };
 
   if (isLoading) return (
     <div className="flex items-center justify-center py-20">
@@ -65,7 +150,7 @@ export default function QuizDetailPage() {
           <div className="flex items-center gap-2 mb-1">
             <button
               onClick={() => navigate('/quizzes')}
-              className="text-sm text-muted-foreground hover:text-[#00bcd4] transition-colors"
+              className="text-sm text-muted-foreground hover:text-[#0A99AB] transition-colors"
             >
               My Quizzes
             </button>
@@ -91,7 +176,7 @@ export default function QuizDetailPage() {
         <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
           <button
             onClick={() => navigate(`/quizzes/${id}/analytics`)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-100 text-sm font-medium text-slate-600 hover:border-[#00bcd4]/30 hover:bg-[#00bcd4]/5 hover:text-[#00bcd4] transition-all"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-100 text-sm font-medium text-slate-600 hover:border-[#0A99AB]/30 hover:bg-[#0A99AB]/5 hover:text-[#0A99AB] transition-all"
           >
             <BarChart2 className="w-4 h-4" />
             <span className="hidden sm:inline">Analytics</span>
@@ -109,12 +194,22 @@ export default function QuizDetailPage() {
         {/* Questions list — takes 2 cols */}
         <div className="lg:col-span-2 space-y-3">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-slate-800">
+            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
               Questions
-              <span className="ml-2 text-sm font-normal text-muted-foreground">
+              <span className="text-sm font-normal text-muted-foreground">
                 ({quiz.questions?.length || 0})
               </span>
             </h2>
+            <button
+              onClick={() => {
+                setSelectedQuestion(undefined);
+                setQuestionEditOpen(true);
+              }}
+              className="flex items-center gap-1 px-3.5 py-1.5 bg-[#0A99AB] text-white text-xs font-bold rounded-xl shadow-md shadow-[#0A99AB]/10 hover:bg-[#098391] active:scale-95 transition-all"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Add Question
+            </button>
           </div>
 
           <motion.div
@@ -129,47 +224,86 @@ export default function QuizDetailPage() {
                 <motion.div
                   key={question.id}
                   variants={fadeUp}
-                  className="bg-white rounded-2xl border border-slate-100 shadow-card overflow-hidden"
+                  draggable
+                  onDragStart={(e: any) => handleDragStart(e, index)}
+                  onDragOver={(e: any) => handleDragOver(e)}
+                  onDrop={(e: any) => handleDrop(e, index)}
+                  className={cn(
+                    "bg-white rounded-2xl border border-slate-100 shadow-card overflow-hidden transition-all duration-200",
+                    draggedIndex === index && "opacity-40 border-dashed border-[#0A99AB]"
+                  )}
                 >
-                  <button
-                    onClick={() => setExpandedQuestion(isExpanded ? null : question.id)}
-                    className="w-full flex items-start gap-4 p-4 text-left hover:bg-slate-50/50 transition-colors"
-                  >
-                    <span className="w-8 h-8 rounded-xl bg-[#00bcd4]/10 flex items-center justify-center text-sm font-black text-[#006672] flex-shrink-0">
-                      {index + 1}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-slate-800 leading-snug break-words">
-                        {question.questionText}
-                      </p>
-                      <div className="flex items-center gap-2 mt-1.5">
-                        <span className={cn(
-                          'text-[10px] font-bold px-2 py-0.5 rounded-full',
-                          typeColors[question.questionType]
-                        )}>
-                          {typeLabels[question.questionType]}
-                        </span>
-                        <span className="text-[10px] text-muted-foreground">
-                          {question.points} pt{question.points !== 1 ? 's' : ''}
-                        </span>
-                      </div>
+                  <div className="flex items-center w-full group">
+                    {/* Drag Handle */}
+                    <div className="pl-3 pr-1 text-slate-350 cursor-grab active:cursor-grabbing hover:text-slate-450 transition-colors">
+                      <GripVertical className="w-4 h-4" />
                     </div>
-                    {isExpanded
-                      ? <ChevronUp className="w-4 h-4 text-slate-400 flex-shrink-0 mt-1" />
-                      : <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0 mt-1" />
-                    }
-                  </button>
+
+                    <button
+                      onClick={() => setExpandedQuestion(isExpanded ? null : question.id)}
+                      className="flex-1 flex items-start gap-3 py-4 pr-4 text-left hover:bg-slate-50/20 transition-colors min-w-0"
+                    >
+                      <span className="w-7 h-7 rounded-lg bg-[#0A99AB]/10 flex items-center justify-center text-xs font-black text-[#08636e] flex-shrink-0">
+                        {index + 1}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-800 leading-snug break-words pr-2">
+                          {question.questionText}
+                        </p>
+                        <div className="flex items-center gap-2 mt-1.5">
+                          <span className={cn(
+                            'text-[9px] font-bold px-1.5 py-0.5 rounded-full',
+                            typeColors[question.questionType]
+                          )}>
+                            {typeLabels[question.questionType]}
+                          </span>
+                          <span className="text-[9px] text-slate-400">
+                            {question.points} pt{question.points !== 1 ? 's' : ''}
+                          </span>
+                        </div>
+                      </div>
+                    </button>
+
+                    {/* Question Actions */}
+                    <div className="flex items-center gap-1.5 pr-4 flex-shrink-0">
+                      {/* Edit */}
+                      <button
+                        onClick={() => {
+                          setSelectedQuestion(question);
+                          setQuestionEditOpen(true);
+                        }}
+                        className="p-1 rounded-md text-[#0A99AB] hover:bg-[#0A99AB]/5 transition-all"
+                        title="Edit Question"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+
+                      {/* Delete */}
+                      <button
+                        onClick={() => setQuestionToDelete(question)}
+                        disabled={quiz.questions?.length === 1}
+                        className={cn(
+                          "p-1 rounded-md text-red-500 hover:bg-red-50 transition-all",
+                          quiz.questions?.length === 1 && "opacity-30 cursor-not-allowed"
+                        )}
+                        title={quiz.questions?.length === 1 ? "Cannot delete the only question" : "Delete Question"}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
 
                   {isExpanded && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.25 }}
+                      transition={{ duration: 0.2 }}
                       className="px-4 pb-4 border-t border-slate-50"
                     >
                       <div className="pt-3 space-y-2">
-                        {question.options?.map(option => (
+                        {/* Options Display */}
+                        {question.questionType !== 'SHORT_ANSWER' && question.options?.map(option => (
                           <div
                             key={option.id}
                             className={cn(
@@ -189,12 +323,31 @@ export default function QuizDetailPage() {
                             </span>
                             <span className="flex-1">{option.text}</span>
                             {option.isCorrect && (
-                              <span className="text-[10px] font-bold uppercase tracking-wider text-green-600 bg-white px-1.5 py-0.5 rounded border border-green-200">
+                              <span className="text-[9px] font-bold uppercase tracking-wider text-green-600 bg-white px-1.5 py-0.5 rounded border border-green-200">
                                 Correct
                               </span>
                             )}
                           </div>
                         ))}
+
+                        {/* Short Answer Display */}
+                        {question.questionType === 'SHORT_ANSWER' && (
+                          <div className="p-3 bg-slate-50 rounded-xl space-y-1.5">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                              Accepted Answer Keys:
+                            </span>
+                            <div className="flex gap-2 flex-wrap">
+                              {question.acceptedAnswers?.map((ans, i) => (
+                                <span
+                                  key={i}
+                                  className="px-2.5 py-1 bg-white border border-slate-200 text-slate-750 font-semibold text-xs rounded-lg"
+                                >
+                                  {ans}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </motion.div>
                   )}
@@ -204,8 +357,59 @@ export default function QuizDetailPage() {
           </motion.div>
         </div>
 
-        {/* Sidebar — link panel + stats */}
+        {/* Sidebar — link panel, stats, schedule */}
         <div className="space-y-4">
+          {/* Scheduling and Status Card */}
+          <div className="bg-white rounded-2xl border border-slate-100 shadow-card p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                <Calendar className="w-4 h-4 text-[#0A99AB]" />
+                Schedule & Status
+              </h3>
+              <button
+                onClick={() => setScheduleOpen(true)}
+                className="text-xs font-bold text-[#0A99AB] hover:underline"
+              >
+                Edit
+              </button>
+            </div>
+            
+            <div className="space-y-3 text-xs">
+              {/* Status & Toggle */}
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Status</span>
+                <button
+                  onClick={() => toggleStatusMutation.mutate(quiz.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED')}
+                  disabled={toggleStatusMutation.isPending}
+                  className={cn(
+                    "px-2.5 py-1 rounded-full font-bold uppercase text-[9px] border transition-all cursor-pointer hover:opacity-85 disabled:opacity-50",
+                    quiz.status === 'PUBLISHED' 
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-250" 
+                      : "bg-slate-100 text-slate-650 border-slate-200"
+                  )}
+                >
+                  {quiz.status}
+                </button>
+              </div>
+              
+              {/* Open datetime */}
+              <div className="flex flex-col gap-1 border-t border-slate-50 pt-2.5">
+                <span className="text-muted-foreground">Opens At</span>
+                <span className="font-semibold text-slate-700">
+                  {quiz.scheduledOpenAt ? new Date(quiz.scheduledOpenAt).toLocaleString() : 'Open Immediately'}
+                </span>
+              </div>
+
+              {/* Close datetime */}
+              <div className="flex flex-col gap-1">
+                <span className="text-muted-foreground">Closes At</span>
+                <span className="font-semibold text-slate-700">
+                  {quiz.scheduledCloseAt ? new Date(quiz.scheduledCloseAt).toLocaleString() : 'Closes Manually'}
+                </span>
+              </div>
+            </div>
+          </div>
+
           <QuizLinkPanel quizId={quiz.id} quizCode={quiz.quizCode} />
 
           {/* Quick stats */}
@@ -228,6 +432,7 @@ export default function QuizDetailPage() {
         </div>
       </div>
 
+      {/* Quiz Deletion Dialog */}
       <ConfirmDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
@@ -236,6 +441,33 @@ export default function QuizDetailPage() {
         onConfirm={() => deleteMutation.mutate()}
         loading={deleteMutation.isPending}
         variant="danger"
+      />
+
+      {/* Question Deletion Dialog */}
+      <ConfirmDialog
+        open={!!questionToDelete}
+        onOpenChange={(open) => !open && setQuestionToDelete(null)}
+        title="Delete Question"
+        description="Are you sure you want to delete this question? This action cannot be undone."
+        onConfirm={() => questionToDelete && deleteQuestionMutation.mutate(questionToDelete.id)}
+        loading={deleteQuestionMutation.isPending}
+        variant="danger"
+      />
+
+      {/* Question Edit / Add Dialog */}
+      <QuestionEditDialog
+        open={questionEditOpen}
+        onOpenChange={setQuestionEditOpen}
+        quizId={quiz.id}
+        question={selectedQuestion}
+      />
+
+      {/* Schedule Edit Dialog */}
+      <ScheduleEditDialog
+        open={scheduleOpen}
+        onOpenChange={setScheduleOpen}
+        quizId={quiz.id}
+        quiz={quiz}
       />
     </AnimatedPage>
   );

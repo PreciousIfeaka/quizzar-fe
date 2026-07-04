@@ -3,14 +3,17 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { analyticsApi } from '../../api/analytics.api';
+import { quizApi } from '../../api/quiz.api';
 import { AnimatedPage } from '../../components/common/AnimatedPage';
 import { SessionResultDialog } from '../../components/analytics/SessionResultDialog';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { fadeUp, staggerContainer } from '../../lib/motion';
+import { toast } from '../../hooks/use-toast';
 import {
   TrendingUp,
   ChevronRight,
   Search,
+  Download,
 } from 'lucide-react';
 import { formatSeconds } from '../../lib/utils';
 
@@ -19,6 +22,35 @@ export default function QuizAnalyticsPage() {
   const navigate = useNavigate();
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportPdf = async () => {
+    if (isExporting) return;
+    setIsExporting(true);
+    try {
+      const blob = await quizApi.exportResultsPdf(id!);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${data?.quizTitle.replace(/\s+/g, '_') || 'Quiz'}_Results.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast({
+        title: 'Export Successful',
+        description: 'Quiz results PDF has been downloaded.',
+      });
+    } catch (err: any) {
+      toast({
+        title: 'Export Failed',
+        description: err.message || 'Failed to export results to PDF.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['analytics', id],
@@ -66,6 +98,14 @@ export default function QuizAnalyticsPage() {
               A comprehensive breakdown of student engagement and performance for "{data.quizTitle}".
             </p>
           </div>
+          <button
+            onClick={handleExportPdf}
+            disabled={isExporting}
+            className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#0A99AB] hover:bg-[#088392] text-white font-bold text-sm shadow-lg shadow-[#0A99AB]/15 hover:scale-[1.01] active:scale-95 transition-all disabled:opacity-50 disabled:pointer-events-none flex-shrink-0"
+          >
+            <Download className="w-4 h-4" />
+            {isExporting ? 'Exporting...' : 'Export PDF Report'}
+          </button>
         </div>
       </div>
 
