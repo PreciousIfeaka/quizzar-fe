@@ -101,7 +101,9 @@ export default function PublicQuizSessionPage() {
       <div className="min-h-screen bg-gradient-to-br from-[#f0f4f8] via-white to-[#0A99AB]/5 flex flex-col items-center justify-center font-['Plus_Jakarta_Sans',sans-serif] relative overflow-hidden">
         <div className="fixed inset-0 grid-pattern pointer-events-none z-0"></div>
         <div className="bg-white p-8 rounded-3xl border border-slate-100/80 custom-shadow text-center space-y-6 max-w-md w-full mx-4 z-10">
-          <LoadingSpinner size="lg" className="mx-auto text-[#0A99AB]" />
+          <div className="flex justify-center text-[#0A99AB]">
+            <LoadingSpinner size="lg" />
+          </div>
           <div>
             <h1 className="font-headline-md text-2xl font-black text-slate-900 mb-2 leading-tight">
               Processing Results...

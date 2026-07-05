@@ -376,20 +376,48 @@ export default function QuizDetailPage() {
             
             <div className="space-y-3 text-xs">
               {/* Status & Toggle */}
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Status</span>
-                <button
-                  onClick={() => toggleStatusMutation.mutate(quiz.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED')}
-                  disabled={toggleStatusMutation.isPending}
-                  className={cn(
-                    "px-2.5 py-1 rounded-full font-bold uppercase text-[9px] border transition-all cursor-pointer hover:opacity-85 disabled:opacity-50",
-                    quiz.status === 'PUBLISHED' 
-                      ? "bg-emerald-50 text-emerald-700 border-emerald-250" 
-                      : "bg-slate-100 text-slate-650 border-slate-200"
-                  )}
-                >
-                  {quiz.status}
-                </button>
+              <div className="flex flex-col gap-2 pb-2.5">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-muted-foreground font-semibold">Quiz Visibility</span>
+                  <span className={cn(
+                    "text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border transition-colors",
+                    quiz.status === 'PUBLISHED'
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                      : "bg-amber-50 text-amber-700 border-amber-200"
+                  )}>
+                    {quiz.status === 'PUBLISHED' ? 'Live & Open' : 'Draft Mode'}
+                  </span>
+                </div>
+
+                {/* Segmented Control */}
+                <div className="bg-slate-100/80 p-0.5 rounded-xl flex gap-1 border border-slate-200/20 relative">
+                  <button
+                    type="button"
+                    onClick={() => quiz.status !== 'DRAFT' && toggleStatusMutation.mutate('DRAFT')}
+                    disabled={toggleStatusMutation.isPending}
+                    className={cn(
+                      "flex-1 py-1.5 px-3 rounded-lg text-center font-bold text-[11px] transition-all relative z-10",
+                      quiz.status === 'DRAFT'
+                        ? "bg-white text-slate-800 shadow-sm"
+                        : "text-slate-400 hover:text-slate-700 disabled:opacity-50"
+                    )}
+                  >
+                    Draft
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => quiz.status !== 'PUBLISHED' && toggleStatusMutation.mutate('PUBLISHED')}
+                    disabled={toggleStatusMutation.isPending}
+                    className={cn(
+                      "flex-1 py-1.5 px-3 rounded-lg text-center font-bold text-[11px] transition-all relative z-10",
+                      quiz.status === 'PUBLISHED'
+                        ? "bg-white text-[#0A99AB] shadow-sm"
+                        : "text-slate-400 hover:text-slate-700 disabled:opacity-50"
+                    )}
+                  >
+                    Published
+                  </button>
+                </div>
               </div>
               
               {/* Open datetime */}
