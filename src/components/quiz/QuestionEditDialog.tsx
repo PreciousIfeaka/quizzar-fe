@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Trash2, CheckCircle2 } from 'lucide-react';
 import { quizApi } from '../../api/quiz.api';
@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogC
 import { toast } from '../../hooks/use-toast';
 import { cn } from '../../lib/utils';
 import type { Question, QuestionType, AddQuestionRequest, UpdateQuestionRequest } from '../../types/quiz.types';
+import { MathText } from '../common/MathText';
 
 interface QuestionEditDialogProps {
   open: boolean;
@@ -29,6 +30,29 @@ export default function QuestionEditDialog({
   const [questionText, setQuestionText] = useState('');
   const [questionType, setQuestionType] = useState<QuestionType>('MCQ');
   const [points, setPoints] = useState(1);
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const insertFormula = (template: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const before = text.substring(0, start);
+    const after = text.substring(end, text.length);
+
+    const newText = before + template + after;
+    setQuestionText(newText);
+
+    // Reset selection/focus
+    setTimeout(() => {
+      textarea.focus();
+      const newCursorPos = start + template.length;
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
+  };
   
   // MCQ/True-False Options state
   const [options, setOptions] = useState<{ id?: string; label: string; optionText: string; isCorrect: boolean }[]>([]);
@@ -214,16 +238,49 @@ export default function QuestionEditDialog({
         <div className="space-y-5 py-2 overflow-y-auto pr-2 flex-1 min-h-0">
           {/* Question Text */}
           <div className="space-y-1.5">
-            <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-              Question Text
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                Question Text
+              </label>
+              <div className="flex gap-1.5 flex-wrap">
+                {[
+                  { label: 'x²', value: '$x^2$', title: 'Superscript' },
+                  { label: 'x_y', value: '$x_y$', title: 'Subscript' },
+                  { label: '√x', value: '$\\sqrt{x}$', title: 'Square Root' },
+                  { label: 'a/b', value: '$\\frac{a}{b}$', title: 'Fraction' },
+                  { label: 'π', value: '$\\pi$', title: 'Pi' },
+                  { label: 'θ', value: '$\\theta$', title: 'Theta' },
+                ].map(shortcut => (
+                  <button
+                    key={shortcut.label}
+                    type="button"
+                    onClick={() => insertFormula(shortcut.value)}
+                    className="px-2 py-0.5 rounded bg-slate-100 hover:bg-[#0A99AB]/10 hover:text-[#0A99AB] text-slate-650 border border-slate-200 text-[10px] font-bold transition-all"
+                    title={shortcut.title}
+                  >
+                    {shortcut.label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <textarea
+              ref={textareaRef}
               value={questionText}
               onChange={e => setQuestionText(e.target.value)}
               placeholder="e.g. What is the capital of France?"
               className="w-full min-h-[90px] p-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-[#0A99AB]/20 focus:border-[#0A99AB] outline-none text-sm text-slate-800 transition-all resize-none"
               maxLength={2000}
             />
+            {questionText.trim() && (
+              <div className="p-3 rounded-xl border border-slate-100 bg-slate-50/50 space-y-1">
+                <span className="text-[9px] font-extrabold uppercase tracking-wider text-[#0A99AB]/75 block">
+                  Live Math Preview:
+                </span>
+                <div className="text-sm text-slate-700 font-medium">
+                  <MathText text={questionText} />
+                </div>
+              </div>
+            )}
             <div className="flex justify-between items-center text-[10px] text-slate-400">
               <span>Be descriptive and clear.</span>
               <span>{questionText.length}/2000</span>
