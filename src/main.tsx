@@ -6,6 +6,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import { queryClient } from './lib/queryClient';
 import App from './App';
 import './index.css';
+import 'katex/dist/katex.min.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

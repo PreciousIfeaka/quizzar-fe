@@ -7,6 +7,7 @@ import { Textarea } from '../ui/textarea';
 import { cn } from '../../lib/utils';
 
 import type { QuestionResultResponse } from '../../types/session.types';
+import { MathText } from '../common/MathText';
 
 interface QuestionCardProps {
   question: Question;
@@ -82,7 +83,7 @@ export function QuestionCard({
 
         {!hideQuestionText && (
           <h2 className="text-2xl md:text-3xl font-extrabold text-slate-850 leading-snug tracking-tight mb-8 text-center px-2">
-            {question.questionText}
+            <MathText text={question.questionText} />
           </h2>
         )}
 
@@ -143,9 +144,14 @@ export function QuestionCard({
                   className="mb-4 p-3 rounded-2xl bg-emerald-50 border border-emerald-100 text-center"
                 >
                   <p className="text-xs font-black text-emerald-600 uppercase tracking-widest mb-1">Accepted Keywords</p>
-                  <p className="text-sm font-extrabold text-emerald-700">
-                    {feedback.correctShortAnswerKeys.join(', ')}
-                  </p>
+                  <div className="text-sm font-extrabold text-emerald-700">
+                    {feedback.correctShortAnswerKeys.map((key, i) => (
+                      <span key={i}>
+                        {i > 0 && ', '}
+                        <MathText text={key} />
+                      </span>
+                    ))}
+                  </div>
                 </motion.div>
               )}
 
@@ -235,9 +241,13 @@ export function QuestionCard({
               <span className="text-xs font-bold text-slate-600 normal-case">
                 Correct answer:{' '}
                 <strong className="text-slate-800 font-extrabold">
-                  {question.questionType === 'TRUE_FALSE'
-                    ? feedback.correctOptionText
-                    : `${feedback.correctOptionLabel}. ${feedback.correctOptionText}`}
+                  {question.questionType === 'TRUE_FALSE' ? (
+                    <MathText text={feedback.correctOptionText} />
+                  ) : (
+                    <>
+                      {feedback.correctOptionLabel}. <MathText text={feedback.correctOptionText} />
+                    </>
+                  )}
                 </strong>
               </span>
             )}

@@ -16,6 +16,7 @@ import { cn } from '../../lib/utils';
 import type { Question, QuestionType } from '../../types/quiz.types';
 import QuestionEditDialog from '../../components/quiz/QuestionEditDialog';
 import ScheduleEditDialog from '../../components/quiz/ScheduleEditDialog';
+import { MathText } from '../../components/common/MathText';
 
 const typeLabels: Record<QuestionType, string> = {
   MCQ: 'MCQ',
@@ -247,9 +248,9 @@ export default function QuizDetailPage() {
                         {index + 1}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-800 leading-snug break-words pr-2">
-                          {question.questionText}
-                        </p>
+                        <div className="text-sm font-semibold text-slate-800 leading-snug break-words pr-2">
+                          <MathText text={question.questionText} />
+                        </div>
                         <div className="flex items-center gap-2 mt-1.5">
                           <span className={cn(
                             'text-[9px] font-bold px-1.5 py-0.5 rounded-full',
@@ -321,7 +322,9 @@ export default function QuizDetailPage() {
                             )}>
                               {option.label}
                             </span>
-                            <span className="flex-1">{option.text}</span>
+                            <span className="flex-1">
+                              <MathText text={option.text} />
+                            </span>
                             {option.isCorrect && (
                               <span className="text-[9px] font-bold uppercase tracking-wider text-green-600 bg-white px-1.5 py-0.5 rounded border border-green-200">
                                 Correct
@@ -342,7 +345,7 @@ export default function QuizDetailPage() {
                                   key={i}
                                   className="px-2.5 py-1 bg-white border border-slate-200 text-slate-750 font-semibold text-xs rounded-lg"
                                 >
-                                  {ans}
+                                  <MathText text={ans} />
                                 </span>
                               ))}
                             </div>

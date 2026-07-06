@@ -1,5 +1,6 @@
 import { cn } from '../../lib/utils';
 import { Check } from 'lucide-react';
+import { MathText } from '../common/MathText';
 
 interface OptionButtonProps {
   label:    string;
@@ -54,7 +55,7 @@ export function OptionButton({
         'ml-3 relative z-10 tracking-tight leading-snug flex-grow text-sm md:text-base',
         selected && !isResult && 'font-extrabold text-slate-900'
       )}>
-        {cleanedText}
+        <MathText text={cleanedText} />
       </span>
 
       {/* Result indicators */}
