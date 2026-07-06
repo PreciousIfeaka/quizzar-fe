@@ -303,7 +303,7 @@ export default function PublicQuizSessionPage() {
 
   const isSubmitDisabled =
     isButtonLoading ||
-    (isPerQuestion && !feedback && !hasAnswered);
+    (!feedback && !hasAnswered);
 
   const handleExit = () => {
     if (window.confirm('Are you sure you want to exit the quiz? Your progress will be lost.')) {
