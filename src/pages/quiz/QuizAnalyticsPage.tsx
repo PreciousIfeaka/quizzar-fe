@@ -9,6 +9,7 @@ import { SessionResultDialog } from '../../components/analytics/SessionResultDia
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { fadeUp, staggerContainer } from '../../lib/motion';
 import { toast } from '../../hooks/use-toast';
+import { MathText } from '../../components/common/MathText';
 import {
   TrendingUp,
   ChevronRight,
@@ -203,7 +204,7 @@ export default function QuizAnalyticsPage() {
             return (
               <div key={stat.questionId} className="grid grid-cols-1 md:grid-cols-[140px_1fr] items-center gap-3 md:gap-6">
                 <span className="font-bold text-sm text-slate-700 truncate" title={stat.questionText}>
-                  Q{i + 1}: {stat.questionText}
+                  Q{i + 1}: <MathText text={stat.questionText} />
                 </span>
                 <div className="h-12 bg-muted rounded-full relative overflow-hidden flex border border-slate-200/40">
                   {successPct > 0 && (

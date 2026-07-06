@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { CheckCircle2, XCircle, Circle } from 'lucide-react';
 import type { DetailedSessionAnswer } from '../../types/session.types';
 import { cn } from '../../lib/utils';
+import { MathText } from '../common/MathText';
 
 interface ResultDetailsProps {
   details: DetailedSessionAnswer[];
@@ -76,9 +77,9 @@ export function ResultDetails({ details, quiz }: ResultDetailsProps) {
               </div>
 
               {/* Question Text */}
-              <h3 className="text-lg font-black text-slate-800 leading-snug pr-24">
-                {detail.questionText}
-              </h3>
+              <div className="text-lg font-black text-slate-800 leading-snug pr-24">
+                <MathText text={detail.questionText} />
+              </div>
 
               {/* Choices Grid (for MCQ and TRUE_FALSE) */}
               {!isShortAnswer && question && question.options && (
@@ -115,7 +116,7 @@ export function ResultDetails({ details, quiz }: ResultDetailsProps) {
                               'font-bold',
                               isCorrect ? 'text-[#0A99AB] font-extrabold' : isSelected && !isCorrect ? 'text-red-700 font-extrabold' : 'text-slate-800 font-bold'
                             )}>
-                              {option.text}
+                              <MathText text={option.text} />
                             </span>
                             {/* Subtext: YOUR ANSWER or CORRECT ANSWER */}
                             {isSelected && !isCorrect && (
@@ -150,18 +151,26 @@ export function ResultDetails({ details, quiz }: ResultDetailsProps) {
                   <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex items-center gap-3">
                     <span className="text-[10px] font-black uppercase text-slate-400">Selected Answer:</span>
                     <span className={cn('text-sm font-bold', detail.correct ? 'text-[#0A99AB]' : 'text-red-500')}>
-                      {detail.selectedOptionLabel && detail.selectedOptionLabel !== detail.selectedOptionText
-                        ? `${detail.selectedOptionLabel}. ${detail.selectedOptionText || ''}`
-                        : detail.selectedOptionText || 'No answer'}
+                      {detail.selectedOptionLabel && detail.selectedOptionLabel !== detail.selectedOptionText ? (
+                        <>
+                          {detail.selectedOptionLabel}. <MathText text={detail.selectedOptionText || ''} />
+                        </>
+                      ) : (
+                        <MathText text={detail.selectedOptionText || 'No answer'} />
+                      )}
                     </span>
                   </div>
                   {!detail.correct && detail.correctOptionText && (
                     <div className="p-4 rounded-xl bg-[#0A99AB]/5 border border-[#0A99AB]/15 flex items-center gap-3">
                       <span className="text-[10px] font-black uppercase text-[#0A99AB]">Correct Answer:</span>
                       <span className="text-sm font-bold text-[#0A99AB]">
-                        {detail.correctOptionLabel && detail.correctOptionLabel !== detail.correctOptionText
-                          ? `${detail.correctOptionLabel}. ${detail.correctOptionText}`
-                          : detail.correctOptionText}
+                        {detail.correctOptionLabel && detail.correctOptionLabel !== detail.correctOptionText ? (
+                          <>
+                            {detail.correctOptionLabel}. <MathText text={detail.correctOptionText} />
+                          </>
+                        ) : (
+                          <MathText text={detail.correctOptionText} />
+                        )}
                       </span>
                     </div>
                   )}
@@ -178,13 +187,22 @@ export function ResultDetails({ details, quiz }: ResultDetailsProps) {
                       : 'border-red-200 bg-red-50/20 text-red-700 font-bold'
                   )}>
                     <p className="text-[10px] font-black uppercase tracking-wider mb-1 opacity-70">Your Response</p>
-                    <p className="font-extrabold text-slate-800">{detail.selectedAnswerText || 'No answer provided'}</p>
+                    <div className="font-extrabold text-slate-800">
+                      <MathText text={detail.selectedAnswerText || 'No answer provided'} />
+                    </div>
                   </div>
                   
                   {!detail.correct && detail.correctShortAnswerKeys && detail.correctShortAnswerKeys.length > 0 && (
                     <div className="p-4 rounded-xl border border-[#0A99AB]/20 bg-[#0A99AB]/5 text-slate-800 text-sm">
                       <p className="text-[10px] font-black text-[#0A99AB] uppercase tracking-wider mb-1">Expected Keywords</p>
-                      <p className="font-bold text-[#0A99AB]">{detail.correctShortAnswerKeys.join(', ')}</p>
+                      <div className="font-bold text-[#0A99AB]">
+                        {detail.correctShortAnswerKeys.map((key, i) => (
+                          <span key={i}>
+                            {i > 0 && ', '}
+                            <MathText text={key} />
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>

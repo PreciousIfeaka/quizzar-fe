@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import type { PerQuestionStat } from '../../types/analytics.types';
 import { formatSeconds } from '../../lib/utils';
 import { cn } from '../../lib/utils';
+import { MathText } from '../common/MathText';
 
 interface PerQuestionTableProps {
   stats: PerQuestionStat[];
@@ -50,9 +51,9 @@ export function PerQuestionTable({ stats }: PerQuestionTableProps) {
 
               {/* Question text */}
               <div className="col-span-5">
-                <p className="text-sm text-slate-700 line-clamp-2 leading-snug">
-                  {stat.questionText}
-                </p>
+                <div className="text-sm text-slate-700 line-clamp-2 leading-snug">
+                  <MathText text={stat.questionText} />
+                </div>
                 {/* Mini bar */}
                 <div className="mt-1.5 h-1.5 bg-slate-100 rounded-full overflow-hidden w-full">
                   <motion.div

@@ -10,6 +10,7 @@ import { TimerRing } from '../../components/session/TimerRing';
 import { QuizzarLogo } from '../../components/common/QuizzarLogo';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import type { AnswerSubmission, SubmitAnswerRequest, QuestionResultResponse } from '../../types/session.types';
+import { MathText } from '../../components/common/MathText';
 
 export default function PublicQuizSessionPage() {
   const { quizCode } = useParams<{ quizCode: string }>();
@@ -384,9 +385,9 @@ export default function PublicQuizSessionPage() {
             className="flex flex-col gap-6"
           >
             {/* Large Question Text — prominent h1 matching Stitch design */}
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-[2rem] font-extrabold text-slate-900 leading-snug tracking-tight">
-              {currentQuestion.questionText}
-            </h1>
+            <div className="text-xl sm:text-2xl md:text-3xl lg:text-[2rem] font-extrabold text-slate-900 leading-snug tracking-tight">
+              <MathText text={currentQuestion.questionText} />
+            </div>
 
             {/* Per-question circular timer (centered below question text) */}
             {timerMode === 'PER_QUESTION' && timerSeconds && !feedback && (
