@@ -10,6 +10,7 @@ import {
   Link2,
   BarChart2,
   Trash2,
+  Copy,
 } from 'lucide-react';
 import { quizApi } from '../../api/quiz.api';
 import { AnimatedPage } from '../../components/common/AnimatedPage';
@@ -49,6 +50,26 @@ export default function QuizzesPage() {
     },
     onError: () => {
       toast({ title: 'Error', description: 'Failed to delete quiz.', variant: 'destructive' });
+    },
+  });
+
+  const cloneMutation = useMutation({
+    mutationFn: (id: string) => quizApi.clone(id),
+    onSuccess: (clonedQuiz) => {
+      queryClient.invalidateQueries({ queryKey: ['quizzes'] });
+      toast({
+        title: 'Quiz Cloned',
+        description: `Successfully created a copy: "${clonedQuiz.title}".`,
+      });
+      navigate(`/quizzes/${clonedQuiz.id}`);
+    },
+    onError: (error: any) => {
+      const message = error.response?.data?.message || 'Failed to clone quiz';
+      toast({
+        title: 'Cloning Failed',
+        description: message,
+        variant: 'destructive',
+      });
     },
   });
 
@@ -173,6 +194,9 @@ export default function QuizzesPage() {
                           <DropdownMenuItem className="cursor-pointer" onClick={() => navigate(`/quizzes/${quiz.id}/analytics`)}>
                             <BarChart2 className="w-4 h-4 mr-2" /> Analytics
                           </DropdownMenuItem>
+                          <DropdownMenuItem className="cursor-pointer" onClick={() => cloneMutation.mutate(quiz.id)} disabled={cloneMutation.isPending}>
+                            <Copy className="w-4 h-4 mr-2" /> Duplicate
+                          </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
@@ -240,7 +264,7 @@ export default function QuizzesPage() {
                       <td className="px-6 py-4">
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00bcd4]/10 text-[#006672] text-xs font-bold">
                           <span className="w-1.5 h-1.5 rounded-full bg-[#00bcd4]" />
-                          Active
+                          {quiz.status === 'DRAFT' ? 'Draft' : 'Live'}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right" onClick={(e) => e.stopPropagation()}>
@@ -260,6 +284,9 @@ export default function QuizzesPage() {
                               </DropdownMenuItem>
                               <DropdownMenuItem className="cursor-pointer" onClick={() => navigate(`/quizzes/${quiz.id}/analytics`)}>
                                 <BarChart2 className="w-4 h-4 mr-2" /> Analytics
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="cursor-pointer" onClick={() => cloneMutation.mutate(quiz.id)} disabled={cloneMutation.isPending}>
+                                <Copy className="w-4 h-4 mr-2" /> Duplicate
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem

@@ -27,12 +27,22 @@ export default function PublicQuizLandingPage() {
 
   const startMutation = useMutation({
     mutationFn: () => sessionApi.startSession(quizCode!, { studentName: name.trim() }),
-    onSuccess: (session) => {
-      resetSession();
-      setQuiz(quiz!);
-      setSession(session);
-      setStudentName(name.trim());
-      navigate(`/quiz/${quizCode}/session`);
+    onSuccess: async (sessionData) => {
+      try {
+        const questions = await sessionApi.getSessionQuestions(quizCode!, sessionData.sessionId);
+        resetSession();
+        setQuiz({ ...quiz!, questions });
+        setSession(sessionData);
+        setStudentName(name.trim());
+        navigate(`/quiz/${quizCode}/session`);
+      } catch (err: any) {
+        const apiMsg = err.response?.data?.message || 'Failed to load session questions';
+        toast({
+          title: 'Error loading questions',
+          description: apiMsg,
+          variant: 'destructive',
+        });
+      }
     },
     onError: (err: any) => {
       const apiMsg = err.response?.data?.message || 'Failed to start quiz session';

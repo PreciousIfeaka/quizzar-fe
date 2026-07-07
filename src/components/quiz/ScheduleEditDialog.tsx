@@ -4,7 +4,8 @@ import { Calendar, Trash2, HelpCircle } from 'lucide-react';
 import { quizApi } from '../../api/quiz.api';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../ui/dialog';
 import { toast } from '../../hooks/use-toast';
-import type { Quiz } from '../../types/quiz.types';
+import type { Quiz, UpdateQuizRequest } from '../../types/quiz.types';
+import { cn } from '../../lib/utils';
 
 interface ScheduleEditDialogProps {
   open: boolean;
@@ -38,29 +39,33 @@ export default function ScheduleEditDialog({
 
   const [openAt, setOpenAt] = useState('');
   const [closeAt, setCloseAt] = useState('');
+  const [randomizeQuestionOrder, setRandomizeQuestionOrder] = useState(false);
+  const [shuffleOptions, setShuffleOptions] = useState(false);
 
   // Prefill when open
   useEffect(() => {
     if (open && quiz) {
       setOpenAt(toLocalDateString(quiz.scheduledOpenAt));
       setCloseAt(toLocalDateString(quiz.scheduledCloseAt));
+      setRandomizeQuestionOrder(quiz.randomizeQuestionOrder || false);
+      setShuffleOptions(quiz.shuffleOptions || false);
     }
   }, [open, quiz]);
 
   const mutation = useMutation({
-    mutationFn: (data: { scheduledOpenAt: string | null; scheduledCloseAt: string | null }) =>
-      quizApi.updateSchedule(quizId, data),
+    mutationFn: (data: UpdateQuizRequest) =>
+      quizApi.update(quizId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['quiz', quizId] });
       queryClient.invalidateQueries({ queryKey: ['quizzes'] });
       toast({
-        title: 'Schedule updated',
-        description: 'Quiz availability schedule has been updated successfully.',
+        title: 'Quiz Settings Updated',
+        description: 'Quiz schedule and behavior settings have been updated successfully.',
       });
       onOpenChange(false);
     },
     onError: (error: any) => {
-      const message = error.response?.data?.message || 'Failed to update schedule';
+      const message = error.response?.data?.message || 'Failed to update settings';
       toast({
         title: 'Update Failed',
         description: message,
@@ -100,6 +105,8 @@ export default function ScheduleEditDialog({
     mutation.mutate({
       scheduledOpenAt: utcOpen,
       scheduledCloseAt: utcClose,
+      randomizeQuestionOrder,
+      shuffleOptions,
     });
   };
 
@@ -114,13 +121,13 @@ export default function ScheduleEditDialog({
         <DialogHeader className="mb-4">
           <DialogTitle className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
             <Calendar className="w-5 h-5 text-[#0A99AB]" />
-            Quiz Schedule Settings
+            Quiz Settings & Schedule
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
           <p className="text-xs text-slate-500 leading-relaxed">
-            Schedule when this quiz becomes accessible to students and when it closes automatically. Leaving them empty makes the quiz always available once published.
+            Configure the schedule, question order, and choice shuffling rules for this quiz.
           </p>
 
           {/* Open Date/Time */}
@@ -149,10 +156,73 @@ export default function ScheduleEditDialog({
             />
           </div>
 
+          {/* Quiz Options */}
+          <div className="border-t border-slate-100 pt-4 mt-2 space-y-3">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              Quiz Options
+            </span>
+
+            {/* Randomize Questions Toggle */}
+            <div className="flex items-center justify-between p-3 bg-slate-50/50 border border-slate-100/50 rounded-xl">
+              <div className="space-y-0.5 pr-2">
+                <label className="text-xs font-bold text-slate-800 cursor-pointer animate-fade-in" htmlFor="randomize-questions">
+                  Randomize Questions
+                </label>
+                <p className="text-[10px] text-slate-400 leading-normal">
+                  Deliver questions in a dynamic randomized order to each student.
+                </p>
+              </div>
+              <button
+                type="button"
+                id="randomize-questions"
+                onClick={() => setRandomizeQuestionOrder(!randomizeQuestionOrder)}
+                className={cn(
+                  "w-10 h-5.5 rounded-full p-0.5 transition-colors focus:outline-none flex-shrink-0 cursor-pointer",
+                  randomizeQuestionOrder ? "bg-[#0A99AB]" : "bg-slate-200"
+                )}
+              >
+                <div
+                  className={cn(
+                    "w-4.5 h-4.5 rounded-full bg-white shadow-sm transition-transform duration-200",
+                    randomizeQuestionOrder ? "translate-x-4.5" : "translate-x-0"
+                  )}
+                />
+              </button>
+            </div>
+
+            {/* Shuffle Answer Options Toggle */}
+            <div className="flex items-center justify-between p-3 bg-slate-50/50 border border-slate-100/50 rounded-xl">
+              <div className="space-y-0.5 pr-2">
+                <label className="text-xs font-bold text-slate-800 cursor-pointer animate-fade-in" htmlFor="shuffle-options">
+                  Shuffle Answer Options
+                </label>
+                <p className="text-[10px] text-slate-400 leading-normal">
+                  Scramble multiple choice and true/false choice positions per student.
+                </p>
+              </div>
+              <button
+                type="button"
+                id="shuffle-options"
+                onClick={() => setShuffleOptions(!shuffleOptions)}
+                className={cn(
+                  "w-10 h-5.5 rounded-full p-0.5 transition-colors focus:outline-none flex-shrink-0 cursor-pointer",
+                  shuffleOptions ? "bg-[#0A99AB]" : "bg-slate-200"
+                )}
+              >
+                <div
+                  className={cn(
+                    "w-4.5 h-4.5 rounded-full bg-white shadow-sm transition-transform duration-200",
+                    shuffleOptions ? "translate-x-4.5" : "translate-x-0"
+                  )}
+                />
+              </button>
+            </div>
+          </div>
+
           <div className="bg-[#0A99AB]/5 rounded-xl p-3 flex items-start gap-2 border border-[#0A99AB]/10 mt-2">
             <HelpCircle className="w-4 h-4 text-[#0A99AB] flex-shrink-0 mt-0.5" />
             <div className="text-[10px] text-slate-500 leading-relaxed">
-              <strong>Draft vs Published:</strong> Students can never access Draft quizzes, regardless of the schedule. Make sure the status is set to Published for the schedule to take effect.
+              <strong>Draft vs Published:</strong> Students can never access Draft quizzes, regardless of the schedule or options. Make sure status is set to Published.
             </div>
           </div>
         </div>

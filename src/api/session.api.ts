@@ -1,5 +1,6 @@
 import { publicApi } from '../lib/axios';
 import type { PublicQuiz, QuizResult, StartSessionRequest, StartSessionResponse, SubmitAnswersRequest, SubmitAnswerRequest, QuestionResultResponse } from '../types/session.types';
+import type { Question } from '../types/quiz.types';
 
 export const sessionApi = {
   getPublicQuiz: (quizCode: string): Promise<PublicQuiz> =>
@@ -7,6 +8,9 @@ export const sessionApi = {
 
   startSession: (quizCode: string, data: StartSessionRequest): Promise<StartSessionResponse> =>
     publicApi.post(`/public/quiz/${quizCode}/start`, data).then(r => r.data.data),
+
+  getSessionQuestions: (quizCode: string, sessionId: string): Promise<Question[]> =>
+    publicApi.get(`/public/quiz/${quizCode}/sessions/${sessionId}/questions`).then(r => r.data.data),
 
   submitAnswers: (quizCode: string, sessionId: string, data: SubmitAnswersRequest): Promise<QuizResult> =>
     publicApi.post(`/public/quiz/${quizCode}/sessions/${sessionId}/submit`, data, { timeout: 60_000 })

@@ -34,6 +34,8 @@ export interface Quiz {
   scheduledOpenAt: string | null;
   scheduledCloseAt: string | null;
   status: 'DRAFT' | 'PUBLISHED';
+  randomizeQuestionOrder?: boolean;
+  shuffleOptions?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -49,6 +51,8 @@ export interface QuizSummary {
   scheduledOpenAt: string | null;
   scheduledCloseAt: string | null;
   status: 'DRAFT' | 'PUBLISHED';
+  randomizeQuestionOrder?: boolean;
+  shuffleOptions?: boolean;
   createdAt: string;
 }
 
@@ -67,6 +71,10 @@ export interface UpdateQuizRequest {
   quizMode?: QuizMode;
   timerValueSeconds?: number;
   status?: 'DRAFT' | 'PUBLISHED';
+  randomizeQuestionOrder?: boolean;
+  shuffleOptions?: boolean;
+  scheduledOpenAt?: string | null;
+  scheduledCloseAt?: string | null;
 }
 
 export interface AddQuestionRequest {

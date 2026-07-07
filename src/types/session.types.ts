@@ -12,6 +12,8 @@ export interface PublicQuiz {
   scheduledOpenAt: string | null;
   scheduledCloseAt: string | null;
   availabilityStatus: 'AVAILABLE' | 'NOT_YET_OPEN' | 'CLOSED';
+  randomizeQuestionOrder?: boolean;
+  shuffleOptions?: boolean;
 }
 
 export interface StartSessionRequest {

@@ -28,6 +28,9 @@ export const quizApi = {
   delete: (id: string): Promise<void> =>
     api.delete(`/api/v1/quizzes/${id}`).then(() => undefined),
 
+  clone: (id: string): Promise<Quiz> =>
+    api.post(`/api/v1/quizzes/${id}/clone`).then(r => r.data.data),
+
   regenerateCode: (id: string): Promise<{ quizCode: string; publicUrl: string }> =>
     api.post(`/api/v1/quizzes/${id}/regenerate-code`).then(r => r.data.data),
 

@@ -25,3 +25,4 @@ dist-ssr
 *.sw?
 AGENT_UI.md
 .antigravitycli
+readiness_assessment.md
