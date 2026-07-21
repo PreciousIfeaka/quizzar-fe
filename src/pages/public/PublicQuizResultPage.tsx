@@ -1,6 +1,6 @@
 import { useLocation, useNavigate, useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { RefreshCw, Clock, CheckCircle2 } from 'lucide-react';
+import { RefreshCw, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { sessionApi } from '../../api/session.api';
 import type { QuizResult } from '@/types/session.types';
@@ -51,7 +51,32 @@ export default function PublicQuizResultPage() {
     </div>
   );
 
-  if (!result) return null;
+  if (!result) return (
+    <div className="min-h-screen bg-gradient-to-br from-[#f4f7fc] via-[#f4f7fc] to-[#0A99AB]/5 flex flex-col items-center justify-center font-['Plus_Jakarta_Sans',sans-serif] relative overflow-hidden">
+      <div className="fixed inset-0 grid-pattern pointer-events-none z-0"></div>
+      <div className="bg-white p-8 rounded-3xl border border-slate-100/80 custom-shadow text-center space-y-6 max-w-md w-full mx-4 z-10">
+        <div className="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mx-auto shadow-inner">
+          <AlertCircle className="w-8 h-8" />
+        </div>
+        <div>
+          <h1 className="font-headline-md text-2xl font-black text-slate-900 mb-2 leading-tight">
+            Failed to Load Results
+          </h1>
+          <p className="text-slate-500 text-sm leading-relaxed">
+            We couldn't retrieve your quiz results. This might be due to a temporary network issue.
+          </p>
+        </div>
+        <div className="flex flex-col gap-2">
+          <Link
+            to={`/quiz/${quizCode}`}
+            className="w-full primary-gradient text-white py-3.5 px-6 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-[#0A99AB]/15 hover:scale-[1.01] active:scale-95 transition-all text-xs"
+          >
+            Back to Quiz Landing
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
 
   const pct = Math.round(result.percentageScore);
 

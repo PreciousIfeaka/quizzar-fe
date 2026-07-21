@@ -93,7 +93,14 @@ export default function PublicQuizSessionPage() {
     }
   });
 
-  if (!quiz || !session) return null;
+  if (!quiz || !session) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#f0f4f8] via-white to-[#0A99AB]/5 flex flex-col items-center justify-center font-['Plus_Jakarta_Sans',sans-serif]">
+        <LoadingSpinner size="lg" />
+        <p className="text-slate-500 text-sm mt-4">Redirecting to quiz landing...</p>
+      </div>
+    );
+  }
 
   const isPerQuestion = quiz.quizMode === 'PER_QUESTION';
 

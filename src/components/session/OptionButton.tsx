@@ -3,10 +3,10 @@ import { Check } from 'lucide-react';
 import { MathText } from '../common/MathText';
 
 interface OptionButtonProps {
-  label:    string;
-  text:     string;
+  label: string;
+  text: string;
   selected: boolean;
-  onClick:  () => void;
+  onClick: () => void;
   correct?: boolean | null;
   disabled?: boolean;
 }
@@ -16,11 +16,9 @@ export function OptionButton({
 }: OptionButtonProps) {
   const isResult = correct !== undefined && correct !== null;
 
-  // Strips prefixes like "A. ", "B) ", "c. ", etc.
-  const cleanedText = text.replace(/^[A-Da-d][.)\ -\s]+\s*/, '').trim();
+  const cleanedText = typeof text === 'string' ? text.replace(/^[A-Da-d][.)\ -\s]+\s*/, '').trim() : String(text ?? '');
 
-  // For T/F questions, label is a full word ("True"/"False"). Show only first letter.
-  const badgeLabel = _label.length > 1 ? _label[0] : _label;
+  const badgeLabel = typeof _label === 'string' && _label.length > 1 ? _label[0] : String(_label ?? '');
 
   return (
     <button
@@ -28,14 +26,13 @@ export function OptionButton({
       disabled={disabled}
       className={cn(
         'w-full flex items-center p-4 md:p-5 rounded-2xl border-2 text-left font-bold text-base relative overflow-hidden',
-        // Use targeted CSS transitions — much cheaper than transition-all
         'transition-[border-color,background-color,box-shadow,color] duration-150',
         !isResult && !selected && 'border-slate-200 bg-slate-50 text-slate-700 hover:border-[#0A99AB]/70 hover:bg-[#0A99AB]/5 hover:text-[#0A99AB]',
-        !isResult && selected  && 'border-[#0A99AB] bg-[#0A99AB]/10 text-slate-900 shadow-[0_0_20px_rgba(10,153,171,0.1)]',
-        isResult  && correct  && selected  && 'border-emerald-500 bg-emerald-50 text-emerald-700',
-        isResult  && !correct && selected  && 'border-red-500 bg-red-50 text-red-700',
-        isResult  && correct  && !selected && 'border-emerald-200 bg-emerald-50/50 text-emerald-600',
-        isResult  && !correct && !selected && 'border-slate-100 bg-slate-50 text-slate-400 opacity-60',
+        !isResult && selected && 'border-[#0A99AB] bg-[#0A99AB]/10 text-slate-900 shadow-[0_0_20px_rgba(10,153,171,0.1)]',
+        isResult && correct && selected && 'border-emerald-500 bg-emerald-50 text-emerald-700',
+        isResult && !correct && selected && 'border-red-500 bg-red-50 text-red-700',
+        isResult && correct && !selected && 'border-emerald-200 bg-emerald-50/50 text-emerald-600',
+        isResult && !correct && !selected && 'border-slate-100 bg-slate-50 text-slate-400 opacity-60',
         disabled && 'cursor-not-allowed'
       )}
     >
@@ -43,10 +40,10 @@ export function OptionButton({
       <div className={cn(
         'flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center font-black text-sm transition-colors duration-150',
         !isResult && !selected && 'bg-slate-200/50 text-slate-500',
-        !isResult && selected  && 'bg-[#0A99AB] text-white',
-        isResult  && correct  && 'bg-emerald-500 text-white',
-        isResult  && !correct && selected  && 'bg-red-500 text-white',
-        isResult  && !correct && !selected && 'bg-slate-200/30 text-slate-400'
+        !isResult && selected && 'bg-[#0A99AB] text-white',
+        isResult && correct && 'bg-emerald-500 text-white',
+        isResult && !correct && selected && 'bg-red-500 text-white',
+        isResult && !correct && !selected && 'bg-slate-200/30 text-slate-400'
       )}>
         {badgeLabel}
       </div>
