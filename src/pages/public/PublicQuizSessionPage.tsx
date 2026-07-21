@@ -22,13 +22,12 @@ export default function PublicQuizSessionPage() {
   const [feedback, setFeedback] = useState<QuestionResultResponse | null>(null);
   const questionStartTime = useRef(Date.now());
   const submittingRef = useRef(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Guard: redirect if no active session
   useEffect(() => {
     if (!quiz || !session) navigate(`/quiz/${quizCode}`, { replace: true });
   }, []);
-
-  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const submitMutation = useMutation({
     mutationFn: () => {
@@ -93,6 +92,114 @@ export default function PublicQuizSessionPage() {
     }
   });
 
+  const isPerQuestion = quiz?.quizMode === 'PER_QUESTION';
+  const timerMode = session?.timingMode;
+  const timerSeconds = session?.timerValueSeconds;
+
+  const currentQuestion = quiz?.questions?.[currentIndex];
+  const isLast = currentIndex === (quiz?.questions?.length || 0) - 1;
+
+  const currentAnswer = answers.find(a => a.questionId === currentQuestion?.id);
+  const progress = ((currentIndex + 1) / (quiz?.questions?.length || 1)) * 100;
+
+  const handleAnswer = (answer: Partial<AnswerSubmission>) => {
+    if (!currentQuestion || (quiz?.quizMode === 'PER_QUESTION' && feedback)) return;
+    const timeTaken = Math.round((Date.now() - questionStartTime.current) / 1000);
+    recordAnswer({ questionId: currentQuestion.id, timeTakenSeconds: timeTaken, ...answer });
+  };
+
+  const hasAnswered = !!(currentAnswer?.selectedOptionId || currentAnswer?.answerText?.trim());
+
+  const handleSubmitAnswer = () => {
+    if (!currentQuestion || submitSingleAnswerMutation.isPending || feedback || isSubmitting || submittingRef.current) return;
+
+    submittingRef.current = true;
+    setIsSubmitting(true);
+
+    const timeTaken = Math.round((Date.now() - questionStartTime.current) / 1000);
+    recordAnswer({
+      questionId: currentQuestion.id,
+      selectedOptionId: currentAnswer?.selectedOptionId,
+      answerText: currentAnswer?.answerText,
+      timeTakenSeconds: timeTaken
+    });
+
+    submitSingleAnswerMutation.mutate({
+      questionId: currentQuestion.id,
+      selectedOptionId: currentAnswer?.selectedOptionId,
+      answerText: currentAnswer?.answerText,
+      timeTakenSeconds: timeTaken
+    });
+  };
+
+  const handleNext = () => {
+    if (isPerQuestion) {
+      if (!feedback) {
+        handleSubmitAnswer();
+      } else {
+        if (isLast) {
+          setIsSubmitting(true);
+          submittingRef.current = true;
+          completeMutation.mutate();
+        } else {
+          setDirection(1);
+          setFeedback(null);
+          submittingRef.current = false;
+          nextQuestion();
+          questionStartTime.current = Date.now();
+        }
+      }
+    } else {
+      if (submitMutation.isPending || isSubmitting || submittingRef.current) return;
+      setDirection(1);
+      if (isLast) {
+        setIsSubmitting(true);
+        submittingRef.current = true;
+        submitMutation.mutate();
+      } else {
+        nextQuestion();
+        questionStartTime.current = Date.now();
+      }
+    }
+  };
+
+  // Auto-submit if user reconnected/refocused and time has already run out
+  useEffect(() => {
+    if (!quiz || !session) return;
+    const handleReconnected = () => {
+      if (
+        isPerQuestion &&
+        timerMode === 'PER_QUESTION' &&
+        timerSeconds &&
+        !feedback &&
+        !submittingRef.current &&
+        navigator.onLine
+      ) {
+        const elapsedTime = (Date.now() - questionStartTime.current) / 1000;
+        if (elapsedTime >= timerSeconds) {
+          handleSubmitAnswer();
+        }
+      }
+    };
+
+    window.addEventListener('online', handleReconnected);
+    window.addEventListener('focus', handleReconnected);
+    
+    // Check immediately on mount/update
+    handleReconnected();
+
+    // Periodically check every second to recover from offline/throttled states
+    const interval = setInterval(handleReconnected, 1000);
+
+    return () => {
+      window.removeEventListener('online', handleReconnected);
+      window.removeEventListener('focus', handleReconnected);
+      clearInterval(interval);
+    };
+  }, [isPerQuestion, timerMode, timerSeconds, feedback]);
+
+  // --- CONDITIONAL RETURNS (Rendered at the very end of the function body) ---
+
   if (!quiz || !session) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#f0f4f8] via-white to-[#0A99AB]/5 flex flex-col items-center justify-center font-['Plus_Jakarta_Sans',sans-serif]">
@@ -101,8 +208,6 @@ export default function PublicQuizSessionPage() {
       </div>
     );
   }
-
-  const isPerQuestion = quiz.quizMode === 'PER_QUESTION';
 
   if (isSubmitting && !submitError) {
     return (
@@ -176,111 +281,7 @@ export default function PublicQuizSessionPage() {
     );
   }
 
-  const currentQuestion = quiz.questions?.[currentIndex];
-  const isLast = currentIndex === (quiz.questions?.length || 0) - 1;
-
-  const currentAnswer = answers.find(a => a.questionId === currentQuestion?.id);
-  const progress = ((currentIndex + 1) / (quiz.questions?.length || 1)) * 100;
-
   if (!currentQuestion) return null;
-
-  const handleAnswer = (answer: Partial<AnswerSubmission>) => {
-    if (quiz.quizMode === 'PER_QUESTION' && feedback) return;
-    const timeTaken = Math.round((Date.now() - questionStartTime.current) / 1000);
-    recordAnswer({ questionId: currentQuestion.id, timeTakenSeconds: timeTaken, ...answer });
-  };
-
-  const hasAnswered = !!(currentAnswer?.selectedOptionId || currentAnswer?.answerText?.trim());
-
-  const handleSubmitAnswer = () => {
-    if (submitSingleAnswerMutation.isPending || feedback || isSubmitting || submittingRef.current) return;
-
-    submittingRef.current = true;
-    setIsSubmitting(true);
-
-    const timeTaken = Math.round((Date.now() - questionStartTime.current) / 1000);
-    recordAnswer({
-      questionId: currentQuestion.id,
-      selectedOptionId: currentAnswer?.selectedOptionId,
-      answerText: currentAnswer?.answerText,
-      timeTakenSeconds: timeTaken
-    });
-
-    submitSingleAnswerMutation.mutate({
-      questionId: currentQuestion.id,
-      selectedOptionId: currentAnswer?.selectedOptionId,
-      answerText: currentAnswer?.answerText,
-      timeTakenSeconds: timeTaken
-    });
-  };
-
-  const handleNext = () => {
-    if (isPerQuestion) {
-      if (!feedback) {
-        handleSubmitAnswer();
-      } else {
-        if (isLast) {
-          setIsSubmitting(true);
-          submittingRef.current = true;
-          completeMutation.mutate();
-        } else {
-          setDirection(1);
-          setFeedback(null);
-          submittingRef.current = false;
-          nextQuestion();
-          questionStartTime.current = Date.now();
-        }
-      }
-    } else {
-      if (submitMutation.isPending || isSubmitting || submittingRef.current) return;
-      setDirection(1);
-      if (isLast) {
-        setIsSubmitting(true);
-        submittingRef.current = true;
-        submitMutation.mutate();
-      } else {
-        nextQuestion();
-        questionStartTime.current = Date.now();
-      }
-    }
-  };
-
-  const timerMode = session.timingMode;
-  const timerSeconds = session.timerValueSeconds;
-
-  // Auto-submit if user reconnected/refocused and time has already run out
-  useEffect(() => {
-    const handleReconnected = () => {
-      if (
-        isPerQuestion &&
-        timerMode === 'PER_QUESTION' &&
-        timerSeconds &&
-        !feedback &&
-        !submittingRef.current &&
-        navigator.onLine
-      ) {
-        const elapsedTime = (Date.now() - questionStartTime.current) / 1000;
-        if (elapsedTime >= timerSeconds) {
-          handleSubmitAnswer();
-        }
-      }
-    };
-
-    window.addEventListener('online', handleReconnected);
-    window.addEventListener('focus', handleReconnected);
-    
-    // Check immediately on mount/update
-    handleReconnected();
-
-    // Periodically check every second to recover from offline/throttled states
-    const interval = setInterval(handleReconnected, 1000);
-
-    return () => {
-      window.removeEventListener('online', handleReconnected);
-      window.removeEventListener('focus', handleReconnected);
-      clearInterval(interval);
-    };
-  }, [isPerQuestion, timerMode, timerSeconds, feedback]);
 
   const getModeLabel = () => {
     if (isPerQuestion) return 'INSTANT FEEDBACK';
